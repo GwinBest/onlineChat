@@ -1,8 +1,11 @@
-#pragma once
+#ifndef _ONLINE	CHAT_CLIENT_CLIENT_H_
+#define _ONLINE_CHAT_CLIENT_CLIENT_H_
+
 #pragma comment (lib, "ws2_32.lib")
 #pragma warning (disable:4996)
 
 #include <iostream>
+#include <thread>
 
 #include <winsock2.h>
 
@@ -30,17 +33,15 @@ namespace Network
 
 	public:
 		Client(const std::string ipAddress, const uint32_t port);
-		~Client();
 
 		bool Connect();
 		bool Disconnect();
 
 		void Send(size_t userId, const char* data, size_t dataSize);
-		void StartReceiveThread();
-
-	private:
-		static void ReceiveThread(LPVOID lpParam);
 		void Receive();
-		
+
+		~Client();
 	};
 }
+
+#endif // !_ONLINE_CHAT_CLIENT_CLIENT_H_

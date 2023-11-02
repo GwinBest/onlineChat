@@ -12,7 +12,7 @@ endif()
 project ("OnlineChat")
 
 # Add source to this project's executable.
-add_executable (OnlineChat "test/main.cpp" "src/client/client.cpp" "src/buffer.h")
+add_executable (OnlineChat "test/main.cpp" "src/client/client.cpp" )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET OnlineChat PROPERTY CXX_STANDARD 20)

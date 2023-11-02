@@ -8,22 +8,20 @@ namespace Network
 		this->_ipAddress = ipAddress;
 
 		if (WSAStartup(this->_dllVersion, &this->_wsaData))
+		{
 			throw (std::logic_error("Wsa error"));
+		}
 
 		this->_socketAddress.sin_family = AF_INET;
 		this->_socketAddress.sin_addr.s_addr = inet_addr(this->_ipAddress.c_str());
 		this->_socketAddress.sin_port = htons(this->_port);
 
 		if ((this->_clientSocket = socket(AF_INET, SOCK_STREAM, NULL)) == INVALID_SOCKET)
+		{
 			throw (std::logic_error("socket error"));
+		}
 
 		this->_clientStatus = kCLientInited;
-	}
-
-	Client::~Client()
-	{
-		if (this->_clientStatus != kClientDisconnected)
-			Client::Disconnect();
 	}
 
 	bool Client::Connect()
@@ -40,11 +38,11 @@ namespace Network
 			return false;
 		}
 
-		recv(this->_clientSocket, reinterpret_cast<char*>(&this->_clientId), sizeof(size_t), NULL);
+		recv(this->_clientSocket, reinterpret_cast<char*>(&this->_clientId), sizeof(size_t), NULL);			//receive client id
 		std::cout << this->_clientId;
 
 		this->_clientStatus = kClientConnected;
-
+			
 		return true;
 	}
 
@@ -73,25 +71,17 @@ namespace Network
 		return true;
 	}
 
+	Client::~Client()
+	{
+		if (this->_clientStatus != kClientDisconnected)
+			Client::Disconnect();
+	}
+
 	void Client::Send(size_t userId, const char* data, size_t dataSize)
 	{
-		send(this->_clientSocket, reinterpret_cast<char*>(&userId), sizeof(size_t), NULL);
-		send(this->_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(size_t), NULL);
-		send(this->_clientSocket, data, dataSize, NULL);
-		
-		Sleep(10);
-	}
-
-	void Client::StartReceiveThread()
-	{
-		CreateThread(NULL, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(Client::ReceiveThread), this, NULL, NULL);
-	}
-
-	void Client::ReceiveThread(LPVOID lpParam)
-	{
-		Client* client = static_cast<Client*>(lpParam);
-		client->Receive();
-		delete client;
+		send(this->_clientSocket, reinterpret_cast<char*>(&userId), sizeof(size_t), NULL);			// send the receiver's id
+		send(this->_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(size_t), NULL);		// send the size of the message
+		send(this->_clientSocket, data, dataSize, NULL);											// send the message
 	}
 
 	void Client::Receive()
@@ -112,4 +102,5 @@ namespace Network
 			}
 		}
 	}
-}
+
+}		// !namespace Network

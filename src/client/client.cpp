@@ -71,12 +71,6 @@ namespace Network
 		return true;
 	}
 
-	Client::~Client()
-	{
-		if (this->_clientStatus != kClientDisconnected)
-			Client::Disconnect();
-	}
-
 	void Client::Send(size_t userId, const char* data, size_t dataSize)
 	{
 		send(this->_clientSocket, reinterpret_cast<char*>(&userId), sizeof(size_t), NULL);			// send the receiver's id
@@ -101,6 +95,12 @@ namespace Network
 				delete[] receiveMessage;
 			}
 		}
+	}
+
+	Client::~Client()
+	{
+		if (this->_clientStatus != kClientDisconnected)
+			Client::Disconnect();
 	}
 
 }// !namespace Network

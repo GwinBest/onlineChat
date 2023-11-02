@@ -43,5 +43,4 @@ namespace Network
 		~Client();
 	};
 }
-
 #endif // !_ONLINE_CHAT_CLIENT_CLIENT_H_

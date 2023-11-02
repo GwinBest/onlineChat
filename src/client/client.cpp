@@ -29,13 +29,19 @@ namespace Network
 	bool Client::Connect()
 	{
 		if (this->_clientStatus != kCLientInited)
+		{
+			std::cout << "Client already connected" << std::endl;
 			return false;
+		}
 
 		if (connect(this->_clientSocket, reinterpret_cast<SOCKADDR*>(&this->_socketAddress), sizeof(this->_socketAddress)) != 0)
 		{
 			std::cout << "connect error " << GetLastError() << std::endl;
 			return false;
 		}
+
+		recv(this->_clientSocket, reinterpret_cast<char*>(&this->_clientId), sizeof(size_t), NULL);
+		std::cout << this->_clientId;
 
 		this->_clientStatus = kClientConnected;
 
@@ -45,19 +51,34 @@ namespace Network
 	bool Client::Disconnect()
 	{
 		if (this->_clientStatus == kClientDisconnected)
+		{
+			std::cout << "Client already disconnected " << std::endl;
 			return false;
-		
-		WSACleanup();
-		closesocket(this->_clientSocket);
+		}
+
+		if (WSACleanup() == SOCKET_ERROR)
+		{
+			std::cout << "wsaCleanup error " << GetLastError() << std::endl;
+			return false;
+		}
+
+		if (closesocket(this->_clientSocket) == SOCKET_ERROR)
+		{
+			std::cout << "closesocket error " << GetLastError() << std::endl;
+			return false;
+		}
+
 		this->_clientStatus = kClientDisconnected;
 
 		return true;
 	}
 
-	void Client::Send(const char* data, size_t dataSize)
+	void Client::Send(size_t userId, const char* data, size_t dataSize)
 	{
+		send(this->_clientSocket, reinterpret_cast<char*>(&userId), sizeof(size_t), NULL);
 		send(this->_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(size_t), NULL);
-		send(this->_clientSocket, data, dataSize, NULL);
+		send(this->_clientSocket, data, dataSize, NULL) == SOCKET_ERROR;
+		
 		Sleep(10);
 	}
 

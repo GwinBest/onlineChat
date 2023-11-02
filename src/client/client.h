@@ -6,8 +6,6 @@
 
 #include <winsock2.h>
 
-#include "../buffer.h"
-
 namespace Network
 {
 	class Client
@@ -26,9 +24,9 @@ namespace Network
 		SOCKADDR_IN _socketAddress;
 		uint8_t _clientStatus = kClientDisconnected;
 
+		size_t _clientId;
 		std::string _ipAddress;
 		uint32_t _port;
-		DataBuffer_t _Buffer;
 
 	public:
 		Client(const std::string ipAddress, const uint32_t port);
@@ -37,11 +35,12 @@ namespace Network
 		bool Connect();
 		bool Disconnect();
 
-		void Send(const char* data, size_t dataSize);
+		void Send(size_t userId, const char* data, size_t dataSize);
 		void StartReceiveThread();
 
 	private:
 		static void ReceiveThread(LPVOID lpParam);
 		void Receive();
+		
 	};
 }

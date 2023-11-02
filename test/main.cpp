@@ -13,10 +13,13 @@ int main()
 	
 
 	std::string buffer;
+	size_t id;
 	while (true)
 	{
+		std::cin >> id;
 		std::cin >> buffer;
-		client.Send(buffer.c_str(), buffer.size());
+		client.Send(id, buffer.c_str(), buffer.size());
+
 	}
 
 	system("pause");

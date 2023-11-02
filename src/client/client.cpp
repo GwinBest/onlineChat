@@ -77,7 +77,7 @@ namespace Network
 	{
 		send(this->_clientSocket, reinterpret_cast<char*>(&userId), sizeof(size_t), NULL);
 		send(this->_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(size_t), NULL);
-		send(this->_clientSocket, data, dataSize, NULL) == SOCKET_ERROR;
+		send(this->_clientSocket, data, dataSize, NULL);
 		
 		Sleep(10);
 	}

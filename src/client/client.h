@@ -4,10 +4,10 @@
 #pragma comment (lib, "ws2_32.lib")
 #pragma warning (disable:4996)
 
+#include <winsock2.h>
+
 #include <iostream>
 #include <thread>
-
-#include <winsock2.h>
 
 namespace Network
 {

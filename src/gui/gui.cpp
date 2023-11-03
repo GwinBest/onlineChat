@@ -35,6 +35,19 @@ namespace Gui
 		return true;
 	}
 
+	void MainWindow::Draw()
+	{
+		if (this->_windowStatus != kWIndowInited)
+			return;
+
+		while (!glfwWindowShouldClose(this->_window))
+		{
+			MainWindow::NewFrame();
+			MainWindow::Update();
+			MainWindow::Render();
+		}
+	}
+
 	void MainWindow::NewFrame()
 	{
 		if (this->_windowStatus != kWIndowInited)

@@ -24,6 +24,7 @@ namespace Gui
 			kWindowDeleted	 = 2
 		};
 		const char* _glslVersion = "#version 130";
+		GLFWwindow* _window = nullptr;
 		const ImVec4 _windowColorBackground = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 		ImGuiIO _io;
 
@@ -33,15 +34,17 @@ namespace Gui
 		uint8_t _windowStatus = kWIndowUndefined;
 
 	public:
-		GLFWwindow* _window = nullptr;
 		MainWindow() = default;
 		~MainWindow();
 
 		bool Init();
+		void Draw();
+		void Cleanup();
+
+	private:
 		void NewFrame();
 		void Update();
 		void Render();
-		void Cleanup();
 	};
 }
 

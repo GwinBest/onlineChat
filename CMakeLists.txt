@@ -21,16 +21,14 @@ add_executable (OnlineChat
 				"src/client/client.cpp" 
 				"src/gui/gui.cpp"
 				"dependencies/imgui/include/imgui.cpp" 
+				"dependencies/imgui/include/imgui_stdlib.cpp"
 				"dependencies/imgui/include/imgui_demo.cpp"
 				"dependencies/imgui/include/imgui_draw.cpp"
 				"dependencies/imgui/include/imgui_impl_glfw.cpp"
 				"dependencies/imgui/include/imgui_impl_opengl3.cpp"
 				"dependencies/imgui/include/imgui_tables.cpp"
 				"dependencies/imgui/include/imgui_widgets.cpp"
-				"dependencies/imgui/include/imgui_impl_glfw.h"
-				"dependencies/imgui/include/imgui_impl_opengl3.h"
-				"dependencies/imgui/include/imgui_impl_opengl3_loader.h"
-				"src/gui/gui.h")
+)
 
 target_link_libraries(OnlineChat
 	opengl32.lib

@@ -43,7 +43,7 @@ namespace Gui
 
 	private:
 		void NewFrame();
-		void Update();
+		void GenerateControls();
 		void Render();
 	};
 }

@@ -43,7 +43,7 @@ namespace Gui
 		while (!glfwWindowShouldClose(this->_window))
 		{
 			MainWindow::NewFrame();
-			MainWindow::Update();
+			MainWindow::GenerateControls();
 			MainWindow::Render();
 		}
 	}
@@ -59,12 +59,13 @@ namespace Gui
 		ImGui::NewFrame();
 	}
 
-	void MainWindow::Update() 
+	void MainWindow::GenerateControls() 
 	{
 		if (this->_windowStatus != kWIndowInited)
 			return;
 
 		//rendering Gui
+		
 	}
 
 	void MainWindow::Render()

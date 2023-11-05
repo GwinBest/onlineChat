@@ -2,7 +2,7 @@
 
 namespace Network 
 {
-	Client& Client::GetInstance()
+	Client& Client::GetInstance() noexcept
 	{
 		static Client instance;
 		if (instance._clientStatus != kClientConnected)
@@ -11,14 +11,14 @@ namespace Network
 		return instance;
 	}
 
-	void Client::Send(size_t userId, const char* data, size_t dataSize)
+	void Client::Send(size_t userId, const char* data, size_t dataSize) noexcept
 	{
 		send(this->_clientSocket, reinterpret_cast<char*>(&userId), sizeof(size_t), NULL);			// send the receiver's id
 		send(this->_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(size_t), NULL);		// send the size of the message
 		send(this->_clientSocket, data, dataSize, NULL);											// send the message
 	}
 
-	void Client::Receive()
+	void Client::Receive() noexcept
 	{
 		size_t receiveMessageSize;
 
@@ -37,13 +37,13 @@ namespace Network
 		}
 	}
 
-	Client::~Client()
+	Client::~Client() noexcept
 	{
 		if (this->_clientStatus != kClientDisconnected)
 			Client::Disconnect();
 	}
 
-	Client::Client()
+	Client::Client() noexcept
 	{
 		WSAStartup(this->_dllVersion, &this->_wsaData);
 
@@ -56,7 +56,7 @@ namespace Network
 		this->_clientStatus = kCLientInited;
 	}
 
-	bool Client::Connect()
+	bool Client::Connect() noexcept
 	{
 		if (this->_clientStatus != kCLientInited)
 		{
@@ -78,7 +78,7 @@ namespace Network
 		return true;
 	}
 
-	bool Client::Disconnect()
+	bool Client::Disconnect() noexcept
 	{
 		if (this->_clientStatus == kClientDisconnected)
 		{

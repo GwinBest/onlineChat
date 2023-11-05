@@ -35,7 +35,7 @@ namespace Network
 		Client(const Client&) = delete;
 		void operator= (const Client&) = delete;
 
-		static Client& getInstance();
+		static Client& GetInstance();
 
 		void Send(size_t userId, const char* data, size_t dataSize);
 		void Receive();

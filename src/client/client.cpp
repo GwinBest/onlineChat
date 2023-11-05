@@ -2,7 +2,7 @@
 
 namespace Network 
 {
-	Client& Client::getInstance()
+	Client& Client::GetInstance()
 	{
 		static Client instance;
 		if (instance._clientStatus != kClientConnected)

@@ -19,7 +19,7 @@ include_directories(dependencies/imgui/include dependencies/imgui/glfw/include)
 add_executable (OnlineChat
 				"test/main.cpp" 
 				"src/client/client.cpp" 
-				"src/gui/gui.cpp"
+				"src/gui/mainWindow.cpp"
 				"dependencies/imgui/include/imgui.cpp" 
 				"dependencies/imgui/include/imgui_stdlib.cpp"
 				"dependencies/imgui/include/imgui_demo.cpp"

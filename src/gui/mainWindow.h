@@ -1,7 +1,10 @@
 #ifndef _ONLINECHAT_GUI_GUI_H_
 #define _ONLINECHAT_GUI_GUI_H_
 
+#include <thread>
+
 #include "imgui.h"
+#include "imgui_stdlib.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
@@ -11,6 +14,7 @@
 #pragma comment(lib, "legacy_stdio_definitions")
 #endif
 
+#include "../client/client.h"
 
 namespace Gui
 {
@@ -26,12 +30,13 @@ namespace Gui
 		const char* _glslVersion = "#version 130";
 		GLFWwindow* _window = nullptr;
 		const ImVec4 _windowColorBackground = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-		ImGuiIO _io;
 
 		int _currentDisplayHeight;
 		int _currentDisplayWidth;
 
 		uint8_t _windowStatus = kWIndowUndefined;
+
+		std::string _buffer;
 
 	public:
 		MainWindow() = default;

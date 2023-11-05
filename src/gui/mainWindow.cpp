@@ -1,4 +1,4 @@
-#include "gui.h"
+#include "mainWindow.h"
 
 namespace Gui
 {
@@ -21,9 +21,9 @@ namespace Gui
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 
-		this->_io = ImGui::GetIO();
-		this->_io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-		this->_io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
 
 		ImGui::StyleColorsDark();
 
@@ -64,7 +64,22 @@ namespace Gui
 		if (this->_windowStatus != kWIndowInited)
 			return;
 
-		//rendering Gui
+		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());				//enable docking 
+
+		ImGui::Begin(" ");
+	
+
+		ImGui::InputText("gfd", &this->_buffer);
+
+		if(ImGui::Button("hello") && this->_buffer != "")
+		{
+			Network::Client::GetInstance().Send(2, this->_buffer.c_str(), this->_buffer.size());
+			this->_buffer = "";
+		}
+
+
+
+		ImGui::End();
 		
 	}
 
@@ -96,6 +111,8 @@ namespace Gui
 
 		glfwDestroyWindow(this->_window);
 		glfwTerminate();
+
+		Network::Client::GetInstance().~Client();
 
 		this->_windowStatus = kWindowDeleted;
 	}

@@ -1,26 +1,14 @@
-#include "../src/client/client.h"
+#include "../src/gui/gui.h"
 
 using namespace Network;
 
+#include <thread>
+
 int main()
 {
-	Client::getInstance().Send(1,"af",1);
-	Client::getInstance().Send(1,"gdg",1);
-
-	//std::thread thread(&Client::Receive, &client);
-
-	//std::string buffer;
-	//size_t id;
-	//while (true)
-	//{
-	//	std::cin >> id;
-	//	std::cin >> buffer;
-	//	client.Send(id, buffer.c_str(), buffer.size());
-
-	//}
-
-	//system("pause");
-
-	//thread.join();
+	Gui::MainWindow window;
+	window.Init();
+	window.Draw();
+	window.Cleanup();
 	return 0;
 }

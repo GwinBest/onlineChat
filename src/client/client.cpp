@@ -4,9 +4,6 @@ namespace Network
 {
 	Client::Client(std::string ipAddress, const uint32_t port)
 	{
-		this->_port = port;
-		this->_ipAddress = ipAddress;
-
 		if (WSAStartup(this->_dllVersion, &this->_wsaData))
 			throw (std::logic_error("Wsa error"));
 		

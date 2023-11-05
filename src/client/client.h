@@ -28,8 +28,8 @@ namespace Network
 		uint8_t _clientStatus = kClientDisconnected;
 
 		size_t _clientId;
-		std::string _ipAddress;
-		uint32_t _port;
+		const std::string _ipAddress = "127.0.0.1";
+		static constexpr uint32_t _port = 1111;
 
 	public:
 		Client(const std::string ipAddress, const uint32_t port);
@@ -42,5 +42,7 @@ namespace Network
 
 		~Client();
 	};
-}
+
+} //!namespase Network
+
 #endif // !_ONLINE_CHAT_CLIENT_CLIENT_H_

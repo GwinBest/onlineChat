@@ -10,7 +10,7 @@ namespace Gui
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-		this->_window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
+		this->_window = glfwCreateWindow(1280, 720, "Online Chat", nullptr, nullptr);
 		if (this->_window == nullptr)
 			return false;
 

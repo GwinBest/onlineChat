@@ -45,16 +45,14 @@ namespace Network
 
 	Client::Client()
 	{
-		if (WSAStartup(this->_dllVersion, &this->_wsaData))
-			throw (std::logic_error("Wsa error"));
+		WSAStartup(this->_dllVersion, &this->_wsaData);
 
 		this->_socketAddress.sin_family = AF_INET;
 		this->_socketAddress.sin_addr.s_addr = inet_addr(this->_ipAddress.c_str());
 		this->_socketAddress.sin_port = htons(this->_port);
 
-		if ((this->_clientSocket = socket(AF_INET, SOCK_STREAM, NULL)) == INVALID_SOCKET)
-			throw (std::logic_error("socket error"));
-
+		socket(AF_INET, SOCK_STREAM, NULL);
+			
 		this->_clientStatus = kCLientInited;
 	}
 

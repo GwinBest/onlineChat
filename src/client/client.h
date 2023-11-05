@@ -35,18 +35,18 @@ namespace Network
 		Client(const Client&) = delete;
 		void operator= (const Client&) = delete;
 
-		static Client& GetInstance();
+		static Client& GetInstance() noexcept;
 
-		void Send(size_t userId, const char* data, size_t dataSize);
-		void Receive();
+		void Send(size_t userId, const char* data, size_t dataSize) noexcept;
+		void Receive() noexcept;
 
 		~Client();
 
 	private:
-		Client();
+		Client() noexcept;
 
-		bool Connect();
-		bool Disconnect();
+		bool Connect() noexcept;
+		bool Disconnect() noexcept;
 	};
 
 } //!namespase Network

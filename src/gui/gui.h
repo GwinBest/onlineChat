@@ -25,7 +25,7 @@ namespace Gui
 		};
 		const char* _glslVersion = "#version 130";
 		GLFWwindow* _window = nullptr;
-		const ImVec4 _windowColorBackground = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+		const ImVec4 _windowColorBackground = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
 		ImGuiIO _io;
 
 		int _currentDisplayHeight;
@@ -46,32 +46,8 @@ namespace Gui
 		void GenerateControls();
 		void Render();
 	};
-}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}//!namespace Gui
 
 #endif // !_ONLINECHAT_GUI_GUI_H_
 

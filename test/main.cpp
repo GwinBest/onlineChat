@@ -4,23 +4,23 @@ using namespace Network;
 
 int main()
 {
-	Client client("127.0.0.1", 1111);
-	client.Connect();
+	Client::getInstance().Send(1,"af",1);
+	Client::getInstance().Send(1,"gdg",1);
 
-	std::thread thread(&Client::Receive, &client);
+	//std::thread thread(&Client::Receive, &client);
 
-	std::string buffer;
-	size_t id;
-	while (true)
-	{
-		std::cin >> id;
-		std::cin >> buffer;
-		client.Send(id, buffer.c_str(), buffer.size());
+	//std::string buffer;
+	//size_t id;
+	//while (true)
+	//{
+	//	std::cin >> id;
+	//	std::cin >> buffer;
+	//	client.Send(id, buffer.c_str(), buffer.size());
 
-	}
+	//}
 
-	system("pause");
+	//system("pause");
 
-	thread.join();
+	//thread.join();
 	return 0;
 }

@@ -2,66 +2,13 @@
 
 namespace Network 
 {
-	Client::Client(std::string ipAddress, const uint32_t port)
+	Client& Client::getInstance()
 	{
-		if (WSAStartup(this->_dllVersion, &this->_wsaData))
-			throw (std::logic_error("Wsa error"));
-		
-		this->_socketAddress.sin_family = AF_INET;
-		this->_socketAddress.sin_addr.s_addr = inet_addr(this->_ipAddress.c_str());
-		this->_socketAddress.sin_port = htons(this->_port);
+		static Client instance;
+		if (instance._clientStatus != kClientConnected)
+			instance.Connect();
 
-		if ((this->_clientSocket = socket(AF_INET, SOCK_STREAM, NULL)) == INVALID_SOCKET)
-			throw (std::logic_error("socket error"));
-
-		this->_clientStatus = kCLientInited;
-	}
-
-	bool Client::Connect()
-	{
-		if (this->_clientStatus != kCLientInited)
-		{
-			std::cout << "Client already connected" << std::endl;
-			return false;
-		}
-
-		if (connect(this->_clientSocket, reinterpret_cast<SOCKADDR*>(&this->_socketAddress), sizeof(this->_socketAddress)) != 0)
-		{
-			std::cout << "connect error " << GetLastError() << std::endl;
-			return false;
-		}
-
-		recv(this->_clientSocket, reinterpret_cast<char*>(&this->_clientId), sizeof(size_t), NULL);			//receive client id
-		std::cout << this->_clientId;
-
-		this->_clientStatus = kClientConnected;
-			
-		return true;
-	}
-
-	bool Client::Disconnect()
-	{
-		if (this->_clientStatus == kClientDisconnected)
-		{
-			std::cout << "Client already disconnected " << std::endl;
-			return false;
-		}
-
-		if (WSACleanup() == SOCKET_ERROR)
-		{
-			std::cout << "wsaCleanup error " << GetLastError() << std::endl;
-			return false;
-		}
-
-		if (closesocket(this->_clientSocket) == SOCKET_ERROR)
-		{
-			std::cout << "closesocket error " << GetLastError() << std::endl;
-			return false;
-		}
-
-		this->_clientStatus = kClientDisconnected;
-
-		return true;
+		return instance;
 	}
 
 	void Client::Send(size_t userId, const char* data, size_t dataSize)
@@ -94,6 +41,68 @@ namespace Network
 	{
 		if (this->_clientStatus != kClientDisconnected)
 			Client::Disconnect();
+	}
+
+	Client::Client()
+	{
+		if (WSAStartup(this->_dllVersion, &this->_wsaData))
+			throw (std::logic_error("Wsa error"));
+
+		this->_socketAddress.sin_family = AF_INET;
+		this->_socketAddress.sin_addr.s_addr = inet_addr(this->_ipAddress.c_str());
+		this->_socketAddress.sin_port = htons(this->_port);
+
+		if ((this->_clientSocket = socket(AF_INET, SOCK_STREAM, NULL)) == INVALID_SOCKET)
+			throw (std::logic_error("socket error"));
+
+		this->_clientStatus = kCLientInited;
+	}
+
+	bool Client::Connect()
+	{
+		if (this->_clientStatus != kCLientInited)
+		{
+			std::cout << "Client already connected" << std::endl;
+			return false;
+		}
+
+		if (connect(this->_clientSocket, reinterpret_cast<SOCKADDR*>(&this->_socketAddress), sizeof(this->_socketAddress)) != 0)
+		{
+			std::cout << "connect error " << GetLastError() << std::endl;
+			return false;
+		}
+
+		recv(this->_clientSocket, reinterpret_cast<char*>(&this->_clientId), sizeof(size_t), NULL);			//receive client id
+		std::cout << this->_clientId;
+
+		this->_clientStatus = kClientConnected;
+
+		return true;
+	}
+
+	bool Client::Disconnect()
+	{
+		if (this->_clientStatus == kClientDisconnected)
+		{
+			std::cout << "Client already disconnected " << std::endl;
+			return false;
+		}
+
+		if (WSACleanup() == SOCKET_ERROR)
+		{
+			std::cout << "wsaCleanup error " << GetLastError() << std::endl;
+			return false;
+		}
+
+		if (closesocket(this->_clientSocket) == SOCKET_ERROR)
+		{
+			std::cout << "closesocket error " << GetLastError() << std::endl;
+			return false;
+		}
+
+		this->_clientStatus = kClientDisconnected;
+
+		return true;
 	}
 
 }// !namespace Network

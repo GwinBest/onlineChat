@@ -17,8 +17,8 @@ namespace Network
 		enum clientStatusCode : uint8_t
 		{
 			kClientDisconnected = 0,
-			kCLientInited		= 1,
-			kClientConnected	= 2,
+			kCLientInited = 1,
+			kClientConnected = 2,
 		};
 
 		static constexpr WORD _dllVersion = MAKEWORD(2, 2);
@@ -32,15 +32,21 @@ namespace Network
 		static constexpr uint32_t _port = 1111;
 
 	public:
-		Client(const std::string ipAddress, const uint32_t port);
+		Client(const Client&) = delete;
+		void operator= (const Client&) = delete;
 
-		bool Connect();
-		bool Disconnect();
+		static Client& getInstance();
 
 		void Send(size_t userId, const char* data, size_t dataSize);
 		void Receive();
 
 		~Client();
+
+	private:
+		Client();
+
+		bool Connect();
+		bool Disconnect();
 	};
 
 } //!namespase Network

@@ -46,7 +46,7 @@ namespace Network
 		Client() noexcept;
 
 		bool Connect() noexcept;
-		bool Disconnect() noexcept;
+		void Disconnect() noexcept;
 	};
 
 } //!namespase Network

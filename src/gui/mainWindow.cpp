@@ -30,14 +30,14 @@ namespace Gui
 		ImGui_ImplGlfw_InitForOpenGL(this->_window, true);
 		ImGui_ImplOpenGL3_Init(this->_glslVersion);
 
-		this->_windowStatus = kWIndowInited;
+		this->_windowStatus = WindowStatusCode::kWIndowInited;
 
 		return true;
 	}
 
 	void MainWindow::Draw()
 	{
-		if (this->_windowStatus != kWIndowInited)
+		if (this->_windowStatus != WindowStatusCode::kWIndowInited)
 			return;
 
 		while (!glfwWindowShouldClose(this->_window))
@@ -50,7 +50,7 @@ namespace Gui
 
 	void MainWindow::NewFrame()
 	{
-		if (this->_windowStatus != kWIndowInited)
+		if (this->_windowStatus != WindowStatusCode::kWIndowInited)
 			return;
 
 		glfwPollEvents();
@@ -61,7 +61,7 @@ namespace Gui
 
 	void MainWindow::GenerateControls() 
 	{
-		if (this->_windowStatus != kWIndowInited)
+		if (this->_windowStatus != WindowStatusCode::kWIndowInited)
 			return;
 
 		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());				//enable docking 
@@ -85,7 +85,7 @@ namespace Gui
 
 	void MainWindow::Render()
 	{
-		if (this->_windowStatus != kWIndowInited)
+		if (this->_windowStatus != WindowStatusCode::kWIndowInited)
 			return;
 
 		ImGui::Render();
@@ -114,12 +114,12 @@ namespace Gui
 
 		Network::Client::GetInstance().~Client();
 
-		this->_windowStatus = kWindowDeleted;
+		this->_windowStatus = WindowStatusCode::kWindowDeleted;
 	}
 
 	MainWindow::~MainWindow()
 	{
-		if (this->_windowStatus != kWindowDeleted)
+		if (this->_windowStatus != WindowStatusCode::kWindowDeleted)
 			MainWindow::Cleanup();
 	}
 

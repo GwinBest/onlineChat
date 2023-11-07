@@ -31,7 +31,7 @@ namespace Network
 		void Disconnect() noexcept;
 
 	private:
-		enum clientStatusCode : uint8_t
+		enum class ClientStatusCode : uint8_t
 		{
 			kClientDisconnected = 0,
 			kCLientInited = 1,
@@ -42,7 +42,7 @@ namespace Network
 		WSADATA _wsaData;
 		SOCKET _clientSocket;
 		SOCKADDR_IN _socketAddress;
-		uint8_t _clientStatus = kClientDisconnected;
+		ClientStatusCode _clientStatus = ClientStatusCode::kClientDisconnected;
 
 		size_t _clientId;
 		const std::string _ipAddress = "127.0.0.1";

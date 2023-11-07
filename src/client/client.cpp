@@ -5,7 +5,7 @@ namespace Network
 	Client& Client::GetInstance() noexcept
 	{
 		static Client instance;
-		if (instance._clientStatus != kClientConnected)
+		if (instance._clientStatus != ClientStatusCode::kClientConnected)
 		{
 			while (!instance.Connect()) {};
 		}
@@ -41,7 +41,7 @@ namespace Network
 
 	Client::~Client() noexcept
 	{
-		if (this->_clientStatus != kClientDisconnected)
+		if (this->_clientStatus != ClientStatusCode::kClientDisconnected)
 			Client::Disconnect();
 	}
 
@@ -63,12 +63,12 @@ namespace Network
 			exit(SOCKET_ERROR);
 		}
 
-		this->_clientStatus = kCLientInited;
+		this->_clientStatus = ClientStatusCode::kCLientInited;
 	}
 
 	bool Client::Connect() noexcept
 	{
-		if (this->_clientStatus != kCLientInited)
+		if (this->_clientStatus != ClientStatusCode::kCLientInited)
 		{
 			std::cout << "Client already connected" << std::endl;
 			return false;
@@ -83,14 +83,14 @@ namespace Network
 		recv(this->_clientSocket, reinterpret_cast<char*>(&this->_clientId), sizeof(size_t), NULL);			//receive client id
 		std::cout << this->_clientId;
 
-		this->_clientStatus = kClientConnected;
+		this->_clientStatus = ClientStatusCode::kClientConnected;
 
 		return true;
 	}
 
 	void Client::Disconnect() noexcept
 	{
-		if (_clientStatus != kClientDisconnected) 
+		if (_clientStatus != ClientStatusCode::kClientDisconnected)
 		{
 			if (closesocket(_clientSocket) == SOCKET_ERROR) 
 			{
@@ -104,7 +104,7 @@ namespace Network
 				exit(SOCKET_ERROR);
 			}
 
-			this->_clientStatus = kClientDisconnected;
+			this->_clientStatus = ClientStatusCode::kClientDisconnected;
 		}
 
 	}

@@ -34,7 +34,7 @@ namespace Gui
 		void Render();
 
 	private:
-		enum WindowStatusCode : uint8_t
+		enum class WindowStatusCode : uint8_t
 		{
 			kWIndowUndefined = 0,
 			kWIndowInited = 1,
@@ -47,7 +47,7 @@ namespace Gui
 		int _currentDisplayHeight;
 		int _currentDisplayWidth;
 
-		uint8_t _windowStatus = kWIndowUndefined;
+		WindowStatusCode _windowStatus = WindowStatusCode::kWIndowUndefined;
 
 		std::string _buffer;
 

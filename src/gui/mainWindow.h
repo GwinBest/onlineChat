@@ -20,24 +20,6 @@ namespace Gui
 {
 	class MainWindow
 	{
-	private:
-		enum WindowStatusCode : uint8_t
-		{
-			kWIndowUndefined = 0,
-			kWIndowInited	 = 1,
-			kWindowDeleted	 = 2
-		};
-		const char* _glslVersion = "#version 130";
-		GLFWwindow* _window = nullptr;
-		const ImVec4 _windowColorBackground = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-
-		int _currentDisplayHeight;
-		int _currentDisplayWidth;
-
-		uint8_t _windowStatus = kWIndowUndefined;
-
-		std::string _buffer;
-
 	public:
 		MainWindow() = default;
 		~MainWindow();
@@ -50,6 +32,25 @@ namespace Gui
 		void NewFrame();
 		void GenerateControls();
 		void Render();
+
+	private:
+		enum WindowStatusCode : uint8_t
+		{
+			kWIndowUndefined = 0,
+			kWIndowInited = 1,
+			kWindowDeleted = 2
+		};
+		const char* _glslVersion = "#version 130";
+		GLFWwindow* _window = nullptr;
+		const ImVec4 _windowColorBackground = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+
+		int _currentDisplayHeight;
+		int _currentDisplayWidth;
+
+		uint8_t _windowStatus = kWIndowUndefined;
+
+		std::string _buffer;
+
 	};
 
 }//!namespace Gui

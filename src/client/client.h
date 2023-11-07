@@ -13,6 +13,23 @@ namespace Network
 {
 	class Client
 	{
+	public:
+		Client(const Client&) = delete;
+		void operator= (const Client&) = delete;
+
+		static Client& GetInstance() noexcept;
+
+		void Send(size_t userId, const char* data, size_t dataSize) noexcept;
+		void Receive() noexcept;
+
+		~Client();
+
+	private:
+		Client() noexcept;
+
+		bool Connect() noexcept;
+		void Disconnect() noexcept;
+
 	private:
 		enum clientStatusCode : uint8_t
 		{
@@ -30,23 +47,6 @@ namespace Network
 		size_t _clientId;
 		const std::string _ipAddress = "127.0.0.1";
 		static constexpr uint32_t _port = 1111;
-
-	public:
-		Client(const Client&) = delete;
-		void operator= (const Client&) = delete;
-
-		static Client& GetInstance() noexcept;
-
-		void Send(size_t userId, const char* data, size_t dataSize) noexcept;
-		void Receive() noexcept;
-
-		~Client();
-
-	private:
-		Client() noexcept;
-
-		bool Connect() noexcept;
-		void Disconnect() noexcept;
 	};
 
 } //!namespase Network

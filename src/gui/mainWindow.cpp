@@ -10,7 +10,7 @@ namespace Gui
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-		this->_window = glfwCreateWindow(1280, 720, "Online Chat", nullptr, nullptr);
+		this->_window = glfwCreateWindow(820, 700, "Online Chat", nullptr, nullptr);
 		if (this->_window == nullptr)
 			return false;
 
@@ -79,6 +79,9 @@ namespace Gui
 
 
 
+		ImGui::End();
+
+		ImGui::Begin("  ");
 		ImGui::End();
 		
 	}

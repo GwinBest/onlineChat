@@ -10,11 +10,11 @@ namespace Gui
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-		this->_window = glfwCreateWindow(820, 700, "Online Chat", nullptr, nullptr);
-		if (this->_window == nullptr)
+		this->_mainWindow = glfwCreateWindow(820, 700, "Online Chat", nullptr, nullptr);
+		if (this->_mainWindow == nullptr)
 			return false;
 
-		glfwMakeContextCurrent(this->_window);
+		glfwMakeContextCurrent(this->_mainWindow);
 		glfwSwapInterval(false); // Disable vsync
 
 		// Setup Dear ImGui context
@@ -27,7 +27,7 @@ namespace Gui
 
 		ImGui::StyleColorsDark();
 
-		ImGui_ImplGlfw_InitForOpenGL(this->_window, true);
+		ImGui_ImplGlfw_InitForOpenGL(this->_mainWindow, true);
 		ImGui_ImplOpenGL3_Init(this->_glslVersion);
 
 		this->_windowStatus = WindowStatusCode::kWIndowInited;
@@ -40,7 +40,7 @@ namespace Gui
 		if (this->_windowStatus != WindowStatusCode::kWIndowInited)
 			return;
 
-		while (!glfwWindowShouldClose(this->_window))
+		while (!glfwWindowShouldClose(this->_mainWindow))
 		{
 			MainWindow::NewFrame();
 			MainWindow::GenerateControls();
@@ -69,12 +69,12 @@ namespace Gui
 		ImGui::Begin(" ");
 	
 
-		ImGui::InputText("gfd", &this->_buffer);
+		ImGui::InputText("gfd", &this->_inputBuffer);
 
-		if(ImGui::Button("hello") && this->_buffer != "")
+		if(ImGui::Button("hello") && this->_inputBuffer != "")
 		{
-			Network::Client::GetInstance().Send(2, this->_buffer.c_str(), this->_buffer.size());
-			this->_buffer = "";
+			Network::Client::GetInstance().Send(2, this->_inputBuffer.c_str(), this->_inputBuffer.size());
+			this->_inputBuffer = "";
 		}
 
 
@@ -92,18 +92,18 @@ namespace Gui
 			return;
 
 		ImGui::Render();
-		glfwGetFramebufferSize(this->_window, &this->_currentDisplayWidth, &this->_currentDisplayHeight);
+		glfwGetFramebufferSize(this->_mainWindow, &this->_currentDisplayWidth, &this->_currentDisplayHeight);
 		glViewport(0, 0, this->_currentDisplayWidth, this->_currentDisplayHeight);
 
-		glClearColor(this->_windowColorBackground.x * this->_windowColorBackground.w,		//red
-			this->_windowColorBackground.y * this->_windowColorBackground.w,				//green	
-			this->_windowColorBackground.z * this->_windowColorBackground.w,				//blue
-			this->_windowColorBackground.w);												//alpha
+		glClearColor(this->_windowBackgroundColor.x * this->_windowBackgroundColor.w,		//red
+			this->_windowBackgroundColor.y * this->_windowBackgroundColor.w,				//green	
+			this->_windowBackgroundColor.z * this->_windowBackgroundColor.w,				//blue
+			this->_windowBackgroundColor.w);												//alpha
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-		glfwSwapBuffers(this->_window);
+		glfwSwapBuffers(this->_mainWindow);
 	}
 
 	void MainWindow::Cleanup()
@@ -112,7 +112,7 @@ namespace Gui
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 
-		glfwDestroyWindow(this->_window);
+		glfwDestroyWindow(this->_mainWindow);
 		glfwTerminate();
 
 		Network::Client::GetInstance().~Client();

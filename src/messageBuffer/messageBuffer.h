@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <string>
 
-namespace MessageBuffer
+namespace Buffer
 {
 	enum class MessageType : uint8_t
 	{

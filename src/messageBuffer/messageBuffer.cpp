@@ -1,6 +1,6 @@
 #include "MessageBuffer.h"
 
-namespace MessageBuffer
+namespace Buffer
 {
 	MessageBuffer::~MessageBuffer()
 	{

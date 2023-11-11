@@ -29,7 +29,7 @@ add_executable (OnlineChat
 				"dependencies/imgui/include/imgui_impl_opengl3.cpp"
 				"dependencies/imgui/include/imgui_tables.cpp"
 				"dependencies/imgui/include/imgui_widgets.cpp"
- "src/MessageBuffer.h" "src/MessageBuffer.cpp")
+ "src/messageBuffer/messageBuffer.h" "src/messageBuffer/messageBuffer.cpp")
 
 target_link_libraries(OnlineChat
 	opengl32.lib

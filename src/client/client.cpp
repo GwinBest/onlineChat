@@ -32,8 +32,7 @@ namespace Network
 				receiveMessage[receiveMessageSize] = '\0';
 
 				recv(this->_clientSocket, receiveMessage, receiveMessageSize, NULL);
-				std::cout << receiveMessage << std::endl;
-
+	
 				delete[] receiveMessage;
 			}
 		}

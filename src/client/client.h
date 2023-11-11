@@ -1,13 +1,15 @@
 #ifndef _ONLINE	CHAT_CLIENT_CLIENT_H_
 #define _ONLINE_CHAT_CLIENT_CLIENT_H_
 
-#pragma comment (lib, "ws2_32.lib")
-#pragma warning (disable:4996)
-
 #include <winsock2.h>
+
+#include <cstdint>
+#include <string>
 
 #include <iostream>
 
+#pragma comment (lib, "ws2_32.lib")
+#pragma warning (disable:4996)
 
 namespace Network
 {

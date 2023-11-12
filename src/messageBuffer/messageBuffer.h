@@ -27,10 +27,10 @@ namespace Buffer
 	public:
 		Iterator(Node* first) : _current(first) {};
 
-		inline Node& operator++() noexcept
+		inline Iterator& operator++() noexcept
 		{
 			_current = _current ? _current->_next : nullptr;
-			return *(this->_current);
+			return *this;
 		}
 
 		inline bool operator== (const Iterator& it) const noexcept

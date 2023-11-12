@@ -15,7 +15,7 @@ namespace Buffer
 
 	struct Node
 	{
-		std::string _data;
+		char* _data;
 		MessageType _messageType = MessageType::kUndefined;
 
 		Node* _next = nullptr;
@@ -56,8 +56,12 @@ namespace Buffer
 	public:
 		using Iterator = Iterator;
 
-		MessageBuffer() = default;
+		MessageBuffer(const MessageBuffer&) = delete;
+		void operator= (const MessageBuffer&) = delete;
+
 		~MessageBuffer();
+
+		static MessageBuffer& GetInstance();
 
 		void PushFront(const MessageType messageType, const char* data) noexcept;
 		void PopFront() noexcept;
@@ -72,7 +76,11 @@ namespace Buffer
 		}
 
 	private:
+		MessageBuffer() = default;
+
+	private:
 		Node* _head = nullptr;
+
 	};
 
 }//!namespace Buffer

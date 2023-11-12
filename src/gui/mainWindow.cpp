@@ -66,24 +66,83 @@ namespace Gui
 
 		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());				//enable docking 
 
-		ImGui::Begin(" ");
-	
+		ImGui::Begin("##main window");
 
-		ImGui::InputText("gfd", &this->_inputBuffer);
-
-		if(ImGui::Button("hello") && this->_inputBuffer != "")
+		//available chats
+		static uint32_t chatSelected = 0;
 		{
-			Network::Client::GetInstance().Send(2, this->_inputBuffer.c_str(), this->_inputBuffer.size());
-			this->_inputBuffer = "";
+			ImGui::BeginChild("##available chats", ImVec2(300, 0));
+			for (int i = 0; i < 100; i++)
+			{
+				char label[128];
+				sprintf(label, "User %d", i);
+				if (ImGui::Selectable(label, chatSelected == i))
+					chatSelected = i;
+			}
+			ImGui::EndChild();
 		}
+		ImGui::SameLine();
 
+		//chat zone
+		{
+			//input text
+			static bool isEnterPressed = false;
+			static bool reclaimFocus = false;
+			ImGui::SetCursorPos(ImVec2(310, 670));
+			ImGui::PushItemWidth(450);
+			if (ImGui::InputText("##input", &(this->_inputBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				isEnterPressed = true;
+				reclaimFocus = true;
+			}
+			ImGui::PopItemWidth();
 
+			//button
+			static bool isButtonPressed = false;
+			ImGui::SameLine();
+			ImGui::SetCursorPosY(670);
+			if (ImGui::Button("send"))
+			{
+				isButtonPressed = true;
+				reclaimFocus = true;
+			}
 
-		ImGui::End();
+			// auto-focus on window apparition
+			ImGui::SetItemDefaultFocus();
+			if (reclaimFocus)
+			{
+				ImGui::SetKeyboardFocusHere(-1); // auto focus input text
+				reclaimFocus = false;
+			}
 
-		ImGui::Begin("  ");
-		ImGui::End();
-		
+			if ((isEnterPressed || isButtonPressed) && this->_inputBuffer != "")
+			{
+				Network::Client::GetInstance().Send(chatSelected, this->_inputBuffer.c_str(), this->_inputBuffer.size());
+				Buffer::MessageBuffer::GetInstance().PushFront(Buffer::MessageType::kSend, this->_inputBuffer.c_str());
+				isEnterPressed = false;
+				isButtonPressed = false;
+
+				this->_inputBuffer = "";
+			}
+
+			//client zone
+			ImGui::SetCursorPos(ImVec2(310, 60));
+			ImGui::BeginChild("##chat zone", ImVec2(510, 600));
+			for (auto& item : Buffer::MessageBuffer::GetInstance())
+			{
+				if (item._messageType == Buffer::MessageType::kReceived)
+				{
+					ImGui::TextWrapped(item._data);
+				}
+				else if (item._messageType == Buffer::MessageType::kSend)
+				{
+					ImGui::SetCursorPosX(300);
+					ImGui::TextWrapped(item._data);
+				}
+			}
+			ImGui::EndChild();
+		}
+		ImGui::End();	
 	}
 
 	void MainWindow::Render()

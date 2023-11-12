@@ -48,7 +48,6 @@ namespace Network
 	{
 		if (WSAStartup(this->_dllVersion, &this->_wsaData))
 		{
-			std::cerr << "wsa error";
 			exit(SOCKET_ERROR);
 		}
 	
@@ -58,7 +57,6 @@ namespace Network
 
 		if ((this->_clientSocket = socket(AF_INET, SOCK_STREAM, NULL)) == SOCKET_ERROR)
 		{
-			std::cerr << "socket error" << WSAGetLastError();
 			exit(SOCKET_ERROR);
 		}
 
@@ -69,18 +67,15 @@ namespace Network
 	{
 		if (this->_clientStatus != ClientStatusCode::kCLientInited)
 		{
-			std::cout << "Client already connected" << std::endl;
 			return false;
 		}
 
 		if (connect(this->_clientSocket, reinterpret_cast<SOCKADDR*>(&this->_socketAddress), sizeof(this->_socketAddress)) != 0)
 		{
-			std::cout << "connect error " << GetLastError() << std::endl;
 			return false;
 		}
 
 		recv(this->_clientSocket, reinterpret_cast<char*>(&this->_clientId), sizeof(size_t), NULL);			//receive client id
-		std::cout << this->_clientId;
 
 		this->_clientStatus = ClientStatusCode::kClientConnected;
 
@@ -93,13 +88,11 @@ namespace Network
 		{
 			if (closesocket(_clientSocket) == SOCKET_ERROR) 
 			{
-				std::cerr << "closesocket error " << GetLastError() << std::endl;
 				exit(SOCKET_ERROR);
 			}
 
 			if (WSACleanup() == SOCKET_ERROR)
 			{
-				std::cerr << "wsaCleanup error " << GetLastError() << std::endl;
 				exit(SOCKET_ERROR);
 			}
 

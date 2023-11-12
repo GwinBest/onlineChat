@@ -6,8 +6,6 @@
 #include <cstdint>
 #include <string>
 
-#include <iostream>
-
 #include "../messageBuffer/messageBuffer.h"
 
 #pragma comment (lib, "ws2_32.lib")

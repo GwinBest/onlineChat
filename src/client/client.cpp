@@ -7,7 +7,10 @@ namespace Network
 		static Client instance;
 		if (instance._clientStatus != ClientStatusCode::kClientConnected)
 		{
-			while (!instance.Connect()) {};
+			while (!instance.Connect())
+			{
+				//TODO: add !connect handle
+			};
 		}
 
 		return instance;

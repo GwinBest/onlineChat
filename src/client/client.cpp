@@ -32,8 +32,8 @@ namespace Network
 				receiveMessage[receiveMessageSize] = '\0';
 
 				recv(this->_clientSocket, receiveMessage, receiveMessageSize, NULL);
-	
-				delete[] receiveMessage;
+				
+				Buffer::MessageBuffer::GetInstance().PushFront(Buffer::MessageType::kReceived, receiveMessage);
 			}
 		}
 	}

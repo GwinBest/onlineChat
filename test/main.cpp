@@ -1,14 +1,20 @@
-#include "../src/gui/gui.h"
-
-using namespace Network;
+#include "../src/gui/mainWindow.h"
 
 #include <thread>
+
+using namespace Network;
 
 int main()
 {
 	Gui::MainWindow window;
-	window.Init();
+	if (!window.Init())
+		return 1;
+
+	std::thread receiveThread(&Network::Client::Receive, &Network::Client::GetInstance());
+	receiveThread.detach();
+
 	window.Draw();
 	window.Cleanup();
+
 	return 0;
 }

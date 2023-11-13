@@ -1,7 +1,5 @@
 #include "../src/gui/mainWindow.h"
 
-using namespace Network;
-
 int main()
 {
 	Gui::MainWindow window;

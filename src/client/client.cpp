@@ -11,6 +11,9 @@ namespace Network
 			{
 				//TODO: add !connect handle
 			};
+
+			static std::thread receiveThread(&Network::Client::Receive, &Network::Client::GetInstance());
+			receiveThread.detach();
 		}
 
 		return instance;

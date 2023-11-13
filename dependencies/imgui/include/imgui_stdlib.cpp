@@ -80,6 +80,20 @@ bool ImGui::InputTextWithHint(const char* label, const char* hint, std::string* 
     return InputTextWithHint(label, hint, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
 }
 
+bool ImGui::InputTextMultilineWithHint(const char* label, const char* hint, std::string* str, const ImVec2& size, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
+{
+    IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+    flags |= ImGuiInputTextFlags_CallbackResize;
+
+    InputTextCallback_UserData cb_user_data;
+    cb_user_data.Str = str;
+    cb_user_data.ChainCallback = callback;
+    cb_user_data.ChainCallbackUserData = user_data;
+  
+    return InputTextEx(label, hint ,(char*)str->c_str(), str->capacity() + 1, size, flags | ImGuiInputTextFlags_Multiline, InputTextCallback, &cb_user_data);
+}
+
+
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

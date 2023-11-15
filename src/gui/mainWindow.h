@@ -42,6 +42,9 @@ namespace Gui
 		const char* _glslVersion = "#version 130";
 		GLFWwindow* _mainWindow = nullptr;
 		const ImVec4 _windowBackgroundColor = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+		
+		const size_t _defaultDisplayHeight = 700;
+		const size_t _defaultDisplayWidth = 820;
 
 		int _currentDisplayHeight;
 		int _currentDisplayWidth;

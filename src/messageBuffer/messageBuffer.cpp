@@ -25,32 +25,32 @@ namespace Buffer
 		{
 			this->_head = new Node;
 			
-			this->_head->_data = new char[dataLength + 1];
-			strcpy_s(this->_head->_data, dataLength + 1, data);
+			this->_head->data = new char[dataLength + 1];
+			strcpy_s(this->_head->data, dataLength + 1, data);
 
-			this->_head->_messageType = messageType;
+			this->_head->messageType = messageType;
 			
 			return;
 		}
 			
-		while (temp->_next != nullptr)
+		while (temp->next != nullptr)
 		{
-			temp = temp->_next;
+			temp = temp->next;
 		}
 
 		Node* newNode = new Node;
-		newNode->_data = new char[dataLength + 1];
-		strcpy_s(newNode->_data, dataLength + 1, data);
+		newNode->data = new char[dataLength + 1];
+		strcpy_s(newNode->data, dataLength + 1, data);
 
-		newNode->_messageType = messageType;
+		newNode->messageType = messageType;
 
-		temp->_next = newNode;
-		temp->_next->_previous = temp;
+		temp->next = newNode;
+		temp->next->previous = temp;
 	}
 
 	void MessageBuffer::PopFront() noexcept
 	{
-		if (this->_head->_next == nullptr)
+		if (this->_head->next == nullptr)
 		{
 			delete this->_head;
 			this->_head = nullptr;
@@ -58,14 +58,14 @@ namespace Buffer
 		}
 
 		Node* temp = this->_head;
-		while (temp->_next != nullptr)
+		while (temp->next != nullptr)
 		{
-			temp = temp->_next;
+			temp = temp->next;
 		}
 		
-		temp->_previous->_next = nullptr;
+		temp->previous->next = nullptr;
 
-		delete[] temp->_data;
+		delete[] temp->data;
 		delete temp;
 	}
 

@@ -15,11 +15,11 @@ namespace Buffer
 
 	struct Node
 	{
-		char* _data;
-		MessageType _messageType = MessageType::kUndefined;
+		char* data;
+		MessageType messageType = MessageType::kUndefined;
 
-		Node* _next = nullptr;
-		Node* _previous = nullptr;
+		Node* next = nullptr;
+		Node* previous = nullptr;
 	};
 
 	class Iterator
@@ -29,7 +29,7 @@ namespace Buffer
 
 		inline Iterator& operator++() noexcept
 		{
-			_current = _current ? _current->_next : nullptr;
+			_current = _current ? _current->next : nullptr;
 			return *this;
 		}
 

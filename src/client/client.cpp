@@ -39,7 +39,7 @@ namespace Network
 
 				recv(this->_clientSocket, receiveMessage, receiveMessageSize, NULL);
 				
-				Buffer::MessageBuffer::GetInstance().PushFront(Buffer::MessageType::kReceived, receiveMessage);
+				Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kReceived, receiveMessage);
 
 				delete[] receiveMessage;
 			}

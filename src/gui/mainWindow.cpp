@@ -196,7 +196,7 @@ namespace Gui
 					ImVec2 textPosition;
 					static constexpr uint8_t maxCharacterOnOneLine = 54;
 					static constexpr uint8_t paddingBetweenMessages = 15;
-					static const size_t	textMaxWidth = ImGui::CalcTextSize(" ").x * maxCharacterOnOneLine;
+					static const size_t textMaxWidth = ImGui::CalcTextSize(" ").x * maxCharacterOnOneLine;
 
 					if (item.messageType == Buffer::MessageType::kReceived)
 					{
@@ -223,6 +223,15 @@ namespace Gui
 							ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - rightBorderPadding);
 						}
 					}
+
+					ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+					size_t rectangleLength = ImGui::CalcTextSize(item.data).x + textPosition.x;
+					size_t rectangleHeight = ImGui::CalcTextSize(item.data).y + textPosition.y;
+					draw_list->AddRectFilled(ImVec2(textPosition.x - 10, textPosition.y - 4),
+						ImVec2(rectangleLength + 10, rectangleHeight + 4),
+						IM_COL32(41, 46, 52, 255),
+						12.0f);	
 
 					ImGui::SetCursorPos(textPosition);
 					ImGui::Text(item.data);

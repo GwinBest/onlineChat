@@ -15,15 +15,15 @@ namespace Gui
             return false;
 
         glfwMakeContextCurrent(this->_mainWindow);
-        glfwSwapInterval(false);									// disable vsync
+        glfwSwapInterval(false);                                                                                    // disable vsync
 
         // setup Dear ImGui context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
 
         ImGuiIO& io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;		// enable Keyboard Controls
-        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			// enable Docking
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;		                                                // enable Keyboard Controls
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			                                                // enable Docking
 
         // setup window style 
         ImGuiStyle& windowStyle = ImGui::GetStyle();
@@ -82,7 +82,7 @@ namespace Gui
         if (this->_windowStatus != WindowStatusCode::kWIndowInited)
             return;
 
-        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				// enable docking 
+        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				        // enable docking 
 
         ImGui::Begin("##main window");
 

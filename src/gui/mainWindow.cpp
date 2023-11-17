@@ -193,7 +193,7 @@ namespace Gui
 
 				for (auto& item : Buffer::MessageBuffer::getInstance())
 				{
-					ImVec2 textPos;
+					ImVec2 textPosition;
 					static constexpr uint8_t maxCharacterOnOneLine = 54;
 					static constexpr uint8_t paddingBetweenMessages = 15;
 					static const size_t	textMaxWidth = ImGui::CalcTextSize(" ").x * maxCharacterOnOneLine;
@@ -202,7 +202,7 @@ namespace Gui
 					{
 						static constexpr uint8_t paddingFromAvailableChats = 15;
 
-						textPos = ImVec2(paddingFromAvailableChats, ImGui::GetCursorPosY());
+						textPosition = ImVec2(paddingFromAvailableChats, ImGui::GetCursorPosY());
 						ImGui::PushTextWrapPos(availableChatsWidth + paddingFromAvailableChats);
 					}
 					else if (item.messageType == Buffer::MessageType::kSend)
@@ -214,17 +214,17 @@ namespace Gui
 
 						if (strlen(item.data) < maxCharacterOnOneLine) 
 						{
-							textPos = ImVec2(ImGui::GetWindowWidth() - textWidth - rightBorderPadding, ImGui::GetCursorPosY());
+							textPosition = ImVec2(ImGui::GetWindowWidth() - textWidth - rightBorderPadding, ImGui::GetCursorPosY());
 							ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - rightBorderPadding);
 						}
 						else
 						{
-							textPos = ImVec2(ImGui::GetWindowWidth() - textMaxWidth - rightBorderPadding, ImGui::GetCursorPosY());
+							textPosition = ImVec2(ImGui::GetWindowWidth() - textMaxWidth - rightBorderPadding, ImGui::GetCursorPosY());
 							ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - rightBorderPadding);
 						}
 					}
 
-					ImGui::SetCursorPos(textPos);
+					ImGui::SetCursorPos(textPosition);
 					ImGui::Text(item.data);
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + paddingBetweenMessages);
 					ImGui::PopTextWrapPos();
@@ -238,17 +238,17 @@ namespace Gui
 			ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
 			const char* textToDraw = "Select a chat to start messaging";
-			size_t textStartX = (ImGui::GetWindowWidth() - availableChatsWidth) / 2 + (availableChatsWidth / 2);
-			size_t textStartY = ImGui::GetWindowHeight() / 2;
+			size_t textX = (ImGui::GetWindowWidth() - availableChatsWidth) / 2 + (availableChatsWidth / 2);
+			size_t textY = ImGui::GetWindowHeight() / 2;
 
-			size_t rectangleLength = ImGui::CalcTextSize(textToDraw).x + textStartX;
-			size_t rectangleHeight = ImGui::CalcTextSize(textToDraw).y + textStartY;
-			draw_list->AddRectFilled(ImVec2(textStartX - 10, textStartY - 4),
+			size_t rectangleLength = ImGui::CalcTextSize(textToDraw).x + textX;
+			size_t rectangleHeight = ImGui::CalcTextSize(textToDraw).y + textY;
+			draw_list->AddRectFilled(ImVec2(textX - 10, textY - 4),
 									 ImVec2(rectangleLength + 10, rectangleHeight + 4),
 									 IM_COL32(41, 46, 52, 255),
 									 12.0f);																		// rounding					
 
-			ImGui::SetCursorPos(ImVec2(textStartX, textStartY));
+			ImGui::SetCursorPos(ImVec2(textX, textY));
 			ImGui::Text(textToDraw);
 		}
 

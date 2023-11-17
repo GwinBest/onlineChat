@@ -46,8 +46,8 @@ namespace Gui
 		const size_t _defaultDisplayHeight = 700;
 		const size_t _defaultDisplayWidth = 820;
 
-		int _currentDisplayHeight;
-		int _currentDisplayWidth;
+		int _currentDisplayHeight = _defaultDisplayHeight;
+		int _currentDisplayWidth = _defaultDisplayWidth;
 
 		WindowStatusCode _windowStatus = WindowStatusCode::kWIndowUndefined;
 

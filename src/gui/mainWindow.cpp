@@ -2,7 +2,7 @@
 
 namespace Gui
 {
-	bool MainWindow::Init()
+	bool MainWindow::Init() noexcept
 	{
 		if (!glfwInit())
 			return false;
@@ -53,7 +53,7 @@ namespace Gui
 		return true;
 	}
 
-	void MainWindow::Draw()
+	void MainWindow::Draw() noexcept
 	{
 		if (this->_windowStatus != WindowStatusCode::kWIndowInited)
 			return;
@@ -66,7 +66,7 @@ namespace Gui
 		}
 	}
 
-	void MainWindow::NewFrame()
+	void MainWindow::NewFrame() const noexcept
 	{
 		if (this->_windowStatus != WindowStatusCode::kWIndowInited)
 			return;
@@ -77,7 +77,7 @@ namespace Gui
 		ImGui::NewFrame();
 	}
 
-	void MainWindow::GenerateControls()
+	void MainWindow::GenerateControls() noexcept
 	{
 		if (this->_windowStatus != WindowStatusCode::kWIndowInited)
 			return;
@@ -88,8 +88,8 @@ namespace Gui
 
 		// available chats
 		static uint32_t chatSelected = -1;
-		static const size_t availableChatsStartHeight = 65;
-		static const size_t availableChatsWidthScaleFactor = 3.0f;
+		static constexpr size_t availableChatsStartHeight = 65;
+		static constexpr size_t availableChatsWidthScaleFactor = 3.0f;
 		size_t availableChatsWidth = ImGui::GetWindowWidth() / availableChatsWidthScaleFactor;
 		{
 			ImGui::SetCursorPosY(availableChatsStartHeight);												// begin child start position 
@@ -126,7 +126,7 @@ namespace Gui
 			static bool reclaimFocus = false;
 			{
 				float oldFontScale = ImGui::GetFont()->Scale;
-				ImGui::GetFont()->Scale *= 1.5f;																// set new font size for input text
+				ImGui::GetFont()->Scale *= 1.5f;																// set new font scale for input text
 				ImGui::PushFont(ImGui::GetFont());
 
 				ImGui::SetCursorPos(ImVec2(availableChatsWidth, ImGui::GetWindowHeight() - 45));				// input text start position 
@@ -138,7 +138,7 @@ namespace Gui
 					reclaimFocus = true;
 				}
 
-				ImGui::GetFont()->Scale = oldFontScale;															// set old font size
+				ImGui::GetFont()->Scale = oldFontScale;															// set old font scale
 				ImGui::PopFont();
 
 				// auto-focus on window apparition
@@ -166,7 +166,7 @@ namespace Gui
 			if ((isEnterPressed || isButtonPressed) && this->_inputBuffer != "")
 			{
 				Network::Client::GetInstance().Send(chatSelected, this->_inputBuffer.c_str(), this->_inputBuffer.size());
-				Buffer::MessageBuffer::GetInstance().PushFront(Buffer::MessageType::kSend, this->_inputBuffer.c_str());
+				Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kSend, this->_inputBuffer.c_str());
 
 				isEnterPressed = false;
 				isButtonPressed = false;
@@ -183,7 +183,7 @@ namespace Gui
 
 				ImGui::SetCursorPos(ImVec2(availableChatsWidth, availableChatsStartHeight));					// begin child start position
 				ImGui::BeginChild("##chat zone", ImVec2(ImGui::GetWindowWidth() - availableChatsWidth, ImGui::GetWindowHeight() - 110));
-				for (auto& item : Buffer::MessageBuffer::GetInstance())
+				for (auto& item : Buffer::MessageBuffer::getInstance())
 				{
 					if (item.messageType == Buffer::MessageType::kReceived)
 					{
@@ -191,7 +191,7 @@ namespace Gui
 					}
 					else if (item.messageType == Buffer::MessageType::kSend)
 					{
-						static constexpr uint16_t kMaxCharacterOnOneLine = 54;
+						static constexpr uint8_t kMaxCharacterOnOneLine = 54;
 						static constexpr uint8_t kRightBorderPadding = 15;
 
 						if (strlen(item.data) < kMaxCharacterOnOneLine)
@@ -203,7 +203,15 @@ namespace Gui
 							ImGui::SetCursorPosX(ImGui::GetWindowWidth() -
 								(ImGui::CalcTextSize(" ").x * kMaxCharacterOnOneLine) - kRightBorderPadding);		// (ImGui::CalcTextSize(" ").x * kMaxCharacterOnOneLine) = one character * kMaxCharacterOnOneLine
 						}
+						ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
 						ImGui::TextWrapped(item.data);
+						draw_list->AddDrawCmd();
+						draw_list->AddRectFilled({ ImGui::GetItemRectMin().x - 10, ImGui::GetItemRectMin().y - 4 },
+							{ ImGui::GetItemRectMax().x + 10, ImGui::GetItemRectMax().y + 4 },
+							IM_COL32(41, 46, 52, 255), 12.0f);
+
+						std::swap(draw_list->CmdBuffer[0], draw_list->CmdBuffer[1]);								// swap text() and addRectFilled() to draw text in front of rectangle	
 					}
 				}
 
@@ -215,19 +223,26 @@ namespace Gui
 		{
 			ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-			ImGui::SetCursorPos(ImVec2((ImGui::GetWindowWidth() - availableChatsWidth) / 2 + availableChatsWidth / 2, ImGui::GetWindowHeight() / 2));
-			ImGui::Text("Select a chat to start messaging");
-			ImGui::SetNextItemAllowOverlap();
-			draw_list->AddRectFilled({ ImGui::GetItemRectMin().x - 5, ImGui::GetItemRectMin().y - 2 }, { ImGui::GetItemRectMax().x + 5, ImGui::GetItemRectMax().y - 20 + 2 * ImGui::GetTextLineHeight() }, IM_COL32(41, 46, 52, 250), 12.0f);
-			draw_list->AddText(ImVec2((ImGui::GetWindowWidth() - availableChatsWidth) / 2 + availableChatsWidth / 2, ImGui::GetWindowHeight() / 2), IM_COL32_WHITE, "Select a chat to start messaging");
+			const char* textToDraw = "Select a chat to start messaging";
+			size_t textStartX = (ImGui::GetWindowWidth() - availableChatsWidth) / 2 + (availableChatsWidth / 2);
+			size_t textStartY = ImGui::GetWindowHeight() / 2;
 
+			size_t rectangleLength = ImGui::CalcTextSize(textToDraw).x + textStartX;
+			size_t rectangleHeight = ImGui::CalcTextSize(textToDraw).y + textStartY;
+			draw_list->AddRectFilled(ImVec2(textStartX - 10, textStartY - 4),
+									 ImVec2(rectangleLength + 10, rectangleHeight + 4),
+									 IM_COL32(41, 46, 52, 255),
+									 12.0f);																		// rounding					
 
+			// set text() start position 
+			ImGui::SetCursorPos(ImVec2(textStartX, textStartY));
+			ImGui::Text(textToDraw);
 		}
 
 		ImGui::End();
 	}
 
-	void MainWindow::Render()
+	void MainWindow::Render() noexcept
 	{
 		if (this->_windowStatus != WindowStatusCode::kWIndowInited)
 			return;
@@ -247,7 +262,7 @@ namespace Gui
 		glfwSwapBuffers(this->_mainWindow);
 	}
 
-	void MainWindow::Cleanup()
+	void MainWindow::Cleanup() noexcept
 	{
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();

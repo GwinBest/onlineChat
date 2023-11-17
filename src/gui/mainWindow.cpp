@@ -92,15 +92,18 @@ namespace Gui
 		static constexpr size_t availableChatsWidthScaleFactor = 3.0f;
 		size_t availableChatsWidth = ImGui::GetWindowWidth() / availableChatsWidthScaleFactor;
 		{
-			ImGui::SetCursorPosY(availableChatsStartHeight);												// begin child start position 
+			ImVec2 availbleChatsSize;				
 			if (ImGui::GetWindowWidth() < this->_defaultDisplayWidth)
 			{
-				ImGui::BeginChild("##available chats", ImVec2(ImGui::GetWindowWidth(), 0));
+				availbleChatsSize = ImVec2(ImGui::GetWindowWidth(), 0);
 			}
 			else
 			{
-				ImGui::BeginChild("##available chats", ImVec2(availableChatsWidth, 0));
+				availbleChatsSize = ImVec2(availableChatsWidth, 0);
 			}
+
+			ImGui::SetCursorPosY(availableChatsStartHeight);
+			ImGui::BeginChild("##available chats", availbleChatsSize);
 
 			for (int i = 0; i < 100; i++)
 			{
@@ -109,13 +112,14 @@ namespace Gui
 				if (ImGui::Selectable(label, chatSelected == i))
 					chatSelected = i;
 			}
-			ImGui::EndChild();
 
 			// unselect current chat
 			if (ImGui::IsKeyPressed(ImGuiKey_Escape))
 			{
 				chatSelected = -1;
 			}
+
+			ImGui::EndChild();
 		}
 
 		// chat zone
@@ -126,26 +130,25 @@ namespace Gui
 			static bool reclaimFocus = false;
 			{
 				float oldFontScale = ImGui::GetFont()->Scale;
-				ImGui::GetFont()->Scale *= 1.5f;																// set new font scale for input text
+				ImGui::GetFont()->Scale *= 1.5f;																	// set new font scale for input text
 				ImGui::PushFont(ImGui::GetFont());
 
-				ImGui::SetCursorPos(ImVec2(availableChatsWidth, ImGui::GetWindowHeight() - 45));				// input text start position 
-				if (ImGui::InputTextMultilineWithHint("##input", "Write a message", &(this->_inputBuffer),
-					ImVec2(ImGui::GetWindowWidth() - availableChatsWidth - 60, 45),								// input text size
-					ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CtrlEnterForNewLine))
+				ImVec2 inputTextSize = ImVec2(ImGui::GetWindowWidth() - availableChatsWidth - 60, 45);
+				ImGui::SetCursorPos(ImVec2(availableChatsWidth, ImGui::GetWindowHeight() - 45));			
+				if (ImGui::InputTextMultilineWithHint("##input", "Write a message", &(this->_inputBuffer), inputTextSize, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CtrlEnterForNewLine))
 				{
 					isEnterPressed = true;
 					reclaimFocus = true;
 				}
 
-				ImGui::GetFont()->Scale = oldFontScale;															// set old font scale
+				ImGui::GetFont()->Scale = oldFontScale;																// set old font scale
 				ImGui::PopFont();
 
 				// auto-focus on window apparition
 				ImGui::SetItemDefaultFocus();
 				if (reclaimFocus)
 				{
-					ImGui::SetKeyboardFocusHere(-1);															// auto focus input text
+					ImGui::SetKeyboardFocusHere(-1);																// auto focus input text
 					reclaimFocus = false;
 				}
 			}
@@ -153,9 +156,10 @@ namespace Gui
 			// button
 			static bool isButtonPressed = false;
 			{
+				ImVec2 buttonSize = ImVec2(35, 40);
 				ImGui::SameLine();
-				ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 45);											// button start position
-				if (ImGui::Button("send", ImVec2(35, 40)))
+				ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 45);											
+				if (ImGui::Button("send", buttonSize))
 				{
 					isButtonPressed = true;
 					reclaimFocus = true;
@@ -179,43 +183,53 @@ namespace Gui
 			// display sent and received messages
 			{
 				ImGuiStyle& windowStyle = ImGui::GetStyle();
-				windowStyle.Colors[ImGuiCol_ChildBg] = ImVec4(0.0941f, 0.0980f, 0.1137f, 1.00f);				// setup new color for begin child
+				windowStyle.Colors[ImGuiCol_ChildBg] = ImVec4(0.0941f, 0.0980f, 0.1137f, 1.00f);					// setup new color for begin child
 
-				ImGui::SetCursorPos(ImVec2(availableChatsWidth, availableChatsStartHeight));					// begin child start position
-				ImGui::BeginChild("##chat zone", ImVec2(ImGui::GetWindowWidth() - availableChatsWidth, ImGui::GetWindowHeight() - 110));
+				ImGui::SetCursorPos(ImVec2(availableChatsWidth, availableChatsStartHeight));					
+				ImGui::BeginChild("##chat zone", ImVec2(ImGui::GetWindowWidth() - availableChatsWidth, 
+														ImGui::GetWindowHeight() - 110));
+
+				windowStyle.Colors[ImGuiCol_ChildBg] = ImVec4(0.1608f, 0.1804f, 0.2039f, 1.00f);					// return it's default color for begin child 
+
 				for (auto& item : Buffer::MessageBuffer::getInstance())
 				{
+					ImVec2 textPos;
+					static constexpr uint8_t maxCharacterOnOneLine = 54;
+					static constexpr uint8_t paddingBetweenMessages = 15;
+					static const size_t	textMaxWidth = ImGui::CalcTextSize(" ").x * maxCharacterOnOneLine;
+
 					if (item.messageType == Buffer::MessageType::kReceived)
 					{
-						ImGui::TextWrapped(item.data);
+						static constexpr uint8_t paddingFromAvailableChats = 15;
+
+						textPos = ImVec2(paddingFromAvailableChats, ImGui::GetCursorPosY());
+						ImGui::PushTextWrapPos(availableChatsWidth + paddingFromAvailableChats);
 					}
 					else if (item.messageType == Buffer::MessageType::kSend)
 					{
-						static constexpr uint8_t kMaxCharacterOnOneLine = 54;
-						static constexpr uint8_t kRightBorderPadding = 15;
+						static constexpr uint8_t rightBorderPadding = 15;
 
-						if (strlen(item.data) < kMaxCharacterOnOneLine)
+						size_t textWidth = ImGui::CalcTextSize(item.data).x;
+						size_t textHeight = ImGui::GetTextLineHeightWithSpacing();
+
+						if (strlen(item.data) < maxCharacterOnOneLine) 
 						{
-							ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::CalcTextSize(item.data).x - kRightBorderPadding);
+							textPos = ImVec2(ImGui::GetWindowWidth() - textWidth - rightBorderPadding, ImGui::GetCursorPosY());
+							ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - rightBorderPadding);
 						}
 						else
 						{
-							ImGui::SetCursorPosX(ImGui::GetWindowWidth() -
-								(ImGui::CalcTextSize(" ").x * kMaxCharacterOnOneLine) - kRightBorderPadding);		// (ImGui::CalcTextSize(" ").x * kMaxCharacterOnOneLine) = one character * kMaxCharacterOnOneLine
+							textPos = ImVec2(ImGui::GetWindowWidth() - textMaxWidth - rightBorderPadding, ImGui::GetCursorPosY());
+							ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - rightBorderPadding);
 						}
-						ImDrawList* draw_list = ImGui::GetWindowDrawList();
-
-						ImGui::TextWrapped(item.data);
-						draw_list->AddDrawCmd();
-						draw_list->AddRectFilled({ ImGui::GetItemRectMin().x - 10, ImGui::GetItemRectMin().y - 4 },
-							{ ImGui::GetItemRectMax().x + 10, ImGui::GetItemRectMax().y + 4 },
-							IM_COL32(41, 46, 52, 255), 12.0f);
-
-						std::swap(draw_list->CmdBuffer[0], draw_list->CmdBuffer[1]);								// swap text() and addRectFilled() to draw text in front of rectangle	
 					}
+
+					ImGui::SetCursorPos(textPos);
+					ImGui::Text(item.data);
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + paddingBetweenMessages);
+					ImGui::PopTextWrapPos();
 				}
 
-				windowStyle.Colors[ImGuiCol_ChildBg] = ImVec4(0.1608f, 0.1804f, 0.2039f, 1.00f);					// return it's default color for begin child 
 				ImGui::EndChild();
 			}
 		}
@@ -234,7 +248,6 @@ namespace Gui
 									 IM_COL32(41, 46, 52, 255),
 									 12.0f);																		// rounding					
 
-			// set text() start position 
 			ImGui::SetCursorPos(ImVec2(textStartX, textStartY));
 			ImGui::Text(textToDraw);
 		}

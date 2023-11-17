@@ -22,14 +22,14 @@ namespace Gui
 		MainWindow() = default;
 		~MainWindow();
 
-		bool Init();
-		void Draw();
-		void Cleanup();
+		bool Init() noexcept;
+		void Draw() noexcept;
+		void Cleanup() noexcept;
 
 	private:
-		void NewFrame();
-		void GenerateControls();
-		void Render();
+		void NewFrame() const noexcept;
+		void GenerateControls() noexcept;
+		void Render() noexcept;
 
 	private:
 		enum class WindowStatusCode : uint8_t

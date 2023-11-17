@@ -21,9 +21,9 @@ namespace Network
 
 	void Client::Send(size_t userId, const char* data, size_t dataSize) noexcept
 	{
-		send(this->_clientSocket, reinterpret_cast<char*>(&userId), sizeof(size_t), NULL);			// send the receiver's id
-		send(this->_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(size_t), NULL);		// send the size of the message
-		send(this->_clientSocket, data, dataSize, NULL);											// send the message
+		send(this->_clientSocket, reinterpret_cast<char*>(&userId), sizeof(size_t), NULL);							// send the receiver's id
+		send(this->_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(size_t), NULL);						// send the size of the message
+		send(this->_clientSocket, data, dataSize, NULL);															// send the message
 	}
 
 	void Client::Receive() noexcept
@@ -83,7 +83,7 @@ namespace Network
 			return false;
 		}
 
-		recv(this->_clientSocket, reinterpret_cast<char*>(&this->_clientId), sizeof(size_t), NULL);			//receive client id
+		recv(this->_clientSocket, reinterpret_cast<char*>(&this->_clientId), sizeof(size_t), NULL);					//receive client id
 
 		this->_clientStatus = ClientStatusCode::kClientConnected;
 

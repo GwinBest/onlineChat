@@ -52,6 +52,6 @@ namespace Network
 		static constexpr uint32_t _port = 1111;
 	};
 
-} //!namespase Network
+} // !namespase Network
 
 #endif // !_ONLINE_CHAT_CLIENT_CLIENT_H_

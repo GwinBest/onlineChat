@@ -74,4 +74,4 @@ namespace Buffer
 		return (this->_head == nullptr) ? true : false;
 	}
 
-}//!namespace Buffer
+} // !namespace Buffer

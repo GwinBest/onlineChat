@@ -16,46 +16,46 @@
 
 namespace Gui
 {
-	class MainWindow
-	{
-	public:
-		MainWindow() = default;
-		~MainWindow();
+    class MainWindow
+    {
+    public:
+        MainWindow() = default;
+        ~MainWindow();
 
-		bool Init() noexcept;
-		void Draw() noexcept;
-		void Cleanup() noexcept;
+        bool Init() noexcept;
+        void Draw() noexcept;
+        void Cleanup() noexcept;
 
-	private:
-		void NewFrame() const noexcept;
-		void GenerateControls() noexcept;
-		void Render() noexcept;
+    private:
+        void NewFrame() const noexcept;
+        void GenerateControls() noexcept;
+        void Render() noexcept;
 
-	private:
-		enum class WindowStatusCode : uint8_t
-		{
-			kWIndowUndefined = 0,
-			kWIndowInited = 1,
-			kWindowDeleted = 2
-		};
+    private:
+        enum class WindowStatusCode : uint8_t
+        {
+            kWIndowUndefined = 0,
+            kWIndowInited = 1,
+            kWindowDeleted = 2
+        };
 
-		const char* _glslVersion = "#version 130";
-		GLFWwindow* _mainWindow = nullptr;
-		const ImVec4 _windowBackgroundColor = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-		
-		const size_t _defaultDisplayHeight = 700;
-		const size_t _defaultDisplayWidth = 820;
+        const char* _glslVersion = "#version 130";
+        GLFWwindow* _mainWindow = nullptr;
+        const ImVec4 _windowBackgroundColor = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
 
-		int _currentDisplayHeight = _defaultDisplayHeight;
-		int _currentDisplayWidth = _defaultDisplayWidth;
+        const size_t _defaultDisplayHeight = 700;
+        const size_t _defaultDisplayWidth = 820;
 
-		WindowStatusCode _windowStatus = WindowStatusCode::kWIndowUndefined;
+        int _currentDisplayHeight = _defaultDisplayHeight;
+        int _currentDisplayWidth = _defaultDisplayWidth;
 
-		std::string _inputBuffer;
+        WindowStatusCode _windowStatus = WindowStatusCode::kWIndowUndefined;
 
-	};
+        std::string _inputBuffer;
 
-}//!namespace Gui
+    };
+
+} // !namespace Gui
 
 #endif // !_ONLINECHAT_GUI_GUI_H_
 

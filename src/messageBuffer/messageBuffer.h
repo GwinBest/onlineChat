@@ -84,6 +84,6 @@ namespace Buffer
 
 	};
 
-}//!namespace Buffer
+} // !namespace Buffer
 
 #endif // !_ONLINECHAT_BUFFER_H_

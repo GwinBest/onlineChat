@@ -92,7 +92,7 @@ namespace Gui
 		static constexpr size_t availableChatsWidthScaleFactor = 3.0f;
 		size_t availableChatsWidth = ImGui::GetWindowWidth() / availableChatsWidthScaleFactor;
 		{
-			ImVec2 availbleChatsSize;				
+			ImVec2 availbleChatsSize;
 			if (ImGui::GetWindowWidth() < this->_defaultDisplayWidth)
 			{
 				availbleChatsSize = ImVec2(ImGui::GetWindowWidth(), 0);
@@ -134,7 +134,7 @@ namespace Gui
 				ImGui::PushFont(ImGui::GetFont());
 
 				ImVec2 inputTextSize = ImVec2(ImGui::GetWindowWidth() - availableChatsWidth - 60, 45);
-				ImGui::SetCursorPos(ImVec2(availableChatsWidth, ImGui::GetWindowHeight() - 45));			
+				ImGui::SetCursorPos(ImVec2(availableChatsWidth, ImGui::GetWindowHeight() - 45));
 				if (ImGui::InputTextMultilineWithHint("##input", "Write a message", &(this->_inputBuffer), inputTextSize, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CtrlEnterForNewLine))
 				{
 					isEnterPressed = true;
@@ -158,7 +158,7 @@ namespace Gui
 			{
 				ImVec2 buttonSize = ImVec2(35, 40);
 				ImGui::SameLine();
-				ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 45);											
+				ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 45);
 				if (ImGui::Button("send", buttonSize))
 				{
 					isButtonPressed = true;
@@ -185,17 +185,20 @@ namespace Gui
 				ImGuiStyle& windowStyle = ImGui::GetStyle();
 				windowStyle.Colors[ImGuiCol_ChildBg] = ImVec4(0.0941f, 0.0980f, 0.1137f, 1.00f);					// setup new color for begin child
 
-				ImGui::SetCursorPos(ImVec2(availableChatsWidth, availableChatsStartHeight));					
-				ImGui::BeginChild("##chat zone", ImVec2(ImGui::GetWindowWidth() - availableChatsWidth, 
-														ImGui::GetWindowHeight() - 110));
+				ImGui::SetCursorPos(ImVec2(availableChatsWidth, availableChatsStartHeight));
+				ImGui::BeginChild("##chat zone", ImVec2(ImGui::GetWindowWidth() - availableChatsWidth,
+					ImGui::GetWindowHeight() - 110));
 
 				windowStyle.Colors[ImGuiCol_ChildBg] = ImVec4(0.1608f, 0.1804f, 0.2039f, 1.00f);					// return it's default color for begin child 
 
 				for (auto& item : Buffer::MessageBuffer::getInstance())
 				{
-					ImVec2 textPosition;
 					static constexpr uint8_t maxCharacterOnOneLine = 54;
 					static constexpr uint8_t paddingBetweenMessages = 15;
+
+					ImVec2 textPosition;
+					size_t textWidth = ImGui::CalcTextSize(item.data).x;
+					size_t textHeight = ImGui::GetTextLineHeightWithSpacing();
 					static const size_t textMaxWidth = ImGui::CalcTextSize(" ").x * maxCharacterOnOneLine;
 
 					if (item.messageType == Buffer::MessageType::kReceived)
@@ -209,10 +212,7 @@ namespace Gui
 					{
 						static constexpr uint8_t rightBorderPadding = 15;
 
-						size_t textWidth = ImGui::CalcTextSize(item.data).x;
-						size_t textHeight = ImGui::GetTextLineHeightWithSpacing();
-
-						if (strlen(item.data) < maxCharacterOnOneLine) 
+						if (strlen(item.data) < maxCharacterOnOneLine)
 						{
 							textPosition = ImVec2(ImGui::GetWindowWidth() - textWidth - rightBorderPadding, ImGui::GetCursorPosY());
 							ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - rightBorderPadding);
@@ -224,17 +224,21 @@ namespace Gui
 						}
 					}
 
-					ImDrawList* draw_list = ImGui::GetWindowDrawList();
+					ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-					size_t rectangleLength = ImGui::CalcTextSize(item.data).x + textPosition.x;
-					size_t rectangleHeight = ImGui::CalcTextSize(item.data).y + textPosition.y;
-					draw_list->AddRectFilled(ImVec2(textPosition.x - 10, textPosition.y - 4),
-						ImVec2(rectangleLength + 10, rectangleHeight + 4),
+					ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + textPosition.x - 10,
+						ImGui::GetCursorScreenPos().y + textPosition.y - 4));
+
+					size_t rectangleLength = textWidth + textPosition.x;
+					size_t rectangleHeight = textHeight + textPosition.y;
+					drawList->AddRectFilled(ImGui::GetCursorScreenPos(),
+						{ ImGui::GetCursorScreenPos().x + rectangleLength,ImGui::GetCursorScreenPos().y + textHeight },
 						IM_COL32(41, 46, 52, 255),
-						12.0f);	
+						12.0f);
 
 					ImGui::SetCursorPos(textPosition);
 					ImGui::Text(item.data);
+					ImVec2 a = ImGui::GetItemRectMin();
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + paddingBetweenMessages);
 					ImGui::PopTextWrapPos();
 				}
@@ -244,7 +248,7 @@ namespace Gui
 		}
 		else if (ImGui::GetWindowWidth() >= this->_defaultDisplayWidth && chatSelected == -1)
 		{
-			ImDrawList* draw_list = ImGui::GetWindowDrawList();
+			ImDrawList* drawList = ImGui::GetWindowDrawList();
 
 			const char* textToDraw = "Select a chat to start messaging";
 			size_t textX = (ImGui::GetWindowWidth() - availableChatsWidth) / 2 + (availableChatsWidth / 2);
@@ -252,10 +256,10 @@ namespace Gui
 
 			size_t rectangleLength = ImGui::CalcTextSize(textToDraw).x + textX;
 			size_t rectangleHeight = ImGui::CalcTextSize(textToDraw).y + textY;
-			draw_list->AddRectFilled(ImVec2(textX - 10, textY - 4),
-									 ImVec2(rectangleLength + 10, rectangleHeight + 4),
-									 IM_COL32(41, 46, 52, 255),
-									 12.0f);																		// rounding					
+			drawList->AddRectFilled(ImVec2(textX - 10, textY - 4),
+				ImVec2(rectangleLength + 10, rectangleHeight + 4),
+				IM_COL32(41, 46, 52, 255),
+				12.0f);																								// rounding					
 
 			ImGui::SetCursorPos(ImVec2(textX, textY));
 			ImGui::Text(textToDraw);
@@ -273,10 +277,10 @@ namespace Gui
 		glfwGetFramebufferSize(this->_mainWindow, &this->_currentDisplayWidth, &this->_currentDisplayHeight);
 		glViewport(0, 0, this->_currentDisplayWidth, this->_currentDisplayHeight);
 
-		glClearColor(this->_windowBackgroundColor.x * this->_windowBackgroundColor.w,		// red
-			this->_windowBackgroundColor.y * this->_windowBackgroundColor.w,				// green	
-			this->_windowBackgroundColor.z * this->_windowBackgroundColor.w,				// blue
-			this->_windowBackgroundColor.w);												// alpha
+		glClearColor(this->_windowBackgroundColor.x * this->_windowBackgroundColor.w,								// red  
+			this->_windowBackgroundColor.y * this->_windowBackgroundColor.w,										// green							
+			this->_windowBackgroundColor.z * this->_windowBackgroundColor.w,										// blue 
+			this->_windowBackgroundColor.w);																		// alpha
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

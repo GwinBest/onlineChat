@@ -61,11 +61,11 @@ namespace Buffer
 
 		~MessageBuffer();
 
-		static MessageBuffer& getInstance();
+		static MessageBuffer& getInstance() noexcept;
 
 		void pushFront(const MessageType messageType, const char* data) noexcept;
 		void popFront() noexcept;
-		inline bool isEmpty() const;
+		inline bool isEmpty() const noexcept;
 
 		inline Iterator begin() const noexcept 
 		{

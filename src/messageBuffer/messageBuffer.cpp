@@ -10,7 +10,7 @@ namespace Buffer
 		}
 	}
 
-	MessageBuffer& MessageBuffer::getInstance()
+	MessageBuffer& MessageBuffer::getInstance() noexcept
 	{
 		static MessageBuffer instance;
 		return instance;
@@ -69,7 +69,7 @@ namespace Buffer
 		delete temp;
 	}
 
-	inline bool MessageBuffer::isEmpty() const
+	inline bool MessageBuffer::isEmpty() const noexcept
 	{
 		return (this->_head == nullptr) ? true : false;
 	}

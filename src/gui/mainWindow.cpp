@@ -92,18 +92,18 @@ namespace Gui
         static constexpr size_t availableChatsWidthScaleFactor = 3.0f;
         size_t availableChatsWidth = ImGui::GetWindowWidth() / availableChatsWidthScaleFactor;
         {
-            ImVec2 availbleChatsSize;
+            ImVec2 availableChatsSize;
             if (ImGui::GetWindowWidth() < this->_defaultDisplayWidth)
             {
-                availbleChatsSize = ImVec2(ImGui::GetWindowWidth(), 0);
+                availableChatsSize = ImVec2(ImGui::GetWindowWidth(), 0);
             }
             else
             {
-                availbleChatsSize = ImVec2(availableChatsWidth, 0);
+                availableChatsSize = ImVec2(availableChatsWidth, 0);
             }
 
             ImGui::SetCursorPosY(availableChatsStartHeight);
-            ImGui::BeginChild("##available chats", availbleChatsSize);
+            ImGui::BeginChild("##available chats", availableChatsSize);
 
             for (int i = 0; i < 100; i++)
             {
@@ -187,7 +187,7 @@ namespace Gui
 
                 ImGui::SetCursorPos(ImVec2(availableChatsWidth, availableChatsStartHeight));
                 ImGui::BeginChild("##chat zone", ImVec2(ImGui::GetWindowWidth() - availableChatsWidth,
-                    ImGui::GetWindowHeight() - 110));
+                                  ImGui::GetWindowHeight() - 110));
 
                 windowStyle.Colors[ImGuiCol_ChildBg] = ImVec4(0.1608f, 0.1804f, 0.2039f, 1.00f);					// return it's default color for begin child 
 
@@ -227,12 +227,12 @@ namespace Gui
                     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
                     ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + textPosition.x - 10,
-                        ImGui::GetCursorScreenPos().y + textPosition.y - 4));
+                                              ImGui::GetCursorScreenPos().y + textPosition.y - 4));
 
                     size_t rectangleLength = textWidth + textPosition.x;
                     size_t rectangleHeight = textHeight + textPosition.y;
                     drawList->AddRectFilled(ImGui::GetCursorScreenPos(),
-                        { ImGui::GetCursorScreenPos().x + rectangleLength,ImGui::GetCursorScreenPos().y + textHeight },
+                                            { ImGui::GetCursorScreenPos().x + rectangleLength,ImGui::GetCursorScreenPos().y + textHeight },
                         IM_COL32(41, 46, 52, 255),
                         12.0f);
 
@@ -257,9 +257,9 @@ namespace Gui
             size_t rectangleLength = ImGui::CalcTextSize(textToDraw).x + textX;
             size_t rectangleHeight = ImGui::CalcTextSize(textToDraw).y + textY;
             drawList->AddRectFilled(ImVec2(textX - 10, textY - 4),
-                ImVec2(rectangleLength + 10, rectangleHeight + 4),
-                IM_COL32(41, 46, 52, 255),
-                12.0f);																								// rounding					
+                                    ImVec2(rectangleLength + 10, rectangleHeight + 4),
+                                    IM_COL32(41, 46, 52, 255),
+                                    12.0f);																			// rounding					
 
             ImGui::SetCursorPos(ImVec2(textX, textY));
             ImGui::Text(textToDraw);
@@ -278,9 +278,9 @@ namespace Gui
         glViewport(0, 0, this->_currentDisplayWidth, this->_currentDisplayHeight);
 
         glClearColor(this->_windowBackgroundColor.x * this->_windowBackgroundColor.w,								// red  
-            this->_windowBackgroundColor.y * this->_windowBackgroundColor.w,										// green							
-            this->_windowBackgroundColor.z * this->_windowBackgroundColor.w,										// blue 
-            this->_windowBackgroundColor.w);																		// alpha
+                     this->_windowBackgroundColor.y * this->_windowBackgroundColor.w,								// green							
+                     this->_windowBackgroundColor.z * this->_windowBackgroundColor.w,							    // blue 
+                     this->_windowBackgroundColor.w);																// alpha
 
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

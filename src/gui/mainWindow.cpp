@@ -1,4 +1,4 @@
-#include "mainWindow.h"
+﻿#include "mainWindow.h"
 
 namespace Gui
 {
@@ -24,6 +24,7 @@ namespace Gui
         ImGuiIO& io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;		                                                // enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			                                                // enable Docking
+        io.Fonts->AddFontFromFileTTF("OpenSans-Regular.ttf", 22, 0, io.Fonts->GetGlyphRangesCyrillic());
 
         // setup window style 
         ImGuiStyle& windowStyle = ImGui::GetStyle();
@@ -130,7 +131,7 @@ namespace Gui
             static bool reclaimFocus = false;
             {
                 float oldFontScale = ImGui::GetFont()->Scale;
-                ImGui::GetFont()->Scale *= 1.5f;																	// set new font scale for input text
+                ImGui::GetFont()->Scale *= 1.4f;																	// set new font scale for input text
                 ImGui::PushFont(ImGui::GetFont());
 
                 ImVec2 inputTextSize = ImVec2(ImGui::GetWindowWidth() - availableChatsWidth - 60, 45);
@@ -197,7 +198,6 @@ namespace Gui
 
                     static constexpr uint8_t maxCharacterOnOneLine = 54;
                     static constexpr uint8_t paddingBetweenMessages = 15;
-                    static constexpr uint8_t AdditionalSpaceForTimeAndStatus = 40;
 
                     ImVec2 textPosition;
                     size_t textWidth = ImGui::CalcTextSize(item.data).x;
@@ -210,12 +210,6 @@ namespace Gui
 
                         textPosition = ImVec2(paddingFromAvailableChats, ImGui::GetCursorPosY());
                         ImGui::PushTextWrapPos(availableChatsWidth + paddingFromAvailableChats);
-
-                        ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + textPosition.x - 10, ImGui::GetCursorScreenPos().y));
-
-                        size_t rectangleHeight = ImGui::GetCursorScreenPos().y + textHeight + 10;
-                        size_t rectangleLength = ImGui::GetCursorScreenPos().x + textWidth + 50;
-                        drawList->AddRectFilled(ImGui::GetCursorScreenPos(), ImVec2(rectangleLength, rectangleHeight), IM_COL32(41, 46, 52, 255), 12.0f);
                     }
                     else if (item.messageType == Buffer::MessageType::kSend)
                     {
@@ -224,27 +218,32 @@ namespace Gui
                         if (strlen(item.data) < maxCharacterOnOneLine)
                         {
                             textPosition = ImVec2(ImGui::GetWindowWidth() - textWidth - rightBorderPadding, ImGui::GetCursorPosY() + 5);
-                            ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - rightBorderPadding);
                         }
                         else
                         {
                             textPosition = ImVec2(ImGui::GetWindowWidth() - textMaxWidth - rightBorderPadding, ImGui::GetCursorPosY() + 5);
-                            ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - rightBorderPadding);
-
                         }
+
+                        ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - rightBorderPadding);
                     }
 
-                    ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + textPosition.x - 10, ImGui::GetCursorScreenPos().y));
+                    //TODO: refactoring
+                    {
+                        ImDrawListSplitter splitter;
+                        splitter.Split(drawList, 2); 
 
-                    size_t rectangleHeight = ImGui::GetCursorScreenPos().y + textHeight + 10;
-                    size_t rectangleLength = ImGui::GetCursorScreenPos().x + textWidth + AdditionalSpaceForTimeAndStatus;
-                    drawList->AddRectFilled(ImGui::GetCursorScreenPos(), ImVec2(rectangleLength, rectangleHeight), IM_COL32(41, 46, 52, 255), 12.0f);
+                        splitter.SetCurrentChannel(drawList, 1);
 
-                    ImGui::SetCursorPos(textPosition);
-                    ImGui::Text(item.data);
-                    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + paddingBetweenMessages);
-                    ImGui::PopTextWrapPos();
-                    // TODO: fix rectangle
+                        ImGui::SetCursorPos(textPosition);
+                        ImGui::Text(item.data);
+                       
+                        splitter.SetCurrentChannel(drawList, 0);
+                        size_t rectangleHeight = ImGui::GetCursorScreenPos().y + textHeight + 10;
+                        size_t rectangleLength = ImGui::GetCursorScreenPos().x + textWidth + 50;
+                        drawList->AddRectFilled({ ImGui::GetItemRectMin().x - 10,ImGui::GetItemRectMin().y - 4 }, { ImGui::GetItemRectMax().x + 10,ImGui::GetItemRectMax().y + 4 }, IM_COL32(41, 46, 52, 255), 12.0f);
+
+                        splitter.Merge(drawList);
+                    }
                 }
 
                 ImGui::EndChild();

@@ -83,7 +83,7 @@ namespace Gui
             return;
 
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				        // enable docking 
-
+       
         ImGui::Begin("##main window");
 
         // available chats
@@ -193,12 +193,15 @@ namespace Gui
 
                 for (auto& item : Buffer::MessageBuffer::getInstance())
                 {
+                    ImDrawList* drawList = ImGui::GetWindowDrawList();
+
                     static constexpr uint8_t maxCharacterOnOneLine = 54;
                     static constexpr uint8_t paddingBetweenMessages = 15;
+                    static constexpr uint8_t AdditionalSpaceForTimeAndStatus = 40;
 
                     ImVec2 textPosition;
                     size_t textWidth = ImGui::CalcTextSize(item.data).x;
-                    size_t textHeight = ImGui::GetTextLineHeightWithSpacing();
+                    size_t textHeight = ImGui::CalcTextSize(item.data).y;
                     static const size_t textMaxWidth = ImGui::CalcTextSize(" ").x * maxCharacterOnOneLine;
 
                     if (item.messageType == Buffer::MessageType::kReceived)
@@ -207,45 +210,46 @@ namespace Gui
 
                         textPosition = ImVec2(paddingFromAvailableChats, ImGui::GetCursorPosY());
                         ImGui::PushTextWrapPos(availableChatsWidth + paddingFromAvailableChats);
+
+                        ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + textPosition.x - 10, ImGui::GetCursorScreenPos().y));
+
+                        size_t rectangleHeight = ImGui::GetCursorScreenPos().y + textHeight + 10;
+                        size_t rectangleLength = ImGui::GetCursorScreenPos().x + textWidth + 50;
+                        drawList->AddRectFilled(ImGui::GetCursorScreenPos(), ImVec2(rectangleLength, rectangleHeight), IM_COL32(41, 46, 52, 255), 12.0f);
                     }
                     else if (item.messageType == Buffer::MessageType::kSend)
                     {
-                        static constexpr uint8_t rightBorderPadding = 15;
+                        static constexpr uint8_t rightBorderPadding = 40;
 
                         if (strlen(item.data) < maxCharacterOnOneLine)
                         {
-                            textPosition = ImVec2(ImGui::GetWindowWidth() - textWidth - rightBorderPadding, ImGui::GetCursorPosY());
+                            textPosition = ImVec2(ImGui::GetWindowWidth() - textWidth - rightBorderPadding, ImGui::GetCursorPosY() + 5);
                             ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - rightBorderPadding);
                         }
                         else
                         {
-                            textPosition = ImVec2(ImGui::GetWindowWidth() - textMaxWidth - rightBorderPadding, ImGui::GetCursorPosY());
+                            textPosition = ImVec2(ImGui::GetWindowWidth() - textMaxWidth - rightBorderPadding, ImGui::GetCursorPosY() + 5);
                             ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - rightBorderPadding);
+
                         }
                     }
 
-                    ImDrawList* drawList = ImGui::GetWindowDrawList();
+                    ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + textPosition.x - 10, ImGui::GetCursorScreenPos().y));
 
-                    ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + textPosition.x - 10,
-                                              ImGui::GetCursorScreenPos().y + textPosition.y - 4));
-
-                    size_t rectangleLength = textWidth + textPosition.x;
-                    size_t rectangleHeight = textHeight + textPosition.y;
-                    drawList->AddRectFilled(ImGui::GetCursorScreenPos(),
-                                            { ImGui::GetCursorScreenPos().x + rectangleLength,ImGui::GetCursorScreenPos().y + textHeight },
-                        IM_COL32(41, 46, 52, 255),
-                        12.0f);
+                    size_t rectangleHeight = ImGui::GetCursorScreenPos().y + textHeight + 10;
+                    size_t rectangleLength = ImGui::GetCursorScreenPos().x + textWidth + AdditionalSpaceForTimeAndStatus;
+                    drawList->AddRectFilled(ImGui::GetCursorScreenPos(), ImVec2(rectangleLength, rectangleHeight), IM_COL32(41, 46, 52, 255), 12.0f);
 
                     ImGui::SetCursorPos(textPosition);
                     ImGui::Text(item.data);
-                    ImVec2 a = ImGui::GetItemRectMin();
                     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + paddingBetweenMessages);
                     ImGui::PopTextWrapPos();
+                    // TODO: fix rectangle
                 }
 
                 ImGui::EndChild();
             }
-        }
+        } 
         else if (ImGui::GetWindowWidth() >= this->_defaultDisplayWidth && chatSelected == -1)
         {
             ImDrawList* drawList = ImGui::GetWindowDrawList();

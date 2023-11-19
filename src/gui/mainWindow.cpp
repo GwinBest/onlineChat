@@ -84,14 +84,14 @@ namespace Gui
             return;
 
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				        // enable docking 
-       
+        
         ImGui::Begin("##main window");
 
         // available chats
-        static uint32_t chatSelected = -1;
+        static int32_t chatSelected = -1;
         static constexpr size_t availableChatsStartHeight = 65;
         static constexpr size_t availableChatsWidthScaleFactor = 3.0f;
-        size_t availableChatsWidth = ImGui::GetWindowWidth() / availableChatsWidthScaleFactor;
+        float availableChatsWidth = ImGui::GetWindowWidth() / availableChatsWidthScaleFactor;
         {
             ImVec2 availableChatsSize;
             if (ImGui::GetWindowWidth() < this->_defaultDisplayWidth)
@@ -129,6 +129,8 @@ namespace Gui
             // input text
             static bool isEnterPressed = false;
             static bool reclaimFocus = false;
+            static bool scrollToBottom = false;
+            static bool autoScroll = true;
             {
                 float oldFontScale = ImGui::GetFont()->Scale;
                 ImGui::GetFont()->Scale *= 1.4f;																	// set new font scale for input text
@@ -140,6 +142,8 @@ namespace Gui
                 {
                     isEnterPressed = true;
                     reclaimFocus = true;
+
+                    scrollToBottom = true;
                 }
 
                 ImGui::GetFont()->Scale = oldFontScale;																// set old font scale
@@ -164,6 +168,8 @@ namespace Gui
                 {
                     isButtonPressed = true;
                     reclaimFocus = true;
+
+                    scrollToBottom = true;
                 }
             }
 
@@ -192,17 +198,17 @@ namespace Gui
 
                 windowStyle.Colors[ImGuiCol_ChildBg] = ImVec4(0.1608f, 0.1804f, 0.2039f, 1.00f);					// return it's default color for begin child 
 
-                for (auto& item : Buffer::MessageBuffer::getInstance())
+                for (const auto& item : Buffer::MessageBuffer::getInstance())
                 {
                     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
                     static constexpr uint8_t maxCharacterOnOneLine = 54;
-                    static constexpr uint8_t paddingBetweenMessages = 15;
+                    static constexpr uint8_t paddingBetweenMessages = 5;
 
                     ImVec2 textPosition;
-                    size_t textWidth = ImGui::CalcTextSize(item.data).x;
-                    size_t textHeight = ImGui::CalcTextSize(item.data).y;
-                    static const size_t textMaxWidth = ImGui::CalcTextSize(" ").x * maxCharacterOnOneLine;
+                    float textWidth = ImGui::CalcTextSize(item.data).x;
+                    float textHeight = ImGui::CalcTextSize(item.data).y;
+                    static const float textMaxWidth = ImGui::CalcTextSize(" ").x * maxCharacterOnOneLine;
 
                     if (item.messageType == Buffer::MessageType::kReceived)
                     {
@@ -227,24 +233,31 @@ namespace Gui
                         ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - rightBorderPadding);
                     }
 
-                    //TODO: refactoring
-                    {
-                        ImDrawListSplitter splitter;
-                        splitter.Split(drawList, 2); 
+                    ImDrawListSplitter splitter;
+                    splitter.Split(drawList, 2);
 
-                        splitter.SetCurrentChannel(drawList, 1);
-
-                        ImGui::SetCursorPos(textPosition);
-                        ImGui::Text(item.data);
+                    splitter.SetCurrentChannel(drawList, 1);
+                    ImGui::SetCursorPos(textPosition);
+                    ImGui::Text(item.data);
+                    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + paddingBetweenMessages);
+                    ImGui::PopTextWrapPos();
                        
-                        splitter.SetCurrentChannel(drawList, 0);
-                        size_t rectangleHeight = ImGui::GetCursorScreenPos().y + textHeight + 10;
-                        size_t rectangleLength = ImGui::GetCursorScreenPos().x + textWidth + 50;
-                        drawList->AddRectFilled({ ImGui::GetItemRectMin().x - 10,ImGui::GetItemRectMin().y - 4 }, { ImGui::GetItemRectMax().x + 10,ImGui::GetItemRectMax().y + 4 }, IM_COL32(41, 46, 52, 255), 12.0f);
+                    splitter.SetCurrentChannel(drawList, 0);
+                    ImVec2 rectanglePosition = ImVec2(ImGui::GetItemRectMin().x - 10, ImGui::GetItemRectMin().y - 4);
+                    float rectangleHeight = ImGui::GetItemRectMax().x + 10;
+                    float rectangleLength = ImGui::GetItemRectMax().y + 4;
+                    drawList->AddRectFilled(rectanglePosition, ImVec2(rectangleHeight, rectangleLength), IM_COL32(41, 46, 52, 255), 12.0f);
 
-                        splitter.Merge(drawList);
-                    }
+                    splitter.Merge(drawList);
                 }
+
+                // Keep up at the bottom of the scroll region if we were already at the bottom at the beginning of the frame.
+                // Using a scrollbar or mouse-wheel will take away from the bottom edge.
+                if (scrollToBottom || (autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()))
+                {
+                    ImGui::SetScrollHereY(1.0f);
+                }
+                scrollToBottom = false;
 
                 ImGui::EndChild();
             }
@@ -254,11 +267,11 @@ namespace Gui
             ImDrawList* drawList = ImGui::GetWindowDrawList();
 
             const char* textToDraw = "Select a chat to start messaging";
-            size_t textX = (ImGui::GetWindowWidth() - availableChatsWidth) / 2 + (availableChatsWidth / 2);
-            size_t textY = ImGui::GetWindowHeight() / 2;
+            float textX = (ImGui::GetWindowWidth() - availableChatsWidth) / 2 + (availableChatsWidth / 2);
+            float textY = ImGui::GetWindowHeight() / 2;
 
-            size_t rectangleLength = ImGui::CalcTextSize(textToDraw).x + textX;
-            size_t rectangleHeight = ImGui::CalcTextSize(textToDraw).y + textY;
+            float rectangleLength = ImGui::CalcTextSize(textToDraw).x + textX;
+            float rectangleHeight = ImGui::CalcTextSize(textToDraw).y + textY;
             drawList->AddRectFilled(ImVec2(textX - 10, textY - 4),
                                     ImVec2(rectangleLength + 10, rectangleHeight + 4),
                                     IM_COL32(41, 46, 52, 255),

@@ -43,8 +43,8 @@ namespace Gui
         GLFWwindow* _mainWindow = nullptr;
         const ImVec4 _windowBackgroundColor = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
 
-        const size_t _defaultDisplayHeight = 700;
-        const size_t _defaultDisplayWidth = 820;
+        const int _defaultDisplayHeight = 700;
+        const int _defaultDisplayWidth = 820;
 
         int _currentDisplayHeight = _defaultDisplayHeight;
         int _currentDisplayWidth = _defaultDisplayWidth;

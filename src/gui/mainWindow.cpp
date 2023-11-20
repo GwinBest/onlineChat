@@ -10,11 +10,11 @@ namespace Gui
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-        this->_mainWindow = glfwCreateWindow(this->_defaultDisplayWidth, this->_defaultDisplayHeight, "Online Chat", nullptr, nullptr);
-        if (this->_mainWindow == nullptr)
+        _mainWindow = glfwCreateWindow(_defaultDisplayWidth, _defaultDisplayHeight, "Online Chat", nullptr, nullptr);
+        if (_mainWindow == nullptr)
             return false;
 
-        glfwMakeContextCurrent(this->_mainWindow);
+        glfwMakeContextCurrent(_mainWindow);
         glfwSwapInterval(false);                                                                                    // disable vsync
 
         // setup Dear ImGui context
@@ -46,20 +46,20 @@ namespace Gui
         windowStyle.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.2039f, 0.2235f, 0.2471f, 1.0f);
         windowStyle.Colors[ImGuiCol_HeaderActive] = ImVec4(0.0f, 0.5882f, 0.5294f, 1.00f);
 
-        ImGui_ImplGlfw_InitForOpenGL(this->_mainWindow, true);
-        ImGui_ImplOpenGL3_Init(this->_glslVersion);
+        ImGui_ImplGlfw_InitForOpenGL(_mainWindow, true);
+        ImGui_ImplOpenGL3_Init(_glslVersion);
 
-        this->_windowStatus = WindowStatusCode::kWIndowInited;
+        _windowStatus = WindowStatusCode::kWIndowInited;
 
         return true;
     }
 
     void MainWindow::Draw() noexcept
     {
-        if (this->_windowStatus != WindowStatusCode::kWIndowInited)
+        if (_windowStatus != WindowStatusCode::kWIndowInited)
             return;
 
-        while (!glfwWindowShouldClose(this->_mainWindow))
+        while (!glfwWindowShouldClose(_mainWindow))
         {
             MainWindow::NewFrame();
             MainWindow::GenerateControls();
@@ -69,7 +69,7 @@ namespace Gui
 
     void MainWindow::NewFrame() const noexcept
     {
-        if (this->_windowStatus != WindowStatusCode::kWIndowInited)
+        if (_windowStatus != WindowStatusCode::kWIndowInited)
             return;
 
         glfwPollEvents();
@@ -80,7 +80,7 @@ namespace Gui
 
     void MainWindow::GenerateControls() noexcept
     {
-        if (this->_windowStatus != WindowStatusCode::kWIndowInited)
+        if (_windowStatus != WindowStatusCode::kWIndowInited)
             return;
 
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				        // enable docking 
@@ -94,7 +94,7 @@ namespace Gui
         float availableChatsWidth = ImGui::GetWindowWidth() / availableChatsWidthScaleFactor;
         {
             ImVec2 availableChatsSize;
-            if (ImGui::GetWindowWidth() < this->_defaultDisplayWidth)
+            if (ImGui::GetWindowWidth() < _defaultDisplayWidth)
             {
                 availableChatsSize = ImVec2(ImGui::GetWindowWidth(), 0);
             }
@@ -124,7 +124,7 @@ namespace Gui
         }
 
         // chat zone
-        if (ImGui::GetWindowWidth() >= this->_defaultDisplayWidth && chatSelected != -1)
+        if (ImGui::GetWindowWidth() >= _defaultDisplayWidth && chatSelected != -1)
         {
             // input text
             static bool isEnterPressed = false;
@@ -138,7 +138,7 @@ namespace Gui
 
                 ImVec2 inputTextSize = ImVec2(ImGui::GetWindowWidth() - availableChatsWidth - 60, 45);
                 ImGui::SetCursorPos(ImVec2(availableChatsWidth, ImGui::GetWindowHeight() - 45));
-                if (ImGui::InputTextMultilineWithHint("##input", "Write a message", &(this->_inputBuffer), inputTextSize, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CtrlEnterForNewLine))
+                if (ImGui::InputTextMultilineWithHint("##input", "Write a message", &(_inputBuffer), inputTextSize, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CtrlEnterForNewLine))
                 {
                     isEnterPressed = true;
                     reclaimFocus = true;
@@ -174,17 +174,17 @@ namespace Gui
             }
 
             // send message 
-            if ((isEnterPressed || isButtonPressed) && this->_inputBuffer != "")
+            if ((isEnterPressed || isButtonPressed) && _inputBuffer != "")
             {
-                Network::Client::GetInstance().Send(chatSelected, this->_inputBuffer.c_str(), this->_inputBuffer.size());
-                Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kSend, this->_inputBuffer.c_str());
+                Network::Client::GetInstance().Send(chatSelected, _inputBuffer.c_str(), _inputBuffer.size());
+                Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kSend, _inputBuffer.c_str());
 
                 isEnterPressed = false;
                 isButtonPressed = false;
 
                 reclaimFocus = true;
 
-                this->_inputBuffer = "";
+                _inputBuffer = "";
             }
 
             // display sent and received messages
@@ -262,7 +262,7 @@ namespace Gui
                 ImGui::EndChild();
             }
         } 
-        else if (ImGui::GetWindowWidth() >= this->_defaultDisplayWidth && chatSelected == -1)
+        else if (ImGui::GetWindowWidth() >= _defaultDisplayWidth && chatSelected == -1)
         {
             ImDrawList* drawList = ImGui::GetWindowDrawList();
 
@@ -286,22 +286,22 @@ namespace Gui
 
     void MainWindow::Render() noexcept
     {
-        if (this->_windowStatus != WindowStatusCode::kWIndowInited)
+        if (_windowStatus != WindowStatusCode::kWIndowInited)
             return;
 
         ImGui::Render();
-        glfwGetFramebufferSize(this->_mainWindow, &this->_currentDisplayWidth, &this->_currentDisplayHeight);
-        glViewport(0, 0, this->_currentDisplayWidth, this->_currentDisplayHeight);
+        glfwGetFramebufferSize(_mainWindow, &_currentDisplayWidth, &_currentDisplayHeight);
+        glViewport(0, 0, _currentDisplayWidth, _currentDisplayHeight);
 
-        glClearColor(this->_windowBackgroundColor.x * this->_windowBackgroundColor.w,								// red  
-                     this->_windowBackgroundColor.y * this->_windowBackgroundColor.w,								// green							
-                     this->_windowBackgroundColor.z * this->_windowBackgroundColor.w,							    // blue 
-                     this->_windowBackgroundColor.w);																// alpha
+        glClearColor(_windowBackgroundColor.x * _windowBackgroundColor.w,								            // red  
+                     _windowBackgroundColor.y * _windowBackgroundColor.w,								            // green							
+                     _windowBackgroundColor.z * _windowBackgroundColor.w,							                // blue 
+                     _windowBackgroundColor.w);																        // alpha
 
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        glfwSwapBuffers(this->_mainWindow);
+        glfwSwapBuffers(_mainWindow);
     }
 
     void MainWindow::Cleanup() noexcept
@@ -310,17 +310,17 @@ namespace Gui
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
 
-        glfwDestroyWindow(this->_mainWindow);
+        glfwDestroyWindow(_mainWindow);
         glfwTerminate();
 
         Network::Client::GetInstance().~Client();
 
-        this->_windowStatus = WindowStatusCode::kWindowDeleted;
+        _windowStatus = WindowStatusCode::kWindowDeleted;
     }
 
     MainWindow::~MainWindow()
     {
-        if (this->_windowStatus != WindowStatusCode::kWindowDeleted)
+        if (_windowStatus != WindowStatusCode::kWindowDeleted)
             MainWindow::Cleanup();
     }
 

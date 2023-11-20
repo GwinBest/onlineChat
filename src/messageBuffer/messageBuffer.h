@@ -8,9 +8,9 @@ namespace Buffer
 {
 	enum class MessageType : uint8_t
 	{
-		kUndefined = 0,
-		kSend = 1,
-		kReceived = 2
+		kUndefined	= 0,
+		kSend		= 1,
+		kReceived	= 2
 	};
 
 	struct Node
@@ -35,7 +35,7 @@ namespace Buffer
 
 		inline bool operator== (const Iterator& it) const noexcept
 		{ 
-			return this->_current == it._current;
+			return _current == it._current;
 		}
 		inline bool operator!=(const Iterator& other) const noexcept 
 		{ 
@@ -44,7 +44,7 @@ namespace Buffer
 		
 		inline Node& operator* ()const noexcept 
 		{
-			return *(this->_current); 
+			return *_current; 
 		}
 
 	private:
@@ -69,7 +69,7 @@ namespace Buffer
 
 		inline Iterator begin() const noexcept 
 		{
-			return Iterator(this->_head);
+			return Iterator(_head);
 		}
 		inline Iterator end() const noexcept 
 		{ 

@@ -37,8 +37,8 @@ namespace Network
 		enum class ClientStatusCode : uint8_t
 		{
 			kClientDisconnected = 0,
-			kCLientInited = 1,
-			kClientConnected = 2,
+			kCLientInited		= 1,
+			kClientConnected	= 2,
 		};
 
 		static constexpr WORD _dllVersion = MAKEWORD(2, 2);

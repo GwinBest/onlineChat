@@ -4,7 +4,7 @@ namespace Buffer
 {
 	MessageBuffer::~MessageBuffer()
 	{
-		while (this->_head != nullptr)
+		while (_head != nullptr)
 		{
 			MessageBuffer::popFront();
 		}
@@ -19,16 +19,16 @@ namespace Buffer
 	void MessageBuffer::pushFront(const MessageType messageType, const char* data) noexcept
 	{
 		size_t dataLength = strlen(data);
-		Node* temp = this->_head;
+		Node* temp = _head;
 
-		if (this->_head == nullptr)
+		if (_head == nullptr)
 		{
-			this->_head = new Node;
+			_head = new Node;
 			
-			this->_head->data = new char[dataLength + 1];
-			strcpy_s(this->_head->data, dataLength + 1, data);
+			_head->data = new char[dataLength + 1];
+			strcpy_s(_head->data, dataLength + 1, data);
 
-			this->_head->messageType = messageType;
+			_head->messageType = messageType;
 			
 			return;
 		}
@@ -50,14 +50,14 @@ namespace Buffer
 
 	void MessageBuffer::popFront() noexcept
 	{
-		if (this->_head->next == nullptr)
+		if (_head->next == nullptr)
 		{
-			delete this->_head;
-			this->_head = nullptr;
+			delete _head;
+			_head = nullptr;
 			return;
 		}
 
-		Node* temp = this->_head;
+		Node* temp = _head;
 		while (temp->next != nullptr)
 		{
 			temp = temp->next;
@@ -71,7 +71,7 @@ namespace Buffer
 
 	inline bool MessageBuffer::isEmpty() const noexcept
 	{
-		return (this->_head == nullptr) ? true : false;
+		return (_head == nullptr) ? true : false;
 	}
 
 } // !namespace Buffer

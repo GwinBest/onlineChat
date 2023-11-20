@@ -48,8 +48,8 @@ namespace Network
 		ClientStatusCode _clientStatus = ClientStatusCode::kClientDisconnected;
 
 		size_t _clientId;
-		const std::string _ipAddress = "127.0.0.1";
-		static constexpr uint32_t _port = 1111;
+		const std::string _ipAddress = "192.168.43.208";
+		static constexpr uint32_t _port = 8080;
 	};
 
 } // !namespase Network

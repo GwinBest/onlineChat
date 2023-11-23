@@ -46,7 +46,7 @@ namespace Network
 		}
 	}
 
-	Client::~Client() noexcept
+	Client::~Client() 
 	{
 		if (_clientStatus != ClientStatusCode::kClientDisconnected)
 			Client::Disconnect();

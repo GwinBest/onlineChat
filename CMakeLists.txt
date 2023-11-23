@@ -18,7 +18,7 @@ include_directories(dependencies/imgui/include dependencies/imgui/glfw/include)
 
 # Add source to this project's executable.
 add_executable (OnlineChat
-				"test/main.cpp" 
+				"clientApp/main.cpp" 
 				"src/client/client.cpp" 
 				"src/gui/mainWindow.cpp"
 				"dependencies/imgui/include/imgui.cpp" 

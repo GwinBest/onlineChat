@@ -212,4 +212,5 @@ namespace Gui
 
         ImGui::End();
     }
-}
+
+} // !namespace Gui

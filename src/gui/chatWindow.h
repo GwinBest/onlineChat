@@ -10,7 +10,7 @@ namespace Gui
 	class ChatWindow final : public MainWindow 
 	{
 	public:
-		ChatWindow() = default;
+		ChatWindow() noexcept = default;
 		~ChatWindow();
 
 	private:

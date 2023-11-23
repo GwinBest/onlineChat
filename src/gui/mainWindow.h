@@ -18,7 +18,7 @@ namespace Gui
     class MainWindow
     {
     public:
-        MainWindow() = default;
+        MainWindow() noexcept = default;
         virtual ~MainWindow();
 
         bool Init() noexcept;

@@ -9,9 +9,6 @@ namespace Gui
 
     void ChatWindow::GenerateControls() noexcept
     {
-        if (_windowStatus != WindowStatusCode::kWIndowInited)
-            return;
-
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				        // enable docking 
 
         ImGui::Begin("##main window");

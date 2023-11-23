@@ -91,9 +91,6 @@ namespace Gui
 
     void MainWindow::NewFrame() const noexcept
     {
-        if (_windowStatus != WindowStatusCode::kWIndowInited)
-            return;
-
         glfwPollEvents();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -102,9 +99,6 @@ namespace Gui
 
     void MainWindow::Render() noexcept
     {
-        if (_windowStatus != WindowStatusCode::kWIndowInited)
-            return;
-
         ImGui::Render();
         glfwGetFramebufferSize(_mainWindow, &_currentDisplayWidth, &_currentDisplayHeight);
         glViewport(0, 0, _currentDisplayWidth, _currentDisplayHeight);

@@ -20,7 +20,7 @@ include_directories(dependencies/imgui/include dependencies/imgui/glfw/include)
 add_executable (OnlineChat
 				"clientApp/main.cpp" 
 				"src/client/client.cpp" 
-				"src/gui/mainWindow.cpp"
+				"src/gui/glfwWindow.cpp"
 				"dependencies/imgui/include/imgui.cpp" 
 				"dependencies/imgui/include/imgui_stdlib.cpp"
 				"dependencies/imgui/include/imgui_demo.cpp"
@@ -32,7 +32,7 @@ add_executable (OnlineChat
 				"src/messageBuffer/messageBuffer.h"
 				"src/messageBuffer/messageBuffer.cpp" 
 				"src/gui/chatWindow.h" 
-				"src/gui/chatWindow.cpp")
+				"src/gui/chatWindow.cpp"  "src/gui/iImGuiWindow.h")
 
 target_link_libraries(OnlineChat
 	opengl32.lib

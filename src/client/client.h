@@ -1,5 +1,4 @@
-#ifndef _ONLINE	CHAT_CLIENT_CLIENT_H_
-#define _ONLINE_CHAT_CLIENT_CLIENT_H_
+#pragma once
 
 #include <winsock2.h>
 
@@ -53,5 +52,3 @@ namespace Network
 	};
 
 } // !namespase Network
-
-#endif // !_ONLINE_CHAT_CLIENT_CLIENT_H_

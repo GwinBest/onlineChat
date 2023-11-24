@@ -1,13 +1,12 @@
-#ifndef _OLINECHAT_GUI_CHAT_WINDOW_H
-#define _OLINECHAT_GUI_CHAT_WINDOW_H
+#pragma once
 
-#include "mainWindow.h"
+#include "iImGuiWindow.h"
 #include "../client/client.h"
 #include "../messageBuffer/messageBuffer.h"
 
 namespace Gui
 {
-	class ChatWindow final : public MainWindow 
+	class ChatWindow final : public IImGuiWindow
 	{
 	public:
 		ChatWindow() noexcept = default;
@@ -21,5 +20,3 @@ namespace Gui
 	};
 
 } // !namespace Gui
-
-#endif // !_OLINECHAT_GUI_CHAT_WINDOW_H

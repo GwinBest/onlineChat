@@ -1,5 +1,4 @@
-#ifndef _ONLINECHAT_BUFFER_H_
-#define _ONLINECHAT_BUFFER_H_
+#pragma once
 
 #include <cstdint>
 #include <string>
@@ -86,4 +85,3 @@ namespace Buffer
 
 } // !namespace Buffer
 
-#endif // !_ONLINECHAT_BUFFER_H_

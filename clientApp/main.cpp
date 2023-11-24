@@ -8,6 +8,7 @@ int main()
 	window.PushWindow(std::make_unique<Gui::ChatWindow>());
 	window.Draw();
 	window.Cleanup();
+	window.PopWindow();
 
 	return 0;
 }

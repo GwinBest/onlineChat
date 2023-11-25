@@ -2,11 +2,6 @@
 
 namespace Gui
 {
-    ChatWindow::~ChatWindow()
-    {
-        Network::Client::GetInstance().~Client();
-    }
-
     void ChatWindow::GenerateControls() noexcept
     {
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				        // enable docking 

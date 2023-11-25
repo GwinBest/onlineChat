@@ -10,7 +10,7 @@ namespace Gui
 	{
 	public:
 		ChatWindow() noexcept = default;
-		~ChatWindow();
+		~ChatWindow() = default;
 
 	private:
 		void GenerateControls() noexcept override;

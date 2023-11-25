@@ -39,7 +39,6 @@ int main()
 	}
 
 	window.Cleanup();
-	window.PopWindow();
 
 	return 0;
 }

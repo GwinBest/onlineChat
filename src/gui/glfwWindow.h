@@ -21,7 +21,7 @@ namespace Gui
     {
     public:
         GlfwWindow() = default;
-        ~GlfwWindow() = default;
+        ~GlfwWindow();
 
         bool Init() noexcept;
         void Draw() noexcept;

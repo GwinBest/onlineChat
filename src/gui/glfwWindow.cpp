@@ -2,6 +2,14 @@
 
 namespace Gui
 {
+	GlfwWindow::~GlfwWindow()
+	{
+		if (_windowStatus != WindowStatusCode::kWindowDeleted)
+		{
+			Cleanup();
+		}
+	}
+
 	bool GlfwWindow::Init() noexcept
 	{
 		if (!glfwInit())

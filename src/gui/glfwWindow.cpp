@@ -2,6 +2,14 @@
 
 namespace Gui
 {
+	GlfwWindow::~GlfwWindow()
+	{
+		if (_windowStatus != WindowStatusCode::kWindowDeleted)
+		{
+			Cleanup();
+		}
+	}
+
 	bool GlfwWindow::Init() noexcept
 	{
 		if (!glfwInit())
@@ -41,12 +49,9 @@ namespace Gui
 		if (_windowStatus != WindowStatusCode::kWIndowInited)
 			return;
 
-		while (!glfwWindowShouldClose(_mainWindow))
-		{
 			NewFrame();
 			GenerateControls();
 			Render();
-		}
 	}
 
 	void GlfwWindow::Cleanup() noexcept
@@ -69,6 +74,11 @@ namespace Gui
 	void GlfwWindow::PopWindow() noexcept
 	{
 		windowArray.pop_back();
+	}
+
+	GLFWwindow* GlfwWindow::GetGlfwWindow() const noexcept
+	{
+		return _mainWindow;
 	}
 
 	void GlfwWindow::SetupWindowStyle() const noexcept

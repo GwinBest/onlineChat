@@ -1,5 +1,7 @@
 ﻿#include "glfwWindow.h"
 
+#include "../../resources/fonts/openSansRegular.h"
+
 namespace Gui
 {
 	GlfwWindow::~GlfwWindow()
@@ -32,7 +34,10 @@ namespace Gui
 		ImGuiIO& io = ImGui::GetIO();
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;		                                                // enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			                                                // enable Docking
-		io.Fonts->AddFontFromFileTTF("OpenSans-Regular.ttf", 22, 0, io.Fonts->GetGlyphRangesCyrillic());
+		io.Fonts->AddFontFromMemoryTTF(openSansRegular, sizeof(openSansRegular), 22.0f, 0, io.Fonts->GetGlyphRangesCyrillic());
+		
+		ImGuiContext& context = *GImGui;
+		context.FontAtlasOwnedByContext = false;																	// we dont need to destruct font as it static array
 
 		SetupWindowStyle();
 

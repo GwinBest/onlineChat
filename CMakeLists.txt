@@ -12,7 +12,7 @@ endif()
 
 project ("OnlineChat")
 
-include_directories(dependencies/imgui/include dependencies/imgui/glfw/include)
+include_directories(dependencies/imgui/include dependencies/imgui/glfw/include resources/)
 
 
 
@@ -32,7 +32,7 @@ add_executable (OnlineChat
 				"src/messageBuffer/messageBuffer.h"
 				"src/messageBuffer/messageBuffer.cpp" 
 				"src/gui/chatWindow.h" 
-				"src/gui/chatWindow.cpp"  "src/gui/iImGuiWindow.h"   "src/gui/loginWindow.h" "src/gui/loginWindow.cpp"  "src/gui/signUpWindow.h" "src/gui/signUpWindow.cpp")
+				"src/gui/chatWindow.cpp"  "src/gui/iImGuiWindow.h"   "src/gui/loginWindow.h" "src/gui/loginWindow.cpp"  "src/gui/signUpWindow.h" "src/gui/signUpWindow.cpp" "dependencies/imgui/glfw/include/GLFW/glfwLoadImage.h" "dependencies/imgui/glfw/include/GLFW/glfwLoadImage.cpp" )
 
 target_link_libraries(OnlineChat
 	opengl32.lib

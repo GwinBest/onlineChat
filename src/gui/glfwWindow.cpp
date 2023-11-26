@@ -1,6 +1,6 @@
 ﻿#include "glfwWindow.h"
 
-#include "../../resources/fonts/openSansRegular.h"
+#include "fonts/openSansRegular.h"
 
 namespace Gui
 {

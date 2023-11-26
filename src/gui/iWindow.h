@@ -9,7 +9,7 @@ namespace Gui
 
         virtual void GenerateControls() noexcept = 0;
 
-        enum class WindowStatusCode : uint8_t
+        enum class WindowState : uint8_t
         {
             kWIndowUndefined    = 0,
             kWIndowInited       = 1,

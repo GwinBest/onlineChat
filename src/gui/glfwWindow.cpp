@@ -11,7 +11,7 @@ namespace Gui
 
 	GlfwWindow::~GlfwWindow()
 	{
-		if (_windowStatus != WindowStatusCode::kWindowDeleted)
+		if (_windowState != WindowState::kWindowDeleted)
 		{
 			Cleanup();
 		}
@@ -49,14 +49,14 @@ namespace Gui
 		ImGui_ImplGlfw_InitForOpenGL(_mainWindow, true);
 		ImGui_ImplOpenGL3_Init(_glslVersion);
 
-		_windowStatus = WindowStatusCode::kWIndowInited;
+		_windowState = WindowState::kWIndowInited;
 
 		return true;
 	}
 
 	void GlfwWindow::Draw() noexcept
 	{
-		if (_windowStatus != WindowStatusCode::kWIndowInited)
+		if (_windowState != WindowState::kWIndowInited)
 			return;
 
 			NewFrame();
@@ -73,7 +73,7 @@ namespace Gui
 		glfwDestroyWindow(_mainWindow);
 		glfwTerminate();
 
-		_windowStatus = WindowStatusCode::kWindowDeleted;
+		_windowState = WindowState::kWindowDeleted;
 	}
 
 	void GlfwWindow::PushWindow(std::unique_ptr<IImGuiWindow>&& window) noexcept
@@ -115,7 +115,7 @@ namespace Gui
 
 	void GlfwWindow::NewFrame() const noexcept
 	{
-		if (_windowStatus != WindowStatusCode::kWIndowInited)
+		if (_windowState != WindowState::kWIndowInited)
 			return;
 
 		glfwPollEvents();
@@ -134,7 +134,7 @@ namespace Gui
 
 	void GlfwWindow::Render() noexcept
 	{
-		if (_windowStatus != WindowStatusCode::kWIndowInited)
+		if (_windowState != WindowState::kWIndowInited)
 			return;
 
 		ImGui::Render();

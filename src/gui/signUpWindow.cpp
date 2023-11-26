@@ -4,7 +4,24 @@ namespace Gui
 {
 	bool SignUpWindow::IsSignUpButtonPressed() noexcept
 	{
-		return _isSignUpButtonPressed;
+		if (_isSignUpButtonPressed)
+		{
+			_isSignUpButtonPressed = false;
+			return true;
+		}
+
+		return false;
+	}
+
+	bool SignUpWindow::IsBackToLoginButtonPressed() noexcept
+	{
+		if (_isBackToLoginButtonPressed)
+		{
+			_isBackToLoginButtonPressed = false;
+			return true;
+		}
+
+		return false;
 	}
 
 	void SignUpWindow::GenerateControls() noexcept
@@ -12,6 +29,22 @@ namespace Gui
 		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);							// enable docking 
 
 		ImGui::Begin("##signUp window");
+		ImGuiStyle& windowStyle = ImGui::GetStyle();
+		ImVec4 oldButtonColor = windowStyle.Colors[ImGuiCol_Button];
+		windowStyle.Colors[ImGuiCol_Button] = windowStyle.Colors[ImGuiCol_WindowBg];									// set the button color to the same 
+																														// as the bg window so that only the arrow is visible
+
+		int32_t backToLoginButtonWidth = 0;
+		int32_t backToLoginButtonHeight = 0;
+		ImTextureID backToLoginButtonTexture = nullptr;
+		loadTextureFromFile(".\\images\\arrowBack.png",reinterpret_cast<GLuint*>(&backToLoginButtonTexture), &backToLoginButtonWidth, &backToLoginButtonHeight);
+		if (ImGui::ImageButton("##back to login", backToLoginButtonTexture, ImVec2(backToLoginButtonWidth, backToLoginButtonHeight)))
+		{
+			_isBackToLoginButtonPressed = true;
+		}
+
+		windowStyle.Colors[ImGuiCol_Button] = oldButtonColor;															// reset the button color to default
+
 
 		static const std::string welcomeText = "Welcome to the Online Chat app!";
 		const float welcomeTextX = ImGui::GetWindowSize().x / 2 - ImGui::CalcTextSize(welcomeText.c_str()).x / 2;

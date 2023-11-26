@@ -10,11 +10,13 @@ namespace Gui
 		SignUpWindow() = default;
 
 		static bool IsSignUpButtonPressed() noexcept;
+		static bool IsBackToLoginButtonPressed() noexcept;
 
 	private:
 		void GenerateControls() noexcept override;
 	
 	private:
 		static inline bool _isSignUpButtonPressed = false;
+		static inline bool _isBackToLoginButtonPressed = false;
 	};
 } // !namespace Gui

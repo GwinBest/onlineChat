@@ -5,12 +5,24 @@ namespace Gui
 {
 	bool LoginWindow::IsLoginButtonPressed() noexcept
 	{
-		return _isLoginButtonPressed;
+		if (_isLoginButtonPressed)
+		{
+			_isLoginButtonPressed = false;
+			return true;
+		}
+
+		return false;
 	}
 
 	bool LoginWindow::IsSignUpLabelPressed() noexcept
 	{
-		return _isSignUpLabelPressed;
+		if (_isSignUpLabelPressed)
+		{
+			_isSignUpLabelPressed = false;
+			return true;
+		}
+
+		return false;
 	}
 
 	void LoginWindow::GenerateControls() noexcept

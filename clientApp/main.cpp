@@ -3,39 +3,74 @@
 #include "../src/gui/loginWindow.h"
 #include "../src/gui/signUpWindow.h"
 
+enum class WindowState : uint8_t
+{
+	kLogin,
+	kSignUp,
+	kChat
+};
+
 int main()
 {
 	Gui::GlfwWindow window;
-	window.Init();
+	if (!window.Init())
+	{
+		return 1;
+	}
+
+    WindowState currentWindowState = WindowState::kLogin;
 
 	while (!glfwWindowShouldClose(window.GetGlfwWindow()))
 	{
-		if (!Gui::LoginWindow::IsLoginButtonPressed() && !Gui::LoginWindow::IsSignUpLabelPressed())
-		{
-			window.PushWindow(std::make_unique<Gui::LoginWindow>());
+        switch (currentWindowState)
+        {
+        case WindowState::kLogin:
+        {
+            window.PushWindow(std::make_unique<Gui::LoginWindow>());
+            window.Draw();
+            window.PopWindow();
 
-			window.Draw();
+            if (Gui::LoginWindow::IsSignUpLabelPressed() || Gui::SignUpWindow::IsBackToLoginButtonPressed()) 
+            {
+                currentWindowState = WindowState::kSignUp;
+            }
+            else if (Gui::LoginWindow::IsLoginButtonPressed())
+            {
+        
+                currentWindowState = WindowState::kChat;
+            }
+            break;
 
-			window.PopWindow();
-		}
+        }
+        case WindowState::kSignUp:
+        {
+            window.PushWindow(std::make_unique<Gui::SignUpWindow>());
 
-		if (Gui::LoginWindow::IsSignUpLabelPressed() && !Gui::SignUpWindow::IsSignUpButtonPressed())
-		{
-			window.PushWindow(std::make_unique<Gui::SignUpWindow>());
+            window.Draw();
 
-			window.Draw();
+            window.PopWindow();
+            if (Gui::SignUpWindow::IsBackToLoginButtonPressed())
+            {
+                currentWindowState = WindowState::kLogin;
+            }
+            else if (Gui::SignUpWindow::IsSignUpButtonPressed()) 
+            {
+             
+                currentWindowState = WindowState::kChat;
+            }
+            break;
+        }
+        case WindowState::kChat:
+        {
+            window.PushWindow(std::make_unique<Gui::ChatWindow>());
 
-			window.PopWindow();
-		}
+            window.Draw();
 
-		if (Gui::SignUpWindow::IsSignUpButtonPressed() || Gui::LoginWindow::IsLoginButtonPressed())
-		{
-			window.PushWindow(std::make_unique<Gui::ChatWindow>());
-			
-			window.Draw();
+            window.PopWindow();
+            break;
+        }
+        }
 
-			window.PopWindow();
-		}
 	}
 
 	window.Cleanup();

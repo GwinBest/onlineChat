@@ -4,6 +4,11 @@
 
 namespace Gui
 {
+	GlfwWindow::GlfwWindow()
+	{
+		_windowArray.reserve(3);
+	}
+
 	GlfwWindow::~GlfwWindow()
 	{
 		if (_windowStatus != WindowStatusCode::kWindowDeleted)
@@ -73,12 +78,12 @@ namespace Gui
 
 	void GlfwWindow::PushWindow(std::unique_ptr<IImGuiWindow>&& window) noexcept
 	{
-		windowArray.push_back(std::move(window));
+		_windowArray.push_back(std::move(window));
 	}
 
 	void GlfwWindow::PopWindow() noexcept
 	{
-		windowArray.pop_back();
+		_windowArray.pop_back();
 	}
 
 	GLFWwindow* GlfwWindow::GetGlfwWindow() const noexcept
@@ -121,7 +126,7 @@ namespace Gui
 
 	void GlfwWindow::GenerateControls() noexcept
 	{
-		for (const auto& item : windowArray)
+		for (const auto& item : _windowArray)
 		{
 			item->GenerateControls();
 		}

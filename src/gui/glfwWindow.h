@@ -20,7 +20,7 @@ namespace Gui
     class GlfwWindow final : public IWindow
     {
     public:
-        GlfwWindow() = default;
+        GlfwWindow();
         ~GlfwWindow();
 
         bool Init() noexcept;
@@ -43,7 +43,7 @@ namespace Gui
         const char* _glslVersion = "#version 130";
         GLFWwindow* _mainWindow = nullptr;
         const ImVec4 _windowBackgroundColor = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-        std::vector<std::unique_ptr<IImGuiWindow>> windowArray;
+        std::vector<std::unique_ptr<IImGuiWindow>> _windowArray;
 
         int32_t _currentDisplayHeight = _defaultDisplayHeight;
         int32_t _currentDisplayWidth = _defaultDisplayWidth;

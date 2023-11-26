@@ -42,7 +42,7 @@ namespace Gui
 		io.Fonts->AddFontFromMemoryTTF(openSansRegular, sizeof(openSansRegular), 22.0f, 0, io.Fonts->GetGlyphRangesCyrillic());
 		
 		ImGuiContext& context = *GImGui;
-		context.FontAtlasOwnedByContext = false;																	// we dont need to destruct font as it static array
+		context.FontAtlasOwnedByContext = false;																	// we don't need to destruct font as it static array
 
 		SetupWindowStyle();
 

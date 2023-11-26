@@ -33,7 +33,6 @@ namespace Gui
 		ImVec4 oldButtonColor = windowStyle.Colors[ImGuiCol_Button];
 		windowStyle.Colors[ImGuiCol_Button] = windowStyle.Colors[ImGuiCol_WindowBg];									// set the button color to the same 
 																														// as the bg window so that only the arrow is visible
-
 		int32_t backToLoginButtonWidth = 0;
 		int32_t backToLoginButtonHeight = 0;
 		ImTextureID backToLoginButtonTexture = nullptr;
@@ -42,9 +41,7 @@ namespace Gui
 		{
 			_isBackToLoginButtonPressed = true;
 		}
-
 		windowStyle.Colors[ImGuiCol_Button] = oldButtonColor;															// reset the button color to default
-
 
 		static const std::string welcomeText = "Welcome to the Online Chat app!";
 		const float welcomeTextX = ImGui::GetWindowSize().x / 2 - ImGui::CalcTextSize(welcomeText.c_str()).x / 2;

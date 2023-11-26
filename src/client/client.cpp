@@ -106,7 +106,6 @@ namespace Network
 
 			_currentClientState = ClientState::kClientDisconnected;
 		}
-
 	}
 
 } // !namespace Network

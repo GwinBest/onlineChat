@@ -30,7 +30,7 @@ int main()
             window.Draw();
             window.PopWindow();
 
-            if (Gui::LoginWindow::IsSignUpLabelPressed() || Gui::SignUpWindow::IsBackToLoginButtonPressed()) 
+            if (Gui::LoginWindow::IsSignUpLabelPressed()) 
             {
                 currentWindowState = WindowState::kSignUp;
             }
@@ -39,6 +39,7 @@ int main()
         
                 currentWindowState = WindowState::kChat;
             }
+
             break;
 
         }
@@ -49,6 +50,7 @@ int main()
             window.Draw();
 
             window.PopWindow();
+
             if (Gui::SignUpWindow::IsBackToLoginButtonPressed())
             {
                 currentWindowState = WindowState::kLogin;
@@ -58,6 +60,7 @@ int main()
              
                 currentWindowState = WindowState::kChat;
             }
+
             break;
         }
         case WindowState::kChat:
@@ -67,6 +70,7 @@ int main()
             window.Draw();
 
             window.PopWindow();
+
             break;
         }
         }

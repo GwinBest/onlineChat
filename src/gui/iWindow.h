@@ -16,8 +16,8 @@ namespace Gui
             kWindowDeleted      = 2
         };
 
-        static constexpr uint32_t _defaultDisplayWidth = 820;
-        static constexpr uint32_t _defaultDisplayHeight = 700;
+        static constexpr int32_t _defaultDisplayWidth = 820;
+        static constexpr int32_t _defaultDisplayHeight = 700;
     };
 
 } // !namespace Gui

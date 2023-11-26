@@ -45,8 +45,8 @@ namespace Gui
         const ImVec4 _windowBackgroundColor = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
         std::vector<std::unique_ptr<IImGuiWindow>> windowArray;
 
-        int _currentDisplayHeight = _defaultDisplayHeight;
-        int _currentDisplayWidth = _defaultDisplayWidth;
+        int32_t _currentDisplayHeight = _defaultDisplayHeight;
+        int32_t _currentDisplayWidth = _defaultDisplayWidth;
 
         WindowStatusCode _windowStatus = WindowStatusCode::kWIndowUndefined;
     };

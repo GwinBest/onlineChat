@@ -48,7 +48,7 @@ namespace Gui
         int32_t _currentDisplayHeight = _defaultDisplayHeight;
         int32_t _currentDisplayWidth = _defaultDisplayWidth;
 
-        WindowState _windowState = WindowState::kWIndowUndefined;
+        WindowState _currentWindowState = WindowState::kWIndowUndefined;
     };
 
 } // !namespace Gui

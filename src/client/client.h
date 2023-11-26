@@ -44,7 +44,7 @@ namespace Network
 		WSADATA _wsaData;
 		SOCKET _clientSocket;
 		SOCKADDR_IN _socketAddress;
-		ClientState _clientState = ClientState::kClientDisconnected;
+		ClientState _currentClientState = ClientState::kClientDisconnected;
 
 		size_t _clientId;
 		const std::string _ipAddress = "192.168.43.208";

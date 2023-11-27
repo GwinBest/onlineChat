@@ -7,6 +7,8 @@ namespace Gui
 	GlfwWindow::GlfwWindow()
 	{
 		_windowArray.reserve(3);
+
+		Init();
 	}
 
 	GlfwWindow::~GlfwWindow()
@@ -17,43 +19,6 @@ namespace Gui
 		}
 	}
 
-	bool GlfwWindow::Init() noexcept
-	{
-		if (!glfwInit())
-			return false;
-
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
-		_mainWindow = glfwCreateWindow(_defaultDisplayWidth, _defaultDisplayHeight, "Online Chat", nullptr, nullptr);
-		if (_mainWindow == nullptr)
-			return false;
-
-		glfwMakeContextCurrent(_mainWindow);
-		glfwSwapInterval(false);                                                                                    // disable vsync
-
-		// setup Dear ImGui context
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-
-		ImGuiIO& io = ImGui::GetIO();
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;		                                                // enable Keyboard Controls
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			                                                // enable Docking
-		io.Fonts->AddFontFromMemoryTTF(openSansRegular, sizeof(openSansRegular), 22.0f, 0, io.Fonts->GetGlyphRangesCyrillic());
-		
-		ImGuiContext& context = *GImGui;
-		context.FontAtlasOwnedByContext = false;																	// we don't need to destruct font as it static array
-
-		SetupWindowStyle();
-
-		ImGui_ImplGlfw_InitForOpenGL(_mainWindow, true);
-		ImGui_ImplOpenGL3_Init(_glslVersion);
-
-		_currentWindowState = WindowState::kWIndowInited;
-
-		return true;
-	}
-
 	void GlfwWindow::Draw() noexcept
 	{
 		if (_currentWindowState != WindowState::kWIndowInited)
@@ -62,18 +27,6 @@ namespace Gui
 			NewFrame();
 			GenerateControls();
 			Render();
-	}
-
-	void GlfwWindow::Cleanup() noexcept
-	{
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
-		ImGui::DestroyContext();
-
-		glfwDestroyWindow(_mainWindow);
-		glfwTerminate();
-
-		_currentWindowState = WindowState::kWindowDeleted;
 	}
 
 	void GlfwWindow::PushWindow(std::unique_ptr<IImGuiWindow>&& window) noexcept
@@ -89,6 +42,57 @@ namespace Gui
 	GLFWwindow* GlfwWindow::GetGlfwWindow() const noexcept
 	{
 		return _mainWindow;
+	}
+
+	void GlfwWindow::Init() noexcept
+	{
+		if (!glfwInit())
+		{
+			return;
+		}
+
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
+		_mainWindow = glfwCreateWindow(_defaultDisplayWidth, _defaultDisplayHeight, "Online Chat", nullptr, nullptr);
+		if (_mainWindow == nullptr)
+		{
+			return;
+		}
+
+		glfwMakeContextCurrent(_mainWindow);
+		glfwSwapInterval(false);                                                                                    // disable vsync
+
+		// setup Dear ImGui context
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;		                                                // enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			                                                // enable Docking
+		io.Fonts->AddFontFromMemoryTTF(openSansRegular, sizeof(openSansRegular), 22.0f, 0, io.Fonts->GetGlyphRangesCyrillic());
+
+		ImGuiContext& context = *GImGui;
+		context.FontAtlasOwnedByContext = false;																	// we don't need to destruct font as it static array
+
+		SetupWindowStyle();
+
+		ImGui_ImplGlfw_InitForOpenGL(_mainWindow, true);
+		ImGui_ImplOpenGL3_Init(_glslVersion);
+
+		_currentWindowState = WindowState::kWIndowInited;
+	}
+
+	void GlfwWindow::Cleanup() noexcept
+	{
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+
+		glfwDestroyWindow(_mainWindow);
+		glfwTerminate();
+
+		_currentWindowState = WindowState::kWindowDeleted;
 	}
 
 	void GlfwWindow::SetupWindowStyle() const noexcept

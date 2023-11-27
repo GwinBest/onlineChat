@@ -23,9 +23,7 @@ namespace Gui
         GlfwWindow();
         ~GlfwWindow();
 
-        bool Init() noexcept;
         void Draw() noexcept;
-        void Cleanup() noexcept;
 
         void PushWindow(std::unique_ptr<IImGuiWindow>&& window) noexcept;
         void PopWindow() noexcept;
@@ -33,6 +31,9 @@ namespace Gui
         GLFWwindow* GetGlfwWindow() const noexcept;
 
     private:
+        void Init() noexcept;
+        void Cleanup() noexcept;
+
         void SetupWindowStyle() const noexcept;
 
         void NewFrame() const noexcept;

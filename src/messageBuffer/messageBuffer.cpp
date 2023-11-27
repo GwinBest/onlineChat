@@ -66,7 +66,10 @@ namespace Buffer
 		temp->previous->next = nullptr;
 
 		delete[] temp->data;
+		temp->data = nullptr;
+
 		delete temp;
+		temp = nullptr;
 	}
 
 	inline bool MessageBuffer::isEmpty() const noexcept

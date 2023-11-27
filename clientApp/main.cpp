@@ -13,10 +13,6 @@ enum class WindowState : uint8_t
 int main()
 {
 	Gui::GlfwWindow window;
-	if (!window.Init())
-	{
-		return 1;
-	}
 
     WindowState currentWindowState = WindowState::kLogin;
 
@@ -76,8 +72,6 @@ int main()
         }
 
 	}
-
-	window.Cleanup();
 
 	return 0;
 }

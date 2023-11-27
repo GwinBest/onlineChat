@@ -4,7 +4,7 @@
 
 namespace Gui
 {
-	GlfwWindow::GlfwWindow()
+	GlfwWindow::GlfwWindow() noexcept
 	{
 		_windowArray.reserve(3);
 

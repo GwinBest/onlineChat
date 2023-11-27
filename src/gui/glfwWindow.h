@@ -20,7 +20,7 @@ namespace Gui
     class GlfwWindow final : public IWindow
     {
     public:
-        GlfwWindow();
+        GlfwWindow() noexcept;
         ~GlfwWindow();
 
         void Draw() noexcept;

@@ -14,7 +14,7 @@ namespace UserData
 		UserCredentialsFile() = default;
 		static bool IsFileExists() noexcept;
 
-		static bool CreateNewFile() noexcept;
+		[[nodiscard]] static bool CreateNewFile() noexcept;
 		static void WriteCredentials(const std::string& name, const std::string& login, const std::string& password) noexcept;
 		static void CloseFile() noexcept;
 

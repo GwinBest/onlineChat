@@ -3,6 +3,9 @@
 #include "../src/gui/loginWindow.h"
 #include "../src/gui/signUpWindow.h"
 
+#include <fstream>
+#include "../src/userData/userCredentialsFile.h"
+
 enum class WindowState : uint8_t
 {
 	kLogin,
@@ -12,9 +15,21 @@ enum class WindowState : uint8_t
 
 int main()
 {
-	Gui::GlfwWindow window;
 
-    WindowState currentWindowState = WindowState::kLogin;
+	Gui::GlfwWindow window;
+    WindowState currentWindowState;
+
+    if (UserData::UserCredentialsFile::IsFileExists())
+    {
+        currentWindowState = WindowState::kChat;
+    }
+    else
+    {
+        currentWindowState = WindowState::kLogin;
+    }
+
+    std::string userLogin;
+    std::string userPassword;
 
 	while (!glfwWindowShouldClose(window.GetGlfwWindow()))
 	{
@@ -32,12 +47,19 @@ int main()
             }
             else if (Gui::LoginWindow::IsLoginButtonPressed())
             {
-        
+                userLogin       = Gui::LoginWindow::GetLogin();
+                userPassword    = Gui::LoginWindow::GetPassword();
+
+                if (UserData::UserCredentialsFile::CreateNewFile())
+                {
+                    UserData::UserCredentialsFile::WriteCredentials("userName", userLogin, userPassword);
+                    UserData::UserCredentialsFile::CloseFile();
+                }
+
                 currentWindowState = WindowState::kChat;
             }
 
             break;
-
         }
         case WindowState::kSignUp:
         {
@@ -53,7 +75,16 @@ int main()
             }
             else if (Gui::SignUpWindow::IsSignUpButtonPressed()) 
             {
-             
+                std::string userName    = Gui::SignUpWindow::GetName();
+                userLogin               = Gui::SignUpWindow::GetLogin();
+                userPassword            = Gui::SignUpWindow::GetPassword();
+                
+                if (UserData::UserCredentialsFile::CreateNewFile())
+                {
+                    UserData::UserCredentialsFile::WriteCredentials(userName, userLogin, userPassword);
+                    UserData::UserCredentialsFile::CloseFile();
+                }
+
                 currentWindowState = WindowState::kChat;
             }
 

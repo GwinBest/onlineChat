@@ -14,6 +14,16 @@ namespace Gui
 		return false;
 	}
 
+	std::string& LoginWindow::GetLogin() noexcept
+	{
+		return _inputBufferLogin;
+	}
+
+	std::string& LoginWindow::GetPassword() noexcept
+	{
+		return _inputBufferPassword;
+	}
+
 	bool LoginWindow::IsSignUpLabelPressed() noexcept
 	{
 		if (_isSignUpLabelPressed)
@@ -45,12 +55,11 @@ namespace Gui
 
 		static constexpr float inputTextWidth = 300.0f;
 
-		static std::string inputBufferLogin;
 		const float inputLoginX = ImGui::GetWindowSize().x / 2 - inputTextWidth / 2;
 		const float inputLoginY = ImGui::GetWindowSize().y / 2 - welcomeTextY;
 		ImGui::SetCursorPos(ImVec2(inputLoginX, inputLoginY));
 		ImGui::PushItemWidth(inputTextWidth);
-		ImGui::InputTextWithHint("##input text login", "Login", &inputBufferLogin, ImGuiInputTextFlags_EnterReturnsTrue);
+		ImGui::InputTextWithHint("##input text login", "Login", &_inputBufferLogin, ImGuiInputTextFlags_EnterReturnsTrue);
 		ImGui::PopItemWidth();
 
 		const std::string forgotPasswordText = "Forgot password?";
@@ -60,12 +69,11 @@ namespace Gui
 		ImGui::TextDisabled(forgotPasswordText.c_str());
 		//TODO: add forgot pass realization
 
-		static std::string inputBufferPassword;
 		const float inputPasswordX = inputLoginX;
 		const float inputPasswordY = inputLoginY + 70.0f;
 		ImGui::SetCursorPos(ImVec2(inputPasswordX, inputPasswordY));
 		ImGui::PushItemWidth(inputTextWidth);
-		ImGui::InputTextWithHint("##input text password", "Password", &inputBufferPassword, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password);
+		ImGui::InputTextWithHint("##input text password", "Password", &_inputBufferPassword, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password);
 		ImGui::PopItemWidth();
 
 		const float loginButtonX = inputLoginX;

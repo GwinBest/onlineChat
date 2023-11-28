@@ -32,13 +32,13 @@ namespace UserData
 		const size_t loginLength = strlen(login.c_str());
 		const size_t passwordLength = strlen(password.c_str());
 
-		_credentialsFile.write(name.c_str(), nameLength);
+		_credentialsFile.write(name.c_str(), name.size());
 		_credentialsFile.write(" ", 1);
 
-		_credentialsFile.write(login.c_str(), loginLength);
+		_credentialsFile.write(login.c_str(), login.size());
 		_credentialsFile.write(" ", 1);
 
-		_credentialsFile.write(password.c_str(), passwordLength);
+		_credentialsFile.write(password.c_str(), password.size());
 
 
 	}

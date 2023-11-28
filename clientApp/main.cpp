@@ -2,8 +2,6 @@
 #include "../src/gui/chatWindow.h"
 #include "../src/gui/loginWindow.h"
 #include "../src/gui/signUpWindow.h"
-
-#include <fstream>
 #include "../src/userData/userCredentialsFile.h"
 
 enum class WindowState : uint8_t

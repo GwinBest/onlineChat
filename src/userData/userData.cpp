@@ -20,6 +20,7 @@ namespace UserData
 		Network::UserRequest request =
 		{
 			.actionType = Network::ActionType::kGetUSerNameFromDatabase,
+			.name  = "",
 			.login = login,
 			.password = password
 		};
@@ -35,6 +36,7 @@ namespace UserData
 		Network::UserRequest request =
 		{
 			.actionType = Network::ActionType::kCheckUserExistence,
+			.name = "",
 			.login = login,
 			.password = password
 		};

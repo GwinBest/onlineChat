@@ -4,8 +4,9 @@
 
 #include <cstdint>
 #include <string>
-#include <iostream>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 
 #include "../messageBuffer/messageBuffer.h"
 #include "../userData/userData.h"
@@ -19,7 +20,8 @@ namespace Network
 	{
 		kUserChatMessage				= 0,
 		kAddUserCredentialsToDatabase	= 1,
-		kCheckUserExistence				= 2
+		kCheckUserExistence				= 2,
+		kGetUSerNameFromDatabase		= 3
 	};
 
 	struct UserRequest
@@ -65,6 +67,11 @@ namespace Network
 		SOCKET _clientSocket;
 		SOCKADDR_IN _socketAddress;
 		ClientState _currentClientState = ClientState::kClientDisconnected;
+
+		std::mutex mutex;
+		std::condition_variable conditionalVariable;
+
+		static inline char _serverResponse[255];
 
 		size_t _clientId;
 		const std::string _ipAddress = "127.0.0.1";

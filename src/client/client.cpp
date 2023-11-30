@@ -1,4 +1,5 @@
 ﻿#include "client.h"
+#include <iostream>
 
 namespace Network 
 {
@@ -32,47 +33,75 @@ namespace Network
 
 		while (true) 
 		{
-			if (recv(_clientSocket, reinterpret_cast<char*>(&receiveMessageSize), sizeof(size_t), NULL) > 0)
+			ActionType type;
+			recv(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
+			
+			switch (type)
 			{
-				char* receiveMessage = new char[receiveMessageSize + 1];
-				receiveMessage[receiveMessageSize] = '\0';
+			case Network::ActionType::kUserChatMessage: 
+			{
+				if (recv(_clientSocket, reinterpret_cast<char*>(&receiveMessageSize), sizeof(size_t), NULL) > 0)
+				{
+					char* receiveMessage = new char[receiveMessageSize + 1];
+					receiveMessage[receiveMessageSize] = '\0';
 
-				recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);
+					recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);
+
+					Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kReceived, receiveMessage);
+
+					delete[] receiveMessage;
+				}
+
+				break;
+			}
+			case Network::ActionType::kAddUserCredentialsToDatabase:
+			{
+				break;
+			}
+			case Network::ActionType::kCheckUserExistence:
+			case Network::ActionType::kGetUSerNameFromDatabase:
+			{
+				recv(_clientSocket, _serverResponse, sizeof(_serverResponse), NULL);
 				
-				Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kReceived, receiveMessage);
+				conditionalVariable.notify_one();
 
-				delete[] receiveMessage;
+				break;
+			}
+			default:
+			{
+				break;
+			}
 			}
 		}
 	}
 
-		void Client::SendUserCredentials(UserRequest& userCredentials) const noexcept
-		{
-			// TODO: static name and login array instead of std::string
+	void Client::SendUserCredentials(UserRequest& userCredentials) const noexcept
+	{
+		// TODO: static name and login array instead of std::string
 
-			ActionType type = userCredentials.actionType;
-			send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
+		ActionType type = userCredentials.actionType;
+		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 
-			size_t nameLength = userCredentials.name.size();
-			send(_clientSocket, reinterpret_cast<char*>(&nameLength), sizeof(nameLength), NULL);
-			send(_clientSocket, userCredentials.name.c_str(), nameLength, NULL);
+		size_t nameLength = userCredentials.name.size();
+		send(_clientSocket, reinterpret_cast<char*>(&nameLength), sizeof(nameLength), NULL);
+		send(_clientSocket, userCredentials.name.c_str(), nameLength, NULL);
 
-			size_t loginLength = userCredentials.login.size();
-			send(_clientSocket, reinterpret_cast<char*>(&loginLength), sizeof(loginLength), NULL);
-			send(_clientSocket, userCredentials.login.c_str(), loginLength, NULL);
+		size_t loginLength = userCredentials.login.size();
+		send(_clientSocket, reinterpret_cast<char*>(&loginLength), sizeof(loginLength), NULL);
+		send(_clientSocket, userCredentials.login.c_str(), loginLength, NULL);
 
-			size_t passwordLength = userCredentials.password.size();
-			send(_clientSocket, reinterpret_cast<char*>(&passwordLength), sizeof(passwordLength), NULL);
-			send(_clientSocket, userCredentials.password.c_str(), passwordLength, NULL);
-		}
+		size_t passwordLength = userCredentials.password.size();
+		send(_clientSocket, reinterpret_cast<char*>(&passwordLength), sizeof(passwordLength), NULL);
+		send(_clientSocket, userCredentials.password.c_str(), passwordLength, NULL);
+	}
 
-		std::string Client::ReceiveServerResponse() noexcept
-		{
-			char response[255];
-			recv(_clientSocket, response, sizeof(response), NULL);
-			
-			return response;
-		}
+	std::string Client::ReceiveServerResponse() noexcept
+	{
+		std::unique_lock<std::mutex> lock(mutex);
+		conditionalVariable.wait(lock);
+
+		return _serverResponse;
+	}
 
 	Client::~Client() 
 	{

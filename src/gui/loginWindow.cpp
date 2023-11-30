@@ -55,12 +55,21 @@ namespace Gui
 
 		static constexpr float inputTextWidth = 300.0f;
 
+		ImGuiStyle& windowStyle = ImGui::GetStyle();
+		ImVec4 oldInputTextColor = windowStyle.Colors[ImGuiCol_FrameBg];
+		ImVec4 inputTextEmptyColor = ImVec4(0.8f, 0.0f, 0.0f, 0.5f);
+
+		if (_isInputLoginEmpty)
+		{
+			windowStyle.Colors[ImGuiCol_FrameBg] = inputTextEmptyColor;
+		}
 		const float inputLoginX = ImGui::GetWindowSize().x / 2 - inputTextWidth / 2;
 		const float inputLoginY = ImGui::GetWindowSize().y / 2 - welcomeTextY;
 		ImGui::SetCursorPos(ImVec2(inputLoginX, inputLoginY));
 		ImGui::PushItemWidth(inputTextWidth);
 		ImGui::InputTextWithHint("##input text login", "Login", &_inputBufferLogin, ImGuiInputTextFlags_EnterReturnsTrue);
 		ImGui::PopItemWidth();
+		windowStyle.Colors[ImGuiCol_FrameBg] = oldInputTextColor;
 
 		const std::string forgotPasswordText = "Forgot password?";
 		const float forgotPasswordX = inputLoginX + inputTextWidth - ImGui::CalcTextSize(forgotPasswordText.c_str()).x;
@@ -69,19 +78,45 @@ namespace Gui
 		ImGui::TextDisabled(forgotPasswordText.c_str());
 		//TODO: add forgot pass realization
 
+		if (_isInputPasswordEmpty)
+		{
+			windowStyle.Colors[ImGuiCol_FrameBg] = inputTextEmptyColor;
+		}
 		const float inputPasswordX = inputLoginX;
 		const float inputPasswordY = inputLoginY + 70.0f;
 		ImGui::SetCursorPos(ImVec2(inputPasswordX, inputPasswordY));
 		ImGui::PushItemWidth(inputTextWidth);
 		ImGui::InputTextWithHint("##input text password", "Password", &_inputBufferPassword, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_Password);
 		ImGui::PopItemWidth();
+		windowStyle.Colors[ImGuiCol_FrameBg] = oldInputTextColor;
 
 		const float loginButtonX = inputLoginX;
 		const float loginButtonY = inputPasswordY + 55.0f;
 		ImGui::SetCursorPos(ImVec2(loginButtonX, loginButtonY));
 		if (ImGui::Button("Login", ImVec2(inputTextWidth, 0)))															//0 means that Y will be default for ImGui
 		{
-			_isLoginButtonPressed = true;
+			if (_inputBufferLogin.empty())
+			{
+				_isInputLoginEmpty = true;
+			}
+			else
+			{
+				_isInputLoginEmpty = false;
+			}
+
+			if (_inputBufferPassword.empty())
+			{
+				_isInputPasswordEmpty = true;
+			}
+			else
+			{
+				_isInputPasswordEmpty = false;
+			}
+
+			if (!_isInputLoginEmpty && !_isInputPasswordEmpty)
+			{
+				_isLoginButtonPressed = true;
+			}
 		}
 
 		const std::string signUpText = "Don't have an account? Create it!";
@@ -92,6 +127,13 @@ namespace Gui
 		if (ImGui::Selectable(signUpText.c_str(), false, 0, ImVec2(signUpTextLength, 0)))								//0 means that Y will be default for ImGui
 		{
 			_isSignUpLabelPressed = true;
+
+			_inputBufferLogin = "";
+			_inputBufferPassword = "";
+
+			_isInputLoginEmpty = false;
+			_isInputPasswordEmpty = false;
+
 		}
 
 		ImGui::End();

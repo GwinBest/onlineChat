@@ -22,6 +22,9 @@ namespace Gui
 		static inline std::string _inputBufferLogin;
 		static inline std::string _inputBufferPassword;
 
+		static inline bool _isInputLoginEmpty = false;
+		static inline bool _isInputPasswordEmpty = false;
+
 		static inline bool _isLoginButtonPressed = false;
 		static inline bool _isSignUpLabelPressed = false;
 	};

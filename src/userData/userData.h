@@ -10,7 +10,7 @@
 
 namespace UserData
 {
-	class User
+	class User final
 	{
 	public:
 		static void PushUserCredentialsToDatabase(const std::string& name, const std::string& login, const std::string& password) noexcept;

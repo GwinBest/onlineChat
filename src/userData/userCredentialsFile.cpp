@@ -32,7 +32,6 @@ namespace UserData
 		{
 			_credentialsFile.close();
 		}
-
 	}
 
 	void UserCredentialsFile::WriteCredentials(const std::string& name, const std::string& login, const std::string& password) noexcept
@@ -42,14 +41,12 @@ namespace UserData
 		const size_t passwordLength = strlen(password.c_str());
 
 		_credentialsFile.write(name.c_str(), name.size());
-		_credentialsFile.write(" ", 1);
+		_credentialsFile.write(" ", sizeof(char));
 
 		_credentialsFile.write(login.c_str(), login.size());
-		_credentialsFile.write(" ", 1);
+		_credentialsFile.write(" ", sizeof(char));
 
 		_credentialsFile.write(password.c_str(), password.size());
-
-
 	}
 
 	void UserCredentialsFile::ReadCredentials(std::string& name, std::string& login, std::string& password) noexcept

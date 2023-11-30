@@ -68,16 +68,9 @@ namespace Network
 
 		std::string Client::ReceiveServerResponse() noexcept
 		{
-			ActionType type;
-			size_t responseSize;
-			std::string response;
-
-			if (recv(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL) != SOCKET_ERROR)
-			{
-				recv(_clientSocket, reinterpret_cast<char*>(&responseSize), sizeof(responseSize), NULL);
-				recv(_clientSocket, const_cast<char*>(response.c_str()), responseSize, NULL);
-			}
-
+			char response[255];
+			recv(_clientSocket, response, sizeof(response), NULL);
+			
 			return response;
 		}
 

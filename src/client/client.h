@@ -21,8 +21,8 @@ namespace Network
 
 		static Client& GetInstance() noexcept;
 
-		void Send(size_t userId, const char* data, size_t dataSize) noexcept;
-		void Receive() noexcept;
+		void SendUserMessage(size_t userId, const char* data, size_t dataSize) noexcept;
+		[[noreturn]] void ReceiveUserMessageThread() noexcept;
 
 		~Client();
 
@@ -47,7 +47,7 @@ namespace Network
 		ClientState _currentClientState = ClientState::kClientDisconnected;
 
 		size_t _clientId;
-		const std::string _ipAddress = "192.168.43.208";
+		const std::string _ipAddress = "127.0.0.1";
 		static constexpr uint32_t _port = 8080;
 	};
 

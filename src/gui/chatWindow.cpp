@@ -97,7 +97,7 @@ namespace Gui
             // send message 
             if ((isEnterPressed || isButtonPressed) && _inputBuffer != "")
             {
-                Network::Client::GetInstance().Send(chatSelected, _inputBuffer.c_str(), _inputBuffer.size());
+                Network::Client::GetInstance().SendUserMessage(chatSelected, _inputBuffer.c_str(), _inputBuffer.size());
                 Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kSend, _inputBuffer.c_str());
 
                 isEnterPressed = false;

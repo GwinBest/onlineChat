@@ -12,21 +12,21 @@ namespace Network
 				//TODO: add !connect handle
 			};
 
-			static std::thread receiveThread(&Network::Client::Receive, &Network::Client::GetInstance());
+			static std::thread receiveThread(&Network::Client::ReceiveUserMessageThread, &Network::Client::GetInstance());
 			receiveThread.detach();
 		}
 
 		return instance;
 	}
 
-	void Client::Send(size_t userId, const char* data, size_t dataSize) noexcept
+	void Client::SendUserMessage(size_t userId, const char* data, size_t dataSize) noexcept
 	{
 		send(_clientSocket, reinterpret_cast<char*>(&userId), sizeof(size_t), NULL);								// send the receiver's id
 		send(_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(size_t), NULL);								// send the size of the message
 		send(_clientSocket, data, dataSize, NULL);																	// send the message
 	}
 
-	void Client::Receive() noexcept
+	void Client::ReceiveUserMessageThread() noexcept
 	{
 		size_t receiveMessageSize;
 

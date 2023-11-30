@@ -1,6 +1,6 @@
 #pragma once
 
-// for FILE_ATTRIBUTE_HIDDEN
+// for SetFileAttributesA
 #include <Windows.h>
 
 #include <fstream>
@@ -12,11 +12,13 @@ namespace UserData
 	{
 	public:
 		UserCredentialsFile() = default;
+
 		static bool IsFileExists() noexcept;
 
 		[[nodiscard]] static bool CreateNewFile() noexcept;
-		static void WriteCredentials(const std::string& name, const std::string& login, const std::string& password) noexcept;
 		static void CloseFile() noexcept;
+
+		static void WriteCredentials(const std::string& name, const std::string& login, const std::string& password) noexcept;
 
 	private:
 		static inline const char* _fileName = ".loginFile.dat";

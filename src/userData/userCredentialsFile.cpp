@@ -26,6 +26,15 @@ namespace UserData
 		return false;
 	}
 
+	void UserCredentialsFile::CloseFile() noexcept
+	{
+		if (_credentialsFile.is_open())
+		{
+			_credentialsFile.close();
+		}
+
+	}
+
 	void UserCredentialsFile::WriteCredentials(const std::string& name, const std::string& login, const std::string& password) noexcept
 	{
 		const size_t nameLength = strlen(name.c_str());
@@ -40,15 +49,6 @@ namespace UserData
 
 		_credentialsFile.write(password.c_str(), password.size());
 
-
-	}
-
-	void UserCredentialsFile::CloseFile() noexcept
-	{
-		if (_credentialsFile.is_open())
-		{
-			_credentialsFile.close();
-		}
 
 	}
 

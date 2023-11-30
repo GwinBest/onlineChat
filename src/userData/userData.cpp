@@ -25,8 +25,8 @@ namespace UserData
 		};
 
 		Network::Client::GetInstance().SendUserCredentials(request);
-		const std::string serverResponse = Network::Client::GetInstance().ReceiveServerResponse();
-
+		std::string serverResponse = Network::Client::GetInstance().ReceiveServerResponse();
+		
 		if (serverResponse == "Exist")
 		{
 			return true;
@@ -48,6 +48,21 @@ namespace UserData
 	std::string User::GetUserPassword() const noexcept
 	{
 		return _userPassword;
+	}
+
+	void User::SetUserName(std::string& name) noexcept
+	{
+		_userName = name;
+	}
+
+	void User::SetUserLogin(std::string& login) noexcept
+	{
+		_userLogin = login;
+	}
+
+	void User::SetUserPassword(std::string& password) noexcept
+	{
+		_userPassword = password;
 	}
 
 } // !namespace UserData

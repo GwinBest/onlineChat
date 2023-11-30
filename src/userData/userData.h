@@ -21,12 +21,14 @@ namespace UserData
 		std::string GetUserLogin() const noexcept;
 		std::string GetUserPassword() const noexcept;
 
+		void SetUserName(std::string& name) noexcept;
+		void SetUserLogin(std::string& login) noexcept;
+		void SetUserPassword(std::string& password) noexcept;
+
 	private:
 		std::string _userName;
 		std::string _userLogin;
 		std::string _userPassword;
-
-		friend UserCredentialsFile;
 	};
 
 } // !namespace UserData

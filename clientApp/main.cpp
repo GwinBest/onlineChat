@@ -13,13 +13,26 @@ enum class WindowState : uint8_t
 
 int main()
 {
-
 	Gui::GlfwWindow window;
     WindowState currentWindowState;
 
+    UserData::User user;
+
     if (UserData::UserCredentialsFile::IsFileExists())
     {
-        currentWindowState = WindowState::kChat;
+        std::string name;
+        std::string login;
+        std::string password;
+        UserData::UserCredentialsFile::ReadCredentials(name, login, password);
+
+        if (UserData::User::IsUserExist(login, password))
+        {
+            currentWindowState = WindowState::kChat;
+        }
+        else
+        {
+            currentWindowState = WindowState::kLogin;
+        }
     }
     else
     {

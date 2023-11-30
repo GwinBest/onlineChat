@@ -4,15 +4,32 @@
 
 #include <cstdint>
 #include <string>
+#include <iostream>
 #include <thread>
 
 #include "../messageBuffer/messageBuffer.h"
+#include "../userData/userData.h"
 
 #pragma comment (lib, "ws2_32.lib")
 #pragma warning (disable:4996)
 
 namespace Network
 {
+	enum class ActionType : uint32_t
+	{
+		kUserChatMessage				= 0,
+		kAddUserCredentialsToDatabase	= 1,
+		kCheckUserExistence				= 2
+	};
+
+	struct UserRequest
+	{
+		ActionType actionType;
+		std::string name;
+		std::string login;
+		std::string password;
+	};
+
 	class Client
 	{
 	public:
@@ -23,6 +40,9 @@ namespace Network
 
 		void SendUserMessage(size_t userId, const char* data, size_t dataSize) noexcept;
 		[[noreturn]] void ReceiveUserMessageThread() noexcept;
+
+		void SendUserCredentials(UserRequest& userCredentials) const noexcept;
+		std::string ReceiveServerResponse() noexcept;
 
 		~Client();
 

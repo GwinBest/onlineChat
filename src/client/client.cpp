@@ -46,6 +46,41 @@ namespace Network
 		}
 	}
 
+		void Client::SendUserCredentials(UserRequest& userCredentials) const noexcept
+		{
+			// TODO: static name and login array instead of std::string
+
+			ActionType type = userCredentials.actionType;
+			send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
+
+			size_t nameLength = userCredentials.name.size();
+			send(_clientSocket, reinterpret_cast<char*>(&nameLength), sizeof(nameLength), NULL);
+			send(_clientSocket, userCredentials.name.c_str(), nameLength, NULL);
+
+			size_t loginLength = userCredentials.login.size();
+			send(_clientSocket, reinterpret_cast<char*>(&loginLength), sizeof(loginLength), NULL);
+			send(_clientSocket, userCredentials.login.c_str(), loginLength, NULL);
+
+			size_t passwordLength = userCredentials.password.size();
+			send(_clientSocket, reinterpret_cast<char*>(&passwordLength), sizeof(passwordLength), NULL);
+			send(_clientSocket, userCredentials.password.c_str(), passwordLength, NULL);
+		}
+
+		std::string Client::ReceiveServerResponse() noexcept
+		{
+			ActionType type;
+			size_t responseSize;
+			std::string response;
+
+			if (recv(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL) != SOCKET_ERROR)
+			{
+				recv(_clientSocket, reinterpret_cast<char*>(&responseSize), sizeof(responseSize), NULL);
+				recv(_clientSocket, const_cast<char*>(response.c_str()), responseSize, NULL);
+			}
+
+			return response;
+		}
+
 	Client::~Client() 
 	{
 		if (_currentClientState != ClientState::kClientDisconnected)

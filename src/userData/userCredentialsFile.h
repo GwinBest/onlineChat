@@ -3,8 +3,8 @@
 // for SetFileAttributesA
 #include <Windows.h>
 
+#include <string>
 #include <fstream>
-
 
 namespace UserData
 {
@@ -19,6 +19,7 @@ namespace UserData
 		static void CloseFile() noexcept;
 
 		static void WriteCredentials(const std::string& name, const std::string& login, const std::string& password) noexcept;
+		static void ReadCredentials(std::string& name, std::string& login, std::string& password) noexcept;
 
 	private:
 		static inline const char* _fileName = ".loginFile.dat";

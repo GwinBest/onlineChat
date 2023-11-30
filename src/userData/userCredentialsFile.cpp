@@ -52,4 +52,11 @@ namespace UserData
 
 	}
 
+	void UserCredentialsFile::ReadCredentials(std::string& name, std::string& login, std::string& password) noexcept
+	{
+		std::getline(_credentialsFile, name, ' ');
+		std::getline(_credentialsFile, login, ' ');
+		std::getline(_credentialsFile, password);
+	}
+
 } // !namespace UserData

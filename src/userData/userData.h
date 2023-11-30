@@ -15,6 +15,8 @@ namespace UserData
 	public:
 		static void PushUserCredentialsToDatabase(const std::string& name, const std::string& login, const std::string& password) noexcept;
 
+		static std::string GetUserNameFromDatabase(const std::string& login, const std::string& password) noexcept;
+
 		static bool IsUserExist(const std::string& login, const std::string& password) noexcept;
 
 		std::string GetUserName() const noexcept;

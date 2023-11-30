@@ -15,6 +15,21 @@ namespace UserData
 		Network::Client::GetInstance().SendUserCredentials(request);
 	}
 
+	std::string User::GetUserNameFromDatabase(const std::string& login, const std::string& password) noexcept
+	{
+		Network::UserRequest request =
+		{
+			.actionType = Network::ActionType::kGetUSerNameFromDatabase,
+			.login = login,
+			.password = password
+		};
+
+		Network::Client::GetInstance().SendUserCredentials(request);
+		std::string serverResponse = Network::Client::GetInstance().ReceiveServerResponse();
+
+		return serverResponse;
+	}
+
 	bool User::IsUserExist(const std::string& login, const std::string& password) noexcept
 	{
 		Network::UserRequest request =

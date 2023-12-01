@@ -13,24 +13,24 @@ namespace UserData
 	class User final
 	{
 	public:
-		static void PushUserCredentialsToDatabase(const std::string& name, const std::string& login, const std::string& password) noexcept;
+		static void PushUserCredentialsToDatabase(const std::string& name, const std::string& login, const size_t password) noexcept;
 
-		static std::string GetUserNameFromDatabase(const std::string& login, const std::string& password) noexcept;
+		static std::string GetUserNameFromDatabase(const std::string& login, const size_t password) noexcept;
 
-		static bool IsUserExist(const std::string& login, const std::string& password) noexcept;
+		static bool IsUserExist(const std::string& login, const size_t password) noexcept;
 
 		std::string GetUserName() const noexcept;
 		std::string GetUserLogin() const noexcept;
-		std::string GetUserPassword() const noexcept;
+		size_t GetUserPassword() const noexcept;
 
-		void SetUserName(std::string& name) noexcept;
-		void SetUserLogin(std::string& login) noexcept;
-		void SetUserPassword(std::string& password) noexcept;
+		void SetUserName(const std::string& name) noexcept;
+		void SetUserLogin(const std::string& login) noexcept;
+		void SetUserPassword(const size_t password) noexcept;
 
 	private:
 		std::string _userName;
 		std::string _userLogin;
-		std::string _userPassword;
+		size_t _userPassword;
 	};
 
 } // !namespace UserData

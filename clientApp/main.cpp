@@ -1,3 +1,4 @@
+#include <functional>
 #include "../src/gui/glfwWindow.h"
 #include "../src/gui/chatWindow.h"
 #include "../src/gui/loginWindow.h"
@@ -19,7 +20,7 @@ int main()
     UserData::User user;
     std::string userName;
     std::string userLogin;
-    std::string userPassword;
+    size_t userPassword;
 
     if (UserData::UserCredentialsFile::IsFileExists())
     {
@@ -61,8 +62,10 @@ int main()
             }
             else if (Gui::LoginWindow::IsLoginButtonPressed())
             {
-                userLogin       = Gui::LoginWindow::GetLogin();
-                userPassword    = Gui::LoginWindow::GetPassword();
+                userLogin                       = Gui::LoginWindow::GetLogin();
+                std::string stringUserPassword  = Gui::LoginWindow::GetPassword();
+
+                userPassword = std::hash<std::string>{}(stringUserPassword);
 
                 if (UserData::User::IsUserExist(userLogin, userPassword))
                 {
@@ -101,10 +104,12 @@ int main()
             }
             else if (Gui::SignUpWindow::IsSignUpButtonPressed()) 
             {
-                std::string userName    = Gui::SignUpWindow::GetName();
-                userLogin               = Gui::SignUpWindow::GetLogin();
-                userPassword            = Gui::SignUpWindow::GetPassword();
-                
+                std::string userName            = Gui::SignUpWindow::GetName();
+                userLogin                       = Gui::SignUpWindow::GetLogin();
+                std::string stringUserPassword  = Gui::SignUpWindow::GetPassword();
+
+                userPassword = std::hash<std::string>{}(stringUserPassword);
+
                 if (UserData::User::IsUserExist(userLogin, userPassword))
                 {
                     Gui::SignUpWindow::SetShowUserAlreadyExistMessage(true);
@@ -113,11 +118,11 @@ int main()
                 {
                     if (UserData::UserCredentialsFile::CreateNewFile())
                     {
-                        UserData::User::PushUserCredentialsToDatabase(userName, userLogin, userPassword);
-
                         UserData::UserCredentialsFile::WriteCredentials(userName, userLogin, userPassword);
                         UserData::UserCredentialsFile::CloseFile();
                     }
+
+                    UserData::User::PushUserCredentialsToDatabase(userName, userLogin, userPassword);
 
                     currentWindowState = WindowState::kChat;
                 }

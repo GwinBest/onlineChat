@@ -2,7 +2,7 @@
 
 namespace UserData
 {
-	void User::PushUserCredentialsToDatabase(const std::string& name, const std::string& login, const std::string& password) noexcept
+	void User::PushUserCredentialsToDatabase(const std::string& name, const std::string& login, const size_t password) noexcept
 	{
 		Network::UserRequest request =
 		{
@@ -15,7 +15,7 @@ namespace UserData
 		Network::Client::GetInstance().SendUserCredentials(request);
 	}
 
-	std::string User::GetUserNameFromDatabase(const std::string& login, const std::string& password) noexcept
+	std::string User::GetUserNameFromDatabase(const std::string& login, const size_t password) noexcept
 	{
 		Network::UserRequest request =
 		{
@@ -31,7 +31,7 @@ namespace UserData
 		return serverResponse;
 	}
 
-	bool User::IsUserExist(const std::string& login, const std::string& password) noexcept
+	bool User::IsUserExist(const std::string& login, const size_t password) noexcept
 	{
 		Network::UserRequest request =
 		{
@@ -62,22 +62,22 @@ namespace UserData
 		return _userLogin;
 	}
 
-	std::string User::GetUserPassword() const noexcept
+	size_t User::GetUserPassword() const noexcept
 	{
 		return _userPassword;
 	}
 
-	void User::SetUserName(std::string& name) noexcept
+	void User::SetUserName(const std::string& name) noexcept
 	{
 		_userName = name;
 	}
 
-	void User::SetUserLogin(std::string& login) noexcept
+	void User::SetUserLogin(const std::string& login) noexcept
 	{
 		_userLogin = login;
 	}
 
-	void User::SetUserPassword(std::string& password) noexcept
+	void User::SetUserPassword(const size_t password) noexcept
 	{
 		_userPassword = password;
 	}

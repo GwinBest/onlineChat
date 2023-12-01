@@ -90,9 +90,7 @@ namespace Network
 		send(_clientSocket, reinterpret_cast<char*>(&loginLength), sizeof(loginLength), NULL);
 		send(_clientSocket, userCredentials.login.c_str(), loginLength, NULL);
 
-		size_t passwordLength = userCredentials.password.size();
-		send(_clientSocket, reinterpret_cast<char*>(&passwordLength), sizeof(passwordLength), NULL);
-		send(_clientSocket, userCredentials.password.c_str(), passwordLength, NULL);
+		send(_clientSocket, reinterpret_cast<char*>(&userCredentials.password), sizeof(userCredentials.password), NULL);
 	}
 
 	std::string Client::ReceiveServerResponse() noexcept

@@ -18,8 +18,8 @@ namespace UserData
 		[[nodiscard]] static bool CreateNewFile() noexcept;
 		static void CloseFile() noexcept;
 
-		static void WriteCredentials(const std::string& name, const std::string& login, const std::string& password) noexcept;
-		static void ReadCredentials(std::string& name, std::string& login, std::string& password) noexcept;
+		static void WriteCredentials(const std::string& name, const std::string& login, const size_t& password) noexcept;
+		static void ReadCredentials(std::string& name, std::string& login, size_t& password) noexcept;
 
 	private:
 		static inline const char* _fileName = ".loginFile.dat";

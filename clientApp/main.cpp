@@ -24,6 +24,7 @@ int main()
     if (UserData::UserCredentialsFile::IsFileExists())
     {
         UserData::UserCredentialsFile::ReadCredentials(userName, userLogin, userPassword);
+        UserData::UserCredentialsFile::CloseFile();
 
         if (UserData::User::IsUserExist(userLogin, userPassword))
         {

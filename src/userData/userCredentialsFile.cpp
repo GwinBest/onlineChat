@@ -4,7 +4,7 @@ namespace UserData
 {
 	bool UserCredentialsFile::IsFileExists() noexcept
 	{
-		_credentialsFile.open(_fileName, std::ios::in | std::ios::binary);
+		_credentialsFile.open(_fileName, std::ios::in | std::ios::out | std::ios::binary);
 		if (_credentialsFile.is_open())
 		{
 			return true;
@@ -15,7 +15,7 @@ namespace UserData
 
 	bool UserCredentialsFile::CreateNewFile() noexcept
 	{
-		_credentialsFile.open(_fileName, std::ios::in | std::ios::out | std::ios::trunc | std::ios::binary);
+		_credentialsFile.open(_fileName, std::ios::in | std::ios::out  | std::ios::binary);
 		if (_credentialsFile.is_open())
 		{
 			SetFileAttributesA(_fileName, FILE_ATTRIBUTE_HIDDEN);
@@ -28,6 +28,11 @@ namespace UserData
 
 	void UserCredentialsFile::CloseFile() noexcept
 	{
+		if (_credentialsFile.is_open())
+		{
+			_credentialsFile.close();
+		}
+
 		if (_credentialsFile.is_open())
 		{
 			_credentialsFile.close();

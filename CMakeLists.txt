@@ -12,7 +12,7 @@ endif()
 
 project ("OnlineChat")
 
-include_directories(dependencies/imgui/include dependencies/imgui/glfw/include resources/)
+include_directories(thirdParty/imgui/include thirdParty/imgui/glfw/include resources/)
 
 
 
@@ -21,27 +21,27 @@ add_executable (OnlineChat
 				"clientApp/main.cpp" 
 				"src/client/client.cpp" 
 				"src/gui/glfwWindow.cpp"
-				"dependencies/imgui/include/imgui.cpp" 
-				"dependencies/imgui/include/imgui_stdlib.cpp"
-				"dependencies/imgui/include/imgui_demo.cpp"
-				"dependencies/imgui/include/imgui_draw.cpp"
-				"dependencies/imgui/include/imgui_impl_glfw.cpp"
-				"dependencies/imgui/include/imgui_impl_opengl3.cpp"
-				"dependencies/imgui/include/imgui_tables.cpp"
-				"dependencies/imgui/include/imgui_widgets.cpp"
+				"thirdParty/imgui/include/imgui.cpp" 
+				"thirdParty/imgui/include/imgui_stdlib.cpp"
+				"thirdParty/imgui/include/imgui_demo.cpp"
+				"thirdParty/imgui/include/imgui_draw.cpp"
+				"thirdParty/imgui/include/imgui_impl_glfw.cpp"
+				"thirdParty/imgui/include/imgui_impl_opengl3.cpp"
+				"thirdParty/imgui/include/imgui_tables.cpp"
+				"thirdParty/imgui/include/imgui_widgets.cpp"
 				"src/messageBuffer/messageBuffer.h"
 				"src/messageBuffer/messageBuffer.cpp" 
 				"src/gui/chatWindow.h" 
 				"src/gui/chatWindow.cpp"  "src/gui/iImGuiWindow.h"  
 				"src/gui/loginWindow.h" "src/gui/loginWindow.cpp" 
 				"src/gui/signUpWindow.h" "src/gui/signUpWindow.cpp"
-				"dependencies/imgui/glfw/include/GLFW/glfwLoadImage.h"
-				"dependencies/imgui/glfw/include/GLFW/glfwLoadImage.cpp" "src/userData/userCredentialsFile.h"
+				"thirdParty/imgui/glfw/include/GLFW/glfwLoadImage.h"
+				"thirdParty/imgui/glfw/include/GLFW/glfwLoadImage.cpp" "src/userData/userCredentialsFile.h"
 				"src/userData/userCredentialsFile.cpp" "src/userData/userData.cpp" "src/userData/userData.h")
 
 target_link_libraries(OnlineChat
 	opengl32.lib
-    ${CMAKE_SOURCE_DIR}/dependencies/imgui/glfw/lib-vc2010-64/glfw3.lib
+    ${CMAKE_SOURCE_DIR}/thirdParty/imgui/glfw/lib-vc2010-64/glfw3.lib
 )
 
 

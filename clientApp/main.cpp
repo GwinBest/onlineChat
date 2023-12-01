@@ -64,19 +64,23 @@ int main()
 
                 if (UserData::User::IsUserExist(userLogin, userPassword))
                 {
-                    //todo
-                }
-                else
-                {
                     if (UserData::UserCredentialsFile::CreateNewFile())
                     {
-                        UserData::UserCredentialsFile::WriteCredentials("userName", userLogin, userPassword);
+                        userName = UserData::User::GetUserNameFromDatabase(userLogin, userPassword);
+                        user.SetUserName(userName);
+                        user.SetUserLogin(userLogin);
+                        user.SetUserPassword(userPassword);
+
+                        UserData::UserCredentialsFile::WriteCredentials(userName, userLogin, userPassword);
                         UserData::UserCredentialsFile::CloseFile();
                     }
 
                     currentWindowState = WindowState::kChat;
                 }
-
+                else
+                {
+                    Gui::LoginWindow::SetShowUserNotFoundMessage(true);
+                }
             }
 
             break;
@@ -101,18 +105,18 @@ int main()
                 
                 if (UserData::User::IsUserExist(userLogin, userPassword))
                 {
+                    Gui::SignUpWindow::SetShowUserAlreadyExistMessage(true);
+                }
+                else
+                {
                     if (UserData::UserCredentialsFile::CreateNewFile())
                     {
                         UserData::UserCredentialsFile::WriteCredentials(userName, userLogin, userPassword);
                         UserData::UserCredentialsFile::CloseFile();
                     }
-                }
-                else
-                {
-                    //todo
-                }
 
-                currentWindowState = WindowState::kChat;
+                    currentWindowState = WindowState::kChat;
+                }
             }
 
             break;

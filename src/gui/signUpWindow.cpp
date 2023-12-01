@@ -41,6 +41,11 @@ namespace Gui
 
 	}
 
+	void SignUpWindow::SetShowUserAlreadyExistMessage(const bool value) noexcept
+	{
+		_showUserAlreadyExistMessage = value;
+	}
+
 	void SignUpWindow::GenerateControls() noexcept
 	{
 		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);							// enable docking 
@@ -65,6 +70,8 @@ namespace Gui
 			_isInputNameEmpty = false;
 			_isInputLoginEmpty = false;
 			_isInputPasswordEmpty = false;
+
+			_showUserAlreadyExistMessage = false;
 		}
 		windowStyle.Colors[ImGuiCol_Button] = oldButtonColor;															// reset the button color to default
 		
@@ -96,6 +103,12 @@ namespace Gui
 		ImGui::PopItemWidth();
 		windowStyle.Colors[ImGuiCol_FrameBg] = oldInputTextColor;
 		
+		if (_showUserAlreadyExistMessage)
+		{
+			ImGui::SetCursorPos(ImVec2(inputNameX, inputNameY - 25));
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This user already registered!");
+		}
+
 		if (_isInputLoginEmpty)
 		{
 			windowStyle.Colors[ImGuiCol_FrameBg] = inputTextEmptyColor;
@@ -156,6 +169,8 @@ namespace Gui
 			if (!_isInputNameEmpty && !_isInputLoginEmpty && !_isInputPasswordEmpty)
 			{
 				_isSignUpButtonPressed = true;
+
+				_showUserAlreadyExistMessage = false;
 			}
 		}
 

@@ -3,6 +3,17 @@
 
 namespace Gui
 {
+	bool LoginWindow::IsSignUpLabelPressed() noexcept
+	{
+		if (_isSignUpLabelPressed)
+		{
+			_isSignUpLabelPressed = false;
+			return true;
+		}
+
+		return false;
+	}
+
 	bool LoginWindow::IsLoginButtonPressed() noexcept
 	{
 		if (_isLoginButtonPressed)
@@ -24,15 +35,9 @@ namespace Gui
 		return _inputBufferPassword;
 	}
 
-	bool LoginWindow::IsSignUpLabelPressed() noexcept
+	void LoginWindow::SetShowUserNotFoundMessage(const bool value) noexcept
 	{
-		if (_isSignUpLabelPressed)
-		{
-			_isSignUpLabelPressed = false;
-			return true;
-		}
-
-		return false;
+		_showUserNotFoundMessage = value;
 	}
 
 	void LoginWindow::GenerateControls() noexcept
@@ -53,6 +58,7 @@ namespace Gui
 		ImGui::Text(loginText.c_str());
 		//FIXME: gap between text and input text when fullscreen
 
+
 		static constexpr float inputTextWidth = 300.0f;
 
 		ImGuiStyle& windowStyle = ImGui::GetStyle();
@@ -70,6 +76,12 @@ namespace Gui
 		ImGui::InputTextWithHint("##input text login", "Login", &_inputBufferLogin, ImGuiInputTextFlags_EnterReturnsTrue);
 		ImGui::PopItemWidth();
 		windowStyle.Colors[ImGuiCol_FrameBg] = oldInputTextColor;
+
+		if (_showUserNotFoundMessage)
+		{
+			ImGui::SetCursorPos(ImVec2(inputLoginX, inputLoginY - 25));
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This user is not exist");
+		}
 
 		const std::string forgotPasswordText = "Forgot password?";
 		const float forgotPasswordX = inputLoginX + inputTextWidth - ImGui::CalcTextSize(forgotPasswordText.c_str()).x;
@@ -116,6 +128,8 @@ namespace Gui
 			if (!_isInputLoginEmpty && !_isInputPasswordEmpty)
 			{
 				_isLoginButtonPressed = true;
+
+				_showUserNotFoundMessage = false;
 			}
 		}
 
@@ -127,6 +141,8 @@ namespace Gui
 		if (ImGui::Selectable(signUpText.c_str(), false, 0, ImVec2(signUpTextLength, 0)))								//0 means that Y will be default for ImGui
 		{
 			_isSignUpLabelPressed = true;
+
+			_showUserNotFoundMessage = false;
 
 			_inputBufferLogin = "";
 			_inputBufferPassword = "";

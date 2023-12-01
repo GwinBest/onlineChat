@@ -15,6 +15,8 @@ namespace Gui
 		static std::string& GetLogin() noexcept;
 		static std::string& GetPassword() noexcept;
 
+		static void SetShowUserNotFoundMessage(const bool value) noexcept;
+
 	private:
 		void GenerateControls() noexcept override;
 
@@ -24,6 +26,8 @@ namespace Gui
 
 		static inline bool _isInputLoginEmpty = false;
 		static inline bool _isInputPasswordEmpty = false;
+
+		static inline bool _showUserNotFoundMessage = false;
 
 		static inline bool _isLoginButtonPressed = false;
 		static inline bool _isSignUpLabelPressed = false;

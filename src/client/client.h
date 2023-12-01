@@ -21,7 +21,7 @@ namespace Network
 		kUserChatMessage				= 0,
 		kAddUserCredentialsToDatabase	= 1,
 		kCheckUserExistence				= 2,
-		kGetUSerNameFromDatabase		= 3
+		kGetUserNameFromDatabase		= 3
 	};
 
 	struct UserRequest

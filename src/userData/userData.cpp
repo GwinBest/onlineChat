@@ -19,7 +19,7 @@ namespace UserData
 	{
 		Network::UserRequest request =
 		{
-			.actionType = Network::ActionType::kGetUSerNameFromDatabase,
+			.actionType = Network::ActionType::kGetUserNameFromDatabase,
 			.name  = "",
 			.login = login,
 			.password = password

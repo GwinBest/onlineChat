@@ -59,7 +59,7 @@ namespace Network
 				break;
 			}
 			case Network::ActionType::kCheckUserExistence:
-			case Network::ActionType::kGetUSerNameFromDatabase:
+			case Network::ActionType::kGetUserNameFromDatabase:
 			{
 				recv(_clientSocket, _serverResponse, sizeof(_serverResponse), NULL);
 				

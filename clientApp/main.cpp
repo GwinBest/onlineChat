@@ -31,6 +31,7 @@ int main()
             user.SetUserName(userName);
             user.SetUserLogin(userLogin);
             user.SetUserPassword(userPassword);
+
             currentWindowState = WindowState::kChat;
         }
         else
@@ -111,6 +112,8 @@ int main()
                 {
                     if (UserData::UserCredentialsFile::CreateNewFile())
                     {
+                        UserData::User::PushUserCredentialsToDatabase(userName, userLogin, userPassword);
+
                         UserData::UserCredentialsFile::WriteCredentials(userName, userLogin, userPassword);
                         UserData::UserCredentialsFile::CloseFile();
                     }

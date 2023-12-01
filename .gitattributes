@@ -3,9 +3,6 @@
 ###############################################################################
 * text=auto
 
-* linguist-vendored
-*.C++ linguist-vendored=false
-
 ###############################################################################
 # Set default behavior for command prompt diff.
 #

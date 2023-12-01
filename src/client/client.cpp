@@ -1,5 +1,4 @@
 ﻿#include "client.h"
-#include <iostream>
 
 namespace Network 
 {

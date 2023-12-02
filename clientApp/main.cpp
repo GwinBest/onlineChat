@@ -16,12 +16,12 @@ enum class WindowState : uint8_t
 int main()
 {
 	Gui::GlfwWindow window;
-    WindowState currentWindowState;
+    WindowState currentWindowState = WindowState::kLogin;
 
     UserData::User user;
     std::string userName;
     std::string userLogin;
-    size_t userPassword;
+    size_t userPassword = 0;
 
     if (UserData::UserCredentialsFile::IsFileExists())
     {
@@ -70,13 +70,13 @@ int main()
 
                 if (UserData::User::IsUserExist(userLogin, userPassword))
                 {
+                    userName = UserData::User::GetUserNameFromDatabase(userLogin, userPassword);
+                    user.SetUserName(userName);
+                    user.SetUserLogin(userLogin);
+                    user.SetUserPassword(userPassword);
+
                     if (UserData::UserCredentialsFile::CreateNewFile())
                     {
-                        userName = UserData::User::GetUserNameFromDatabase(userLogin, userPassword);
-                        user.SetUserName(userName);
-                        user.SetUserLogin(userLogin);
-                        user.SetUserPassword(userPassword);
-
                         UserData::UserCredentialsFile::WriteCredentials(userName, userLogin, userPassword);
                         UserData::UserCredentialsFile::CloseFile();
                     }
@@ -105,7 +105,7 @@ int main()
             }
             else if (Gui::SignUpWindow::IsSignUpButtonPressed()) 
             {
-                std::string userName            = Gui::SignUpWindow::GetName();
+                userName                        = Gui::SignUpWindow::GetName();
                 userLogin                       = Gui::SignUpWindow::GetLogin();
                 std::string stringUserPassword  = Gui::SignUpWindow::GetPassword();
 
@@ -142,7 +142,6 @@ int main()
             break;
         }
         }
-
 	}
 
 	return 0;

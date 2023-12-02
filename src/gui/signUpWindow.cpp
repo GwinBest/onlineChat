@@ -41,12 +41,12 @@ namespace Gui
 
 	}
 
-	void SignUpWindow::SetShowUserAlreadyExistMessage(const bool value) noexcept
+	void SignUpWindow::SetShowUserAlreadyExistMessage(const bool state) noexcept
 	{
-		_showUserAlreadyExistMessage = value;
+		_showUserAlreadyExistMessage = state;
 	}
 
-	void SignUpWindow::GenerateControls() noexcept
+	void SignUpWindow::DrawGui() noexcept
 	{
 		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);							// enable docking 
 
@@ -55,14 +55,14 @@ namespace Gui
 		ImVec4 oldButtonColor = windowStyle.Colors[ImGuiCol_Button];
 		windowStyle.Colors[ImGuiCol_Button] = windowStyle.Colors[ImGuiCol_WindowBg];									// set the button color to the same 
 																														// as the bg window so that only the arrow is visible
-		int32_t backToLoginButtonWidth = 0;
-		int32_t backToLoginButtonHeight = 0;
+		int32_t backToLoginButtonWidth = 0;																				// loads from loadTextureFromFile
+		int32_t backToLoginButtonHeight = 0;																			// loads from loadTextureFromFile
 		ImTextureID backToLoginButtonTexture = nullptr;
 		loadTextureFromFile(".\\images\\arrowBack.png",reinterpret_cast<GLuint*>(&backToLoginButtonTexture), &backToLoginButtonWidth, &backToLoginButtonHeight);
 		if (ImGui::ImageButton("##back to login", backToLoginButtonTexture, ImVec2(backToLoginButtonWidth, backToLoginButtonHeight)))
 		{
 			_isBackToLoginButtonPressed = true;
-			//todo 
+			
 			_inputBufferName[0] = '\0';
 			_inputBufferLogin[0] = '\0';
 			_inputBufferPassword = "";
@@ -139,7 +139,7 @@ namespace Gui
 		ImGui::SetCursorPos(ImVec2(singUpButtonX, signUpButtonY));
 		if (ImGui::Button("Create an account", ImVec2(inputTextWidth, 0)))												// 0 means that Y will be default for ImGui
 		{
-			if (_inputBufferName == "")
+			if (_inputBufferName[0] == '\0')
 			{
 				_isInputNameEmpty = true;
 			}
@@ -148,7 +148,7 @@ namespace Gui
 				_isInputNameEmpty = false;
 			}
 
-			if (_inputBufferLogin == "")
+			if (_inputBufferLogin[0] == '\0')
 			{
 				_isInputLoginEmpty = true;
 			}

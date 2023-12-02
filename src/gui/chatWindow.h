@@ -12,7 +12,7 @@ namespace Gui
 		ChatWindow() noexcept = default;
 
 	private:
-		void GenerateControls() noexcept override;
+		void DrawGui() noexcept override;
 
 	private:
 		std::string _inputBuffer;

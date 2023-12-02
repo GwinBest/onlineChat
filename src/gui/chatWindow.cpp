@@ -2,7 +2,7 @@
 
 namespace Gui
 {
-    void ChatWindow::GenerateControls() noexcept
+    void ChatWindow::DrawGui() noexcept
     {
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				        // enable docking 
 
@@ -48,12 +48,21 @@ namespace Gui
             ImGui::SetCursorPosY(availableChatsStartHeight);
             ImGui::BeginChild("##available chats", availableChatsSize);
 
+            ImVec2 selectablePosition = { 0, 0 };
             for (int i = 0; i < 100; i++)
             {
                 char label[128];
                 sprintf(label, "User %d", i);
-                if (ImGui::Selectable(label, chatSelected == i))
+                ImGui::SetCursorPos(selectablePosition);
+                if (ImGui::Selectable(label, chatSelected == i,0, ImVec2(0,50)))
                     chatSelected = i;
+
+                ImGui::SetItemAllowOverlap();
+
+                ImGui::SetCursorPos(ImVec2(selectablePosition.x + 10, selectablePosition.y + 10));
+                ImGui::Text("text");
+
+                selectablePosition.y += 50;
             }
 
             // unselect current chat

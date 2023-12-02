@@ -18,10 +18,11 @@ namespace Network
 {
 	enum class ActionType : uint32_t
 	{
-		kUserChatMessage				= 0,
-		kAddUserCredentialsToDatabase	= 1,
-		kCheckUserExistence				= 2,
-		kGetUserNameFromDatabase		= 3
+		kActionUndefined				= 0,
+		kUserChatMessage				= 1,
+		kAddUserCredentialsToDatabase	= 2,
+		kCheckUserExistence				= 3,
+		kGetUserNameFromDatabase		= 4
 	};
 
 	struct UserRequest
@@ -32,7 +33,7 @@ namespace Network
 		size_t password;
 	};
 
-	class Client
+	class Client final
 	{
 	public:
 		Client(const Client&) = delete;
@@ -40,11 +41,11 @@ namespace Network
 
 		static Client& GetInstance() noexcept;
 
-		void SendUserMessage(size_t userId, const char* data, size_t dataSize) noexcept;
-		[[noreturn]] void ReceiveUserMessageThread() noexcept;
-
+		void SendUserMessage(size_t userId, const char* data, size_t dataSize) const noexcept;
 		void SendUserCredentials(UserRequest& userCredentials) const noexcept;
-		std::string ReceiveServerResponse() noexcept;
+
+		[[noreturn]] void ReceiveThread() const noexcept;
+		std::string GetServerResponse() const noexcept;
 
 		~Client();
 
@@ -68,12 +69,13 @@ namespace Network
 		SOCKADDR_IN _socketAddress;
 		ClientState _currentClientState = ClientState::kClientDisconnected;
 
-		std::mutex mutex;
-		std::condition_variable conditionalVariable;
+		mutable std::mutex mutex;
+		mutable std::condition_variable conditionalVariable;
 
-		static inline char _serverResponse[255];
+		static constexpr const uint8_t _serverResponseSize = 255;
+		static inline char _serverResponse[_serverResponseSize];
 
-		size_t _clientId;
+		size_t _clientId = 0;
 		const std::string _ipAddress = "127.0.0.1";
 		static constexpr uint32_t _port = 8080;
 	};

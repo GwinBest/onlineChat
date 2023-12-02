@@ -26,7 +26,7 @@ namespace UserData
 		};
 
 		Network::Client::GetInstance().SendUserCredentials(request);
-		std::string serverResponse = Network::Client::GetInstance().ReceiveServerResponse();
+		std::string serverResponse = Network::Client::GetInstance().GetServerResponse();
 
 		return serverResponse;
 	}
@@ -42,7 +42,7 @@ namespace UserData
 		};
 
 		Network::Client::GetInstance().SendUserCredentials(request);
-		std::string serverResponse = Network::Client::GetInstance().ReceiveServerResponse();
+		std::string serverResponse = Network::Client::GetInstance().GetServerResponse();
 		
 		if (serverResponse == "Exist")
 		{

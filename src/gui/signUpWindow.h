@@ -16,14 +16,14 @@ namespace Gui
 		static char* GetLogin() noexcept;
 		static std::string GetPassword() noexcept;
 
-		static void SetShowUserAlreadyExistMessage(const bool value) noexcept;
+		static void SetShowUserAlreadyExistMessage(const bool state) noexcept;
 
 	private:
-		void GenerateControls() noexcept override;
+		void DrawGui() noexcept override;
 	
 	private:
-		static inline char _inputBufferName[50];
-		static inline char _inputBufferLogin[50];
+		static inline char _inputBufferName[50] = "";
+		static inline char _inputBufferLogin[50] = "";
 		static inline std::string _inputBufferPassword;
 
 		static inline bool _isInputNameEmpty = false;

@@ -18,10 +18,10 @@ namespace Gui
 		static void SetShowUserNotFoundMessage(const bool value) noexcept;
 
 	private:
-		void GenerateControls() noexcept override;
+		void DrawGui() noexcept override;
 
 	private:
-		static inline char _inputBufferLogin[50];
+		static inline char _inputBufferLogin[50] = "";
 		static inline std::string _inputBufferPassword;
 
 		static inline bool _isInputLoginEmpty = false;

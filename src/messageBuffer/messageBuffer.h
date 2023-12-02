@@ -21,7 +21,7 @@ namespace Buffer
 		Node* previous = nullptr;
 	};
 
-	class Iterator
+	class Iterator final
 	{
 	public:
 		Iterator(Node* first) : _current(first) {};
@@ -36,6 +36,7 @@ namespace Buffer
 		{ 
 			return _current == it._current;
 		}
+
 		inline bool operator!=(const Iterator& other) const noexcept 
 		{ 
 			return _current != other._current; 
@@ -50,7 +51,7 @@ namespace Buffer
 		Node* _current;
 	};
 
-	class MessageBuffer
+	class MessageBuffer final
 	{	
 	public:
 		using Iterator = Iterator;
@@ -80,7 +81,6 @@ namespace Buffer
 
 	private:
 		Node* _head = nullptr;
-
 	};
 
 } // !namespace Buffer

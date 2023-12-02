@@ -25,7 +25,7 @@ namespace Gui
 			return;
 
 			NewFrame();
-			GenerateControls();
+			DrawGui();
 			Render();
 	}
 
@@ -128,11 +128,11 @@ namespace Gui
 		ImGui::NewFrame();
 	}
 
-	void GlfwWindow::GenerateControls() noexcept
+	void GlfwWindow::DrawGui() noexcept
 	{
 		for (const auto& item : _windowArray)
 		{
-			item->GenerateControls();
+			item->DrawGui();
 		}
 	}
 

@@ -37,7 +37,7 @@ namespace Gui
         void SetupWindowStyle() const noexcept;
 
         void NewFrame() const noexcept;
-        void GenerateControls() noexcept override;
+        void DrawGui() noexcept override;
         void Render() noexcept;
 
     private:

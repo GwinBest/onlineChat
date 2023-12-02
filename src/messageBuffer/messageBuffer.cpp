@@ -19,7 +19,7 @@ namespace Buffer
 	void MessageBuffer::pushFront(const MessageType messageType, const char* data) noexcept
 	{
 		size_t dataLength = strlen(data);
-		Node* temp = _head;
+		Node* tempNode = _head;
 
 		if (_head == nullptr)
 		{
@@ -33,9 +33,9 @@ namespace Buffer
 			return;
 		}
 			
-		while (temp->next != nullptr)
+		while (tempNode->next != nullptr)
 		{
-			temp = temp->next;
+			tempNode = tempNode->next;
 		}
 
 		Node* newNode = new Node;
@@ -44,8 +44,8 @@ namespace Buffer
 
 		newNode->messageType = messageType;
 
-		temp->next = newNode;
-		temp->next->previous = temp;
+		tempNode->next = newNode;
+		tempNode->next->previous = tempNode;
 	}
 
 	void MessageBuffer::popFront() noexcept

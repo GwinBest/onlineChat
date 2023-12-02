@@ -12,66 +12,18 @@ namespace Network
 				//TODO: add !connect handle
 			};
 
-			static std::thread receiveThread(&Network::Client::ReceiveUserMessageThread, &Network::Client::GetInstance());
+			static std::thread receiveThread(&Network::Client::ReceiveThread, &Network::Client::GetInstance());
 			receiveThread.detach();
 		}
 
 		return instance;
 	}
 
-	void Client::SendUserMessage(size_t userId, const char* data, size_t dataSize) noexcept
+	void Client::SendUserMessage(size_t userId, const char* data, size_t dataSize) const noexcept
 	{
 		send(_clientSocket, reinterpret_cast<char*>(&userId), sizeof(size_t), NULL);								// send the receiver's id
 		send(_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(size_t), NULL);								// send the size of the message
 		send(_clientSocket, data, dataSize, NULL);																	// send the message
-	}
-
-	void Client::ReceiveUserMessageThread() noexcept
-	{
-		size_t receiveMessageSize;
-
-		while (true) 
-		{
-			ActionType type;
-			recv(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
-			
-			switch (type)
-			{
-			case Network::ActionType::kUserChatMessage: 
-			{
-				if (recv(_clientSocket, reinterpret_cast<char*>(&receiveMessageSize), sizeof(size_t), NULL) > 0)
-				{
-					char* receiveMessage = new char[receiveMessageSize + 1];
-					receiveMessage[receiveMessageSize] = '\0';
-
-					recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);
-
-					Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kReceived, receiveMessage);
-
-					delete[] receiveMessage;
-				}
-
-				break;
-			}
-			case Network::ActionType::kAddUserCredentialsToDatabase:
-			{
-				break;
-			}
-			case Network::ActionType::kCheckUserExistence:
-			case Network::ActionType::kGetUserNameFromDatabase:
-			{
-				recv(_clientSocket, _serverResponse, sizeof(_serverResponse), NULL);
-				
-				conditionalVariable.notify_one();
-
-				break;
-			}
-			default:
-			{
-				break;
-			}
-			}
-		}
 	}
 
 	void Client::SendUserCredentials(UserRequest& userCredentials) const noexcept
@@ -89,8 +41,50 @@ namespace Network
 
 		send(_clientSocket, reinterpret_cast<char*>(&userCredentials.password), sizeof(userCredentials.password), NULL);
 	}
+	
+	void Client::ReceiveThread() const noexcept
+	{
+		while (true)
+		{
+			ActionType type = ActionType::kActionUndefined;
+			recv(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 
-	std::string Client::ReceiveServerResponse() noexcept
+			switch (type)
+			{
+			case Network::ActionType::kUserChatMessage:
+			{
+				constexpr const uint16_t receiveMessageSize = 4096 + 1;
+				char receiveMessage[receiveMessageSize];
+				while (uint32_t receivedSize = recv(_clientSocket, receiveMessage, receiveMessageSize, NULL) > 0)
+				{
+					receiveMessage[receivedSize] = '\0';
+					Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kReceived, receiveMessage);
+				}
+
+				break;
+			}
+			case Network::ActionType::kAddUserCredentialsToDatabase:
+			{
+				break;
+			}
+			case Network::ActionType::kCheckUserExistence:
+			case Network::ActionType::kGetUserNameFromDatabase:
+			{
+				recv(_clientSocket, _serverResponse, sizeof(_serverResponse), NULL);
+
+				conditionalVariable.notify_one();
+
+				break;
+			}
+			default:
+			{
+				break;
+			}
+			}
+		}
+	}
+
+	std::string Client::GetServerResponse() const noexcept
 	{
 		std::unique_lock<std::mutex> lock(mutex);
 		conditionalVariable.wait(lock);

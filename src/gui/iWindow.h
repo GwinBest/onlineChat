@@ -7,7 +7,7 @@ namespace Gui
     public:
         virtual ~IWindow() = default;
 
-        virtual void GenerateControls() noexcept = 0;
+        virtual void DrawGui() noexcept = 0;
 
         enum class WindowState : uint8_t
         {

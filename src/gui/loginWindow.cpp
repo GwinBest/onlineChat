@@ -40,7 +40,7 @@ namespace Gui
 		_showUserNotFoundMessage = value;
 	}
 
-	void LoginWindow::GenerateControls() noexcept
+	void LoginWindow::DrawGui() noexcept
 	{
 		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);							// enable docking 
 		
@@ -63,7 +63,6 @@ namespace Gui
 		ImGuiStyle& windowStyle = ImGui::GetStyle();
 		ImVec4 oldInputTextColor = windowStyle.Colors[ImGuiCol_FrameBg];
 		ImVec4 inputTextEmptyColor = ImVec4(0.8f, 0.0f, 0.0f, 0.5f);
-
 		if (_isInputLoginEmpty)
 		{
 			windowStyle.Colors[ImGuiCol_FrameBg] = inputTextEmptyColor;
@@ -106,7 +105,7 @@ namespace Gui
 		ImGui::SetCursorPos(ImVec2(loginButtonX, loginButtonY));
 		if (ImGui::Button("Login", ImVec2(inputTextWidth, 0)))															//0 means that Y will be default for ImGui
 		{
-			if (_inputBufferLogin == "")
+			if (_inputBufferLogin[0] == '\0')
 			{
 				_isInputLoginEmpty = true;
 			}

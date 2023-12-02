@@ -24,12 +24,12 @@ namespace Gui
 		return false;
 	}
 
-	std::string SignUpWindow::GetName() noexcept
+	char* SignUpWindow::GetName() noexcept
 	{
 		return _inputBufferName;
 	}
 
-	std::string SignUpWindow::GetLogin() noexcept
+	char* SignUpWindow::GetLogin() noexcept
 	{
 		return _inputBufferLogin;
 
@@ -62,9 +62,9 @@ namespace Gui
 		if (ImGui::ImageButton("##back to login", backToLoginButtonTexture, ImVec2(backToLoginButtonWidth, backToLoginButtonHeight)))
 		{
 			_isBackToLoginButtonPressed = true;
-
-			_inputBufferName = "";
-			_inputBufferLogin = "";
+			//todo 
+			_inputBufferName[0] = (char)"\0";
+			_inputBufferLogin[0] = (char)"\0";
 			_inputBufferPassword = "";
 
 			_isInputNameEmpty = false;
@@ -99,7 +99,7 @@ namespace Gui
 		const float inputNameY = ImGui::GetWindowSize().y / 2 - welcomeTextY - 50.0f;
 		ImGui::SetCursorPos(ImVec2(inputNameX, inputNameY));
 		ImGui::PushItemWidth(inputTextWidth);
-		ImGui::InputTextWithHint("##input text name", "Name", &_inputBufferName);
+		ImGui::InputTextWithHint("##input text name", "Name", _inputBufferName, IM_ARRAYSIZE(_inputBufferName));
 		ImGui::PopItemWidth();
 		windowStyle.Colors[ImGuiCol_FrameBg] = oldInputTextColor;
 		
@@ -117,7 +117,7 @@ namespace Gui
 		const float inputLoginY = inputNameY + 50.0f;
 		ImGui::SetCursorPos(ImVec2(inputLoginX, inputLoginY));
 		ImGui::PushItemWidth(inputTextWidth);
-		ImGui::InputTextWithHint("##input text login", "Login", &_inputBufferLogin);
+		ImGui::InputTextWithHint("##input text login", "Login", _inputBufferLogin, IM_ARRAYSIZE(_inputBufferLogin));
 		ImGui::PopItemWidth();
 		windowStyle.Colors[ImGuiCol_FrameBg] = oldInputTextColor;
 
@@ -139,7 +139,7 @@ namespace Gui
 		ImGui::SetCursorPos(ImVec2(singUpButtonX, signUpButtonY));
 		if (ImGui::Button("Create an account", ImVec2(inputTextWidth, 0)))												// 0 means that Y will be default for ImGui
 		{
-			if (_inputBufferName.empty())
+			if (_inputBufferName == "")
 			{
 				_isInputNameEmpty = true;
 			}
@@ -148,7 +148,7 @@ namespace Gui
 				_isInputNameEmpty = false;
 			}
 
-			if (_inputBufferLogin.empty())
+			if (_inputBufferLogin == "")
 			{
 				_isInputLoginEmpty = true;
 			}

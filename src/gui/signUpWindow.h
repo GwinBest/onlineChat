@@ -12,8 +12,8 @@ namespace Gui
 		static bool IsSignUpButtonPressed() noexcept;
 		static bool IsBackToLoginButtonPressed() noexcept;
 
-		static std::string GetName() noexcept;
-		static std::string GetLogin() noexcept;
+		static char* GetName() noexcept;
+		static char* GetLogin() noexcept;
 		static std::string GetPassword() noexcept;
 
 		static void SetShowUserAlreadyExistMessage(const bool value) noexcept;
@@ -22,8 +22,8 @@ namespace Gui
 		void GenerateControls() noexcept override;
 	
 	private:
-		static inline std::string _inputBufferName;
-		static inline std::string _inputBufferLogin;
+		static inline char _inputBufferName[50];
+		static inline char _inputBufferLogin[50];
 		static inline std::string _inputBufferPassword;
 
 		static inline bool _isInputNameEmpty = false;

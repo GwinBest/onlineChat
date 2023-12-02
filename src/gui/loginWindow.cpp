@@ -25,7 +25,7 @@ namespace Gui
 		return false;
 	}
 
-	std::string LoginWindow::GetLogin() noexcept
+	char* LoginWindow::GetLogin() noexcept
 	{
 		return _inputBufferLogin;
 	}
@@ -73,7 +73,7 @@ namespace Gui
 		const float inputLoginY = ImGui::GetWindowSize().y / 2 - welcomeTextY;
 		ImGui::SetCursorPos(ImVec2(inputLoginX, inputLoginY));
 		ImGui::PushItemWidth(inputTextWidth);
-		ImGui::InputTextWithHint("##input text login", "Login", &_inputBufferLogin, ImGuiInputTextFlags_EnterReturnsTrue);
+		ImGui::InputTextWithHint("##input text login", "Login", _inputBufferLogin, IM_ARRAYSIZE(_inputBufferLogin), ImGuiInputTextFlags_EnterReturnsTrue);
 		ImGui::PopItemWidth();
 		windowStyle.Colors[ImGuiCol_FrameBg] = oldInputTextColor;
 
@@ -107,7 +107,7 @@ namespace Gui
 		ImGui::SetCursorPos(ImVec2(loginButtonX, loginButtonY));
 		if (ImGui::Button("Login", ImVec2(inputTextWidth, 0)))															//0 means that Y will be default for ImGui
 		{
-			if (_inputBufferLogin.empty())
+			if (_inputBufferLogin == "")
 			{
 				_isInputLoginEmpty = true;
 			}
@@ -116,7 +116,7 @@ namespace Gui
 				_isInputLoginEmpty = false;
 			}
 
-			if (_inputBufferPassword.empty())
+			if (_inputBufferPassword == "")
 			{
 				_isInputPasswordEmpty = true;
 			}
@@ -144,7 +144,7 @@ namespace Gui
 
 			_showUserNotFoundMessage = false;
 
-			_inputBufferLogin = "";
+			_inputBufferLogin[0] = (char)"\0";
 			_inputBufferPassword = "";
 
 			_isInputLoginEmpty = false;

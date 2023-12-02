@@ -14,6 +14,27 @@ namespace Gui
         static constexpr size_t availableChatsWidthScaleFactor = 3.0f;
         float availableChatsWidth = ImGui::GetWindowWidth() / availableChatsWidthScaleFactor;
         {
+            // search input text
+            {
+                ImDrawList* drawList = ImGui::GetWindowDrawList();
+                drawList->AddRectFilled(ImVec2(0, 0), ImVec2(availableChatsWidth, 65), IM_COL32(41, 46, 52, 255));
+
+                ImGuiStyle& windowStyle = ImGui::GetStyle();
+                const float oldRounding = windowStyle.FrameRounding;
+                const ImVec4 oldInputTextColor = windowStyle.Colors[ImGuiCol_FrameBg];
+                windowStyle.FrameRounding = 12.0f;
+                windowStyle.Colors[ImGuiCol_FrameBg] = ImVec4(0.0941f, 0.0980f, 0.1137f, 1.00f);
+
+                static std::string search;
+                ImGui::SetCursorPos(ImVec2(55, 20));
+                ImGui::PushItemWidth(availableChatsWidth - 70);
+                ImGui::InputTextWithHint("##search", "Search", &search);
+                ImGui::PopItemWidth();
+
+                windowStyle.FrameRounding = oldRounding;
+                windowStyle.Colors[ImGuiCol_FrameBg] = oldInputTextColor;
+            }
+
             ImVec2 availableChatsSize;
             if (ImGui::GetWindowWidth() < _defaultDisplayWidth)
             {
@@ -47,6 +68,12 @@ namespace Gui
         // chat zone
         if (ImGui::GetWindowWidth() >= _defaultDisplayWidth && chatSelected != -1)
         {
+            // selected user info
+            {
+                ImDrawList* drawList = ImGui::GetWindowDrawList();
+                drawList->AddRectFilled(ImVec2(availableChatsWidth, 0), ImVec2(2000, 65), IM_COL32(41, 46, 52, 255));
+            }
+
             // input text
             static bool isEnterPressed = false;
             static bool reclaimFocus = false;

@@ -58,7 +58,6 @@ namespace Gui
 		ImGui::Text(loginText.c_str());
 		//FIXME: gap between text and input text when fullscreen
 
-
 		static constexpr float inputTextWidth = 300.0f;
 
 		ImGuiStyle& windowStyle = ImGui::GetStyle();

@@ -14,7 +14,7 @@ namespace Gui
         static constexpr size_t availableChatsWidthScaleFactor = 3.0f;
         float availableChatsWidth = ImGui::GetWindowWidth() / availableChatsWidthScaleFactor;
         {
-            // search input text
+            // search
             {
                 ImDrawList* drawList = ImGui::GetWindowDrawList();
                 drawList->AddRectFilled(ImVec2(0, 0), ImVec2(availableChatsWidth, 65), IM_COL32(41, 46, 52, 255));
@@ -71,7 +71,8 @@ namespace Gui
             // selected user info
             {
                 ImDrawList* drawList = ImGui::GetWindowDrawList();
-                drawList->AddRectFilled(ImVec2(availableChatsWidth, 0), ImVec2(2000, 65), IM_COL32(41, 46, 52, 255));
+                ImGui::SetCursorPos(ImVec2(availableChatsWidth, 0));
+                drawList->AddRectFilled(ImVec2(availableChatsWidth, 0), ImVec2(ImGui::GetWindowSize().x, 65), IM_COL32(41, 46, 52, 255));
             }
 
             // input text

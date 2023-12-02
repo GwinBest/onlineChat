@@ -71,7 +71,6 @@ namespace Gui
             // selected user info
             {
                 ImDrawList* drawList = ImGui::GetWindowDrawList();
-                ImGui::SetCursorPos(ImVec2(availableChatsWidth, 0));
                 drawList->AddRectFilled(ImVec2(availableChatsWidth, 0), ImVec2(ImGui::GetWindowSize().x, 65), IM_COL32(41, 46, 52, 255));
             }
 

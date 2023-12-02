@@ -144,7 +144,7 @@ namespace Gui
 
 			_showUserNotFoundMessage = false;
 
-			_inputBufferLogin[0] = (char)"\0";
+			_inputBufferLogin[0] = '\0';
 			_inputBufferPassword = "";
 
 			_isInputLoginEmpty = false;

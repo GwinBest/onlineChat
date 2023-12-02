@@ -63,8 +63,8 @@ namespace Gui
 		{
 			_isBackToLoginButtonPressed = true;
 			//todo 
-			_inputBufferName[0] = (char)"\0";
-			_inputBufferLogin[0] = (char)"\0";
+			_inputBufferName[0] = '\0';
+			_inputBufferLogin[0] = '\0';
 			_inputBufferPassword = "";
 
 			_isInputNameEmpty = false;

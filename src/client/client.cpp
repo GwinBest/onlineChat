@@ -76,8 +76,6 @@ namespace Network
 
 	void Client::SendUserCredentials(UserRequest& userCredentials) const noexcept
 	{
-		// TODO: static name and login array instead of std::string
-
 		ActionType type = userCredentials.actionType;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 

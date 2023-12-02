@@ -25,12 +25,12 @@ namespace Gui
 		return false;
 	}
 
-	std::string& LoginWindow::GetLogin() noexcept
+	std::string LoginWindow::GetLogin() noexcept
 	{
 		return _inputBufferLogin;
 	}
 
-	std::string& LoginWindow::GetPassword() noexcept
+	std::string LoginWindow::GetPassword() noexcept
 	{
 		return _inputBufferPassword;
 	}

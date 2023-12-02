@@ -24,18 +24,18 @@ namespace Gui
 		return false;
 	}
 
-	std::string& SignUpWindow::GetName() noexcept
+	std::string SignUpWindow::GetName() noexcept
 	{
 		return _inputBufferName;
 	}
 
-	std::string& SignUpWindow::GetLogin() noexcept
+	std::string SignUpWindow::GetLogin() noexcept
 	{
 		return _inputBufferLogin;
 
 	}
 
-	std::string& SignUpWindow::GetPassword() noexcept
+	std::string SignUpWindow::GetPassword() noexcept
 	{
 		return _inputBufferPassword;
 

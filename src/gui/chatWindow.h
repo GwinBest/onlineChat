@@ -3,6 +3,7 @@
 #include "iImGuiWindow.h"
 #include "../client/client.h"
 #include "../messageBuffer/messageBuffer.h"
+#include "../userData/userData.h"
 
 namespace Gui
 {

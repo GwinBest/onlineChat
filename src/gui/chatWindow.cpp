@@ -182,7 +182,7 @@ namespace Gui
                 Network::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), availableChats[chatSelected]->GetChatName(), _inputBuffer);
                 }
 
-                Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kSend, _inputBuffer.c_str());
+                //Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kSend, _inputBuffer.c_str());
                 
                 isEnterPressed = false;
                 isButtonPressed = false;
@@ -196,6 +196,11 @@ namespace Gui
             {
                 ImGuiStyle& windowStyle = ImGui::GetStyle();
                 windowStyle.Colors[ImGuiCol_ChildBg] = ImVec4(0.0941f, 0.0980f, 0.1137f, 1.00f);					// setup new color for begin child
+
+                if (chatSelected != -1) 
+                {
+                    Network::Client::GetInstance().ReceiveAllMessagesFromSelectedChat(currentUser.GetUserLogin(), availableChats[chatSelected]->GetChatId());
+                }
 
                 ImGui::SetCursorPos(ImVec2(availableChatsWidth, availableChatsStartHeight));
                 ImGui::BeginChild("##chat zone", ImVec2(ImGui::GetWindowWidth() - availableChatsWidth,

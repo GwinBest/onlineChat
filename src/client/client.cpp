@@ -170,6 +170,36 @@ namespace Network
 
 				break;
 			}
+			case ActionType::kReceiveAllMessages:
+			{
+				size_t count;
+				recv(_clientSocket, reinterpret_cast<char*>(&count), sizeof(count), NULL);
+
+				while (count > 0)
+				{
+					constexpr const size_t receiveMessageSize = 4096;
+					char receiveMessage[4097];
+					uint32_t receivedSize;
+					recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);
+					{
+						/*receiveMessage[receivedSize] = '\0';*/
+						size_t msgType;
+						recv(_clientSocket, reinterpret_cast<char*>(&msgType), sizeof(msgType), NULL);
+						if (msgType == 2)
+						{
+							Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kReceived, receiveMessage);
+						}
+						else
+						{
+							Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kSend, receiveMessage);
+
+						}
+					}
+					count--;
+				}
+
+				break;
+			}
 			default:
 			{
 				break;
@@ -239,5 +269,21 @@ namespace Network
 			_currentClientState = ClientState::kClientDisconnected;
 		}
 	}
+
+	void Client::ReceiveAllMessagesFromSelectedChat(std::string author, size_t chatId) const noexcept
+	{
+		ActionType type = ActionType::kReceiveAllMessages;
+		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
+
+		send(_clientSocket, reinterpret_cast<char*>(&chatId), sizeof(chatId), NULL);
+
+		size_t authorSize = author.size();
+		send(_clientSocket, reinterpret_cast<char*>(&authorSize), sizeof(authorSize), NULL);
+		send(_clientSocket, author.c_str(), authorSize, NULL);
+
+	}
+
+
+
 
 } // !namespace Network

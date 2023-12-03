@@ -35,7 +35,8 @@ namespace Network
 		kCheckUserExistence				= 3,
 		kGetUserNameFromDatabase		= 4,
 		kFindUsersByLogin				= 5,
-		kGetAvailableChatsForUser		= 6
+		kGetAvailableChatsForUser		= 6,
+		kReceiveAllMessages				= 7
 	};
 
 	struct UserRequest
@@ -72,6 +73,8 @@ namespace Network
 		}
 
 		~Client();
+
+		void ReceiveAllMessagesFromSelectedChat(std::string author, size_t chatId) const noexcept;
 
 	private:
 		Client() noexcept;

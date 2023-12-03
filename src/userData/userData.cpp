@@ -52,7 +52,7 @@ namespace UserData
 		return false;
 	}
 
-	std::vector<UserData::User*> User::FindUsersByLogin(std::string& userLogin)
+	std::vector<UserData::User*> User::FindUsersByLogin(const std::string& userLogin) noexcept
 	{
 		Network::UserRequest request =
 		{

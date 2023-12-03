@@ -37,7 +37,7 @@ add_executable (OnlineChat
 				"src/gui/signUpWindow.h" "src/gui/signUpWindow.cpp"
 				"thirdParty/imgui/glfw/include/GLFW/glfwLoadImage.h"
 				"thirdParty/imgui/glfw/include/GLFW/glfwLoadImage.cpp" "src/userData/userCredentialsFile.h"
-				"src/userData/userCredentialsFile.cpp" "src/userData/userData.cpp" "src/userData/userData.h")
+				"src/userData/userCredentialsFile.cpp" "src/userData/userData.cpp" "src/userData/userData.h" "src/chat/chat.h" "src/chat/chat.cpp")
 
 target_link_libraries(OnlineChat
 	opengl32.lib

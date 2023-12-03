@@ -20,6 +20,10 @@ namespace UserData
 {
 	class User; 
 }
+namespace Chat
+{
+	class Chat;
+}
 
 namespace Network
 {
@@ -30,7 +34,8 @@ namespace Network
 		kAddUserCredentialsToDatabase	= 2,
 		kCheckUserExistence				= 3,
 		kGetUserNameFromDatabase		= 4,
-		kFindUsersByLogin				= 5
+		kFindUsersByLogin				= 5,
+		kGetAvailableChatsForUser		= 6
 	};
 
 	struct UserRequest
@@ -38,13 +43,13 @@ namespace Network
 		ActionType actionType;
 		std::string name;
 		std::string login;
-		size_t password;
+		size_t password = 0;
 	};
 
 	class Client final
 	{
 	public:
-		using ServerResponse = std::variant<std::string, std::vector<UserData::User*>>;
+		using ServerResponse = std::variant<std::string, std::vector<UserData::User*>, std::vector<Chat::Chat*>>;
 
 		Client(const Client&) = delete;
 		void operator= (const Client&) = delete;
@@ -53,6 +58,8 @@ namespace Network
 
 		void SendUserMessage(const std::string& currentUserLogin, const std::string& selectedUserLogin, const std::string data) const noexcept;
 		void SendUserCredentials(UserRequest& userCredentials) const noexcept;
+
+		void SendChatInfo(const std::string& name) noexcept;
 
 		[[noreturn]] void ReceiveThread() const noexcept;
 		template<typename T>

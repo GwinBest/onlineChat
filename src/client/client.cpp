@@ -1,6 +1,7 @@
 ﻿#include "client.h"
 
 #include "../userData/userData.h"
+#include "../chat/chat.h"
 
 namespace Network 
 {
@@ -53,6 +54,16 @@ namespace Network
 		send(_clientSocket, userCredentials.login.c_str(), loginLength, NULL);
 
 		send(_clientSocket, reinterpret_cast<char*>(&userCredentials.password), sizeof(userCredentials.password), NULL);
+	}
+
+	void Client::SendChatInfo(const std::string& name) noexcept
+	{
+		ActionType type = ActionType::kGetAvailableChatsForUser;
+		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
+
+		size_t nameLength = name.size();
+		send(_clientSocket, reinterpret_cast<char*>(&nameLength), sizeof(nameLength), NULL);
+		send(_clientSocket, name.c_str(), nameLength, NULL);
 	}
 	
 	void Client::ReceiveThread() const noexcept
@@ -121,6 +132,40 @@ namespace Network
 				}
 
 				_serverResponse = foundUsersVector;
+				conditionalVariable.notify_one();
+
+				break;
+			}
+			case ActionType::kGetAvailableChatsForUser:
+			{
+				size_t availableChatsCount = 0;
+				recv(_clientSocket, reinterpret_cast<char*>(&availableChatsCount), sizeof(availableChatsCount), NULL);
+
+				std::vector<Chat::Chat*> availableChatsVector;
+
+				size_t i = 0;
+				while (availableChatsCount > 0)
+				{
+					char chatName[50];
+					size_t chatNameLength;
+					Chat::Chat* foundChat= new Chat::Chat;
+
+					size_t chatId;
+					recv(_clientSocket, reinterpret_cast<char*>(&chatId), sizeof(chatId), NULL);
+
+					recv(_clientSocket, reinterpret_cast<char*>(&chatNameLength), sizeof(chatNameLength), NULL);
+					recv(_clientSocket, chatName, chatNameLength, NULL);
+					chatName[chatNameLength] = '\0';
+
+					foundChat->SetChatName(chatName);
+					foundChat->SetChatId(chatId);
+
+					availableChatsVector.push_back(foundChat);
+
+					availableChatsCount--;
+				}
+
+				_serverResponse = availableChatsVector;
 				conditionalVariable.notify_one();
 
 				break;

@@ -6,6 +6,10 @@ namespace Gui
     {
         //TODO: free memory
         static std::vector<UserData::User*> foundUsers;
+        static std::vector<Chat::Chat*> availableChats;
+        static bool isAvailableChatsUpdated = true;
+
+        bool isSearch = false;
 
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				        // enable docking 
 
@@ -35,6 +39,11 @@ namespace Gui
                 if (ImGui::InputTextWithHint("##search", "Search", &search))
                 {
                     foundUsers = UserData::User::FindUsersByLogin(search);
+                   
+                }
+                if (search != "")
+                {
+                    isSearch = true;
                 }
                 ImGui::PopItemWidth();
 
@@ -56,21 +65,44 @@ namespace Gui
             ImGui::BeginChild("##available chats", availableChatsSize);
 
             ImVec2 selectablePosition = { 0, 0 };
-            for (int i = 0; i < foundUsers.size(); i++)
-            {
-                char label[128];
-                sprintf(label, "User %d", i);
+           
                 ImGui::SetCursorPos(selectablePosition);
-                if (ImGui::Selectable(foundUsers[i]->GetUserLogin().c_str(), chatSelected == i, 0, ImVec2(0, 50)))
-                    chatSelected = i;
+                if (isSearch)
+                {
+                    for (size_t i = 0; i < foundUsers.size(); ++i)
+                    {
+                        if (ImGui::Selectable(foundUsers[i]->GetUserLogin().c_str(), chatSelected == i, 0, ImVec2(0, 50)))
+                        {
+                            chatSelected = i;
+                        }
+                    }
+                }
+                else
+                {
+                    if (isAvailableChatsUpdated)
+                    {
+                        availableChats = Chat::Chat::GetAvailableChatsForUser(currentUser.GetUserLogin());
+                        isAvailableChatsUpdated = false;
+                    }
+
+                    for (size_t i = 0; i < availableChats.size(); ++i)
+                    {
+                        
+                        if (ImGui::Selectable(availableChats[i]->GetChatName().c_str(), chatSelected == i, 0, ImVec2(0, 50)))
+                        {
+                            chatSelected = i;
+
+                        }
+                    }
+                }
 
                 ImGui::SetItemAllowOverlap();
 
-                ImGui::SetCursorPos(ImVec2(selectablePosition.x + 10, selectablePosition.y + 10));
-                ImGui::Text("text");
+                //ImGui::SetCursorPos(ImVec2(selectablePosition.x + 10, selectablePosition.y + 15));
+                //ImGui::Text("text");
 
                 selectablePosition.y += 50;
-            }
+            
 
             // unselect current chat
             if (ImGui::IsKeyPressed(ImGuiKey_Escape))
@@ -141,7 +173,15 @@ namespace Gui
             if ((isEnterPressed || isButtonPressed) && _inputBuffer != "")
             {
                 //TODO: 4096 max message size
-                Network::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), foundUsers[chatSelected]->GetUserLogin(), _inputBuffer);
+                if (isSearch)
+                {
+                    Network::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), foundUsers[chatSelected]->GetUserLogin(), _inputBuffer);
+                }
+                else
+                {
+                Network::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), availableChats[chatSelected]->GetChatName(), _inputBuffer);
+                }
+
                 Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kSend, _inputBuffer.c_str());
                 
                 isEnterPressed = false;

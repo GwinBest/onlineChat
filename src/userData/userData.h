@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "../client/client.h"
 #include "userCredentialsFile.h"
 
@@ -19,7 +21,7 @@ namespace UserData
 
 		static bool IsUserExist(const std::string& login, const size_t password) noexcept;
 
-		static std::vector<UserData::User*> FindUsersByLogin(std::string& userLogin);
+		static std::vector<UserData::User*> FindUsersByLogin(const std::string& userLogin) noexcept;
 
 		std::string GetUserName() const noexcept;
 		std::string GetUserLogin() const noexcept;

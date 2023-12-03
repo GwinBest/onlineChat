@@ -51,7 +51,7 @@ namespace Network
 
 		static Client& GetInstance() noexcept;
 
-		void SendUserMessage(size_t userId, const char* data, size_t dataSize) const noexcept;
+		void SendUserMessage(const std::string& currentUserLogin, const std::string& selectedUserLogin, const std::string data) const noexcept;
 		void SendUserCredentials(UserRequest& userCredentials) const noexcept;
 
 		[[noreturn]] void ReceiveThread() const noexcept;

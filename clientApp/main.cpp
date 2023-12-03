@@ -14,12 +14,13 @@ enum class WindowState : uint8_t
 	kChat
 };
 
+UserData::User currentUser;
+
 int main()
 {
 	Gui::GlfwWindow window;
     WindowState currentWindowState = WindowState::kLogin;
 
-    UserData::User user;
     std::string userName;
     std::string userLogin;
     size_t userPassword = 0;
@@ -32,9 +33,9 @@ int main()
         if (UserData::User::IsUserExist(userLogin, userPassword))
         {
             userName = UserData::User::GetUserNameFromDatabase(userLogin, userPassword);
-            user.SetUserName(userName);
-            user.SetUserLogin(userLogin);
-            user.SetUserPassword(userPassword);
+            currentUser.SetUserName(userName);
+            currentUser.SetUserLogin(userLogin);
+            currentUser.SetUserPassword(userPassword);
 
             currentWindowState = WindowState::kChat;
         }
@@ -72,9 +73,9 @@ int main()
                 if (UserData::User::IsUserExist(userLogin, userPassword))
                 {
                     userName = UserData::User::GetUserNameFromDatabase(userLogin, userPassword);
-                    user.SetUserName(userName);
-                    user.SetUserLogin(userLogin);
-                    user.SetUserPassword(userPassword);
+                    currentUser.SetUserName(userName);
+                    currentUser.SetUserLogin(userLogin);
+                    currentUser.SetUserPassword(userPassword);
 
                     if (UserData::UserCredentialsFile::CreateNewFile())
                     {

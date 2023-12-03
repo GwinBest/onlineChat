@@ -1,7 +1,7 @@
 #include "UserData.h"
 
 namespace UserData
-{
+{	
 	void User::PushUserCredentialsToDatabase(const std::string& name, const std::string& login, const size_t password) noexcept
 	{
 		Network::UserRequest request =

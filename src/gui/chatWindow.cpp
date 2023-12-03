@@ -140,9 +140,10 @@ namespace Gui
             // send message 
             if ((isEnterPressed || isButtonPressed) && _inputBuffer != "")
             {
-                Network::Client::GetInstance().SendUserMessage(chatSelected, _inputBuffer.c_str(), _inputBuffer.size());
+                //TODO: 4096 max message size
+                Network::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), foundUsers[chatSelected]->GetUserLogin(), _inputBuffer);
                 Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kSend, _inputBuffer.c_str());
-
+                
                 isEnterPressed = false;
                 isButtonPressed = false;
 
@@ -230,6 +231,7 @@ namespace Gui
         {
             ImDrawList* drawList = ImGui::GetWindowDrawList();
 
+            //TODO: fix textX and textY
             const char* textToDraw = "Select a chat to start messaging";
             float textX = (ImGui::GetWindowWidth() - availableChatsWidth) / 2 + (availableChatsWidth / 2);
             float textY = ImGui::GetWindowHeight() / 2;

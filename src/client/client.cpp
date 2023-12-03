@@ -21,14 +21,22 @@ namespace Network
 		return instance;
 	}
 
-	void Client::SendUserMessage(size_t userId, const char* data, size_t dataSize) const noexcept
+	void Client::SendUserMessage(const std::string& currentUserLogin, const std::string& selectedUserLogin, const std::string data) const noexcept
 	{
 		ActionType type = ActionType::kUserChatMessage;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 
-		send(_clientSocket, reinterpret_cast<char*>(&userId), sizeof(userId), NULL);									// send the receiver's id
-		send(_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(dataSize), NULL);								// send the size of the message
-		send(_clientSocket, data, dataSize, NULL);																		// send the message
+		size_t currentUserLoginSize = currentUserLogin.size();
+		send(_clientSocket, reinterpret_cast<char*>(&currentUserLoginSize), sizeof(currentUserLoginSize), NULL);
+		send(_clientSocket, currentUserLogin.c_str(), currentUserLoginSize, NULL);
+
+		size_t userLoginSize = selectedUserLogin.size();
+		send(_clientSocket, reinterpret_cast<char*>(&userLoginSize), sizeof(userLoginSize), NULL);
+		send(_clientSocket, selectedUserLogin.c_str(), userLoginSize, NULL);
+
+		size_t dataSize = data.size();
+		send(_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(dataSize), NULL);
+		send(_clientSocket, data.c_str(), dataSize, NULL);
 	}
 
 	void Client::SendUserCredentials(UserRequest& userCredentials) const noexcept

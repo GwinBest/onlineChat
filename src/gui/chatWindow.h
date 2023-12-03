@@ -5,6 +5,8 @@
 #include "../messageBuffer/messageBuffer.h"
 #include "../userData/userData.h"
 
+extern UserData::User currentUser;
+
 namespace Gui
 {
 	class ChatWindow final : public IImGuiWindow

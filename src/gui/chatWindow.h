@@ -15,7 +15,7 @@ namespace Gui
 		void DrawGui() noexcept override;
 
 	private:
-		std::string _inputBuffer;
+		static inline std::string _inputBuffer;
 	};
 
 } // !namespace Gui

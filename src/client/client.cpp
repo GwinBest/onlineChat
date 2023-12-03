@@ -21,9 +21,12 @@ namespace Network
 
 	void Client::SendUserMessage(size_t userId, const char* data, size_t dataSize) const noexcept
 	{
-		send(_clientSocket, reinterpret_cast<char*>(&userId), sizeof(size_t), NULL);								// send the receiver's id
-		send(_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(size_t), NULL);								// send the size of the message
-		send(_clientSocket, data, dataSize, NULL);																	// send the message
+		ActionType type = ActionType::kUserChatMessage;
+		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
+
+		send(_clientSocket, reinterpret_cast<char*>(&userId), sizeof(userId), NULL);									// send the receiver's id
+		send(_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(dataSize), NULL);								// send the size of the message
+		send(_clientSocket, data, dataSize, NULL);																		// send the message
 	}
 
 	void Client::SendUserCredentials(UserRequest& userCredentials) const noexcept
@@ -53,9 +56,10 @@ namespace Network
 			{
 			case Network::ActionType::kUserChatMessage:
 			{
-				constexpr const uint16_t receiveMessageSize = 4096 + 1;
-				char receiveMessage[receiveMessageSize];
-				while (uint32_t receivedSize = recv(_clientSocket, receiveMessage, receiveMessageSize, NULL) > 0)
+				constexpr const size_t receiveMessageSize = 4096;
+				char receiveMessage[4097];
+				uint32_t receivedSize;
+				if((receivedSize = recv(_clientSocket, receiveMessage, receiveMessageSize, NULL)) > 0)
 				{
 					receiveMessage[receivedSize] = '\0';
 					Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kReceived, receiveMessage);
@@ -129,7 +133,7 @@ namespace Network
 			return false;
 		}
 
-		recv(_clientSocket, reinterpret_cast<char*>(&_clientId), sizeof(size_t), NULL);								//receive client id
+		recv(_clientSocket, reinterpret_cast<char*>(&_clientId), sizeof(_clientId), NULL);								//receive client id
 
 		_currentClientState = ClientState::kClientConnected;
 

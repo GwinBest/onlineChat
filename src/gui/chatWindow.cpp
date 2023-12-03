@@ -10,8 +10,8 @@ namespace Gui
 
         // available chats
         static int32_t chatSelected = -1;
-        static constexpr size_t availableChatsStartHeight = 65;
-        static constexpr size_t availableChatsWidthScaleFactor = 3.0f;
+        static constexpr const size_t availableChatsStartHeight = 65;
+        static constexpr const float availableChatsWidthScaleFactor = 3.0f;
         float availableChatsWidth = ImGui::GetWindowWidth() / availableChatsWidthScaleFactor;
         {
             // search

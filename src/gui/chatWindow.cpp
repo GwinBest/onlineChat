@@ -4,6 +4,9 @@ namespace Gui
 {
     void ChatWindow::DrawGui() noexcept
     {
+        //TODO: free memory
+        static std::vector<UserData::User*> foundUsers;
+
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				        // enable docking 
 
         ImGui::Begin("##main window");
@@ -14,6 +17,7 @@ namespace Gui
         static constexpr const float availableChatsWidthScaleFactor = 3.0f;
         float availableChatsWidth = ImGui::GetWindowWidth() / availableChatsWidthScaleFactor;
         {
+
             // search
             {
                 ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -28,7 +32,10 @@ namespace Gui
                 static std::string search;
                 ImGui::SetCursorPos(ImVec2(55, 20));
                 ImGui::PushItemWidth(availableChatsWidth - 70);
-                ImGui::InputTextWithHint("##search", "Search", &search);
+                if (ImGui::InputTextWithHint("##search", "Search", &search))
+                {
+                    foundUsers = UserData::User::FindUsersByLogin(search);
+                }
                 ImGui::PopItemWidth();
 
                 windowStyle.FrameRounding = oldRounding;
@@ -49,12 +56,12 @@ namespace Gui
             ImGui::BeginChild("##available chats", availableChatsSize);
 
             ImVec2 selectablePosition = { 0, 0 };
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < foundUsers.size(); i++)
             {
                 char label[128];
                 sprintf(label, "User %d", i);
                 ImGui::SetCursorPos(selectablePosition);
-                if (ImGui::Selectable(label, chatSelected == i,0, ImVec2(0,50)))
+                if (ImGui::Selectable(foundUsers[i]->GetUserLogin().c_str(), chatSelected == i, 0, ImVec2(0, 50)))
                     chatSelected = i;
 
                 ImGui::SetItemAllowOverlap();

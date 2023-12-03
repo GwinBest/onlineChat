@@ -93,31 +93,26 @@ namespace Network
 				size_t foundUsersCount = 0;
 				recv(_clientSocket, reinterpret_cast<char*>(&foundUsersCount), sizeof(foundUsersCount), NULL);
 
-				UserData::User* foundUsers;
-				if (foundUsersCount != 0)
-				{
-					foundUsers = new UserData::User[foundUsersCount];
-				}
-				else
-				{
-					UserData::User* foundUsers = nullptr;
-				}
+				std::vector<UserData::User*> foundUsersVector;
 
 				size_t i = 0;
 				while (foundUsersCount > 0)
 				{
 					char userLogin[50];
 					size_t userLoginLength;
+					UserData::User* foundUser = new UserData::User;
+
 					recv(_clientSocket, reinterpret_cast<char*>(&userLoginLength), sizeof(userLoginLength), NULL);
 					recv(_clientSocket, userLogin, userLoginLength, NULL);
 					userLogin[userLoginLength] = '\0';
 
-					foundUsers[i++].SetUserLogin(userLogin);
+					foundUser->SetUserLogin(userLogin);
+					foundUsersVector.push_back(foundUser);
 
 					foundUsersCount--;
 				}
 
-				_serverResponse = foundUsers;
+				_serverResponse = foundUsersVector;
 				conditionalVariable.notify_one();
 
 				break;

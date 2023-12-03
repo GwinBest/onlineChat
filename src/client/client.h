@@ -7,6 +7,7 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include <vector>
 #include <variant>
 
 #include "../messageBuffer/messageBuffer.h"
@@ -43,7 +44,7 @@ namespace Network
 	class Client final
 	{
 	public:
-		using ServerResponse = std::variant<std::string, UserData::User*>;
+		using ServerResponse = std::variant<std::string, std::vector<UserData::User*>>;
 
 		Client(const Client&) = delete;
 		void operator= (const Client&) = delete;

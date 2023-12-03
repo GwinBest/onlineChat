@@ -52,7 +52,7 @@ namespace UserData
 		return false;
 	}
 
-	User* User::FindUsersByLogin(std::string& userLogin)
+	std::vector<UserData::User*> User::FindUsersByLogin(std::string& userLogin)
 	{
 		Network::UserRequest request =
 		{
@@ -61,7 +61,7 @@ namespace UserData
 		};
 
 		Network::Client::GetInstance().SendUserCredentials(request);
-		User* response = Network::Client::GetInstance().GetServerResponse<User*>();
+		std::vector<UserData::User*> response = Network::Client::GetInstance().GetServerResponse<std::vector<UserData::User*>>();
 
 		return response;
 	}

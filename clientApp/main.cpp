@@ -1,5 +1,6 @@
 #include <functional>
 
+#include "../src/userData/userData.h"
 #include "../src/gui/glfwWindow.h"
 #include "../src/gui/chatWindow.h"
 #include "../src/gui/loginWindow.h"

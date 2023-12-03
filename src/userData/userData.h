@@ -19,6 +19,8 @@ namespace UserData
 
 		static bool IsUserExist(const std::string& login, const size_t password) noexcept;
 
+		static User* FindUsersByLogin(std::string& userLogin);
+
 		std::string GetUserName() const noexcept;
 		std::string GetUserLogin() const noexcept;
 		size_t GetUserPassword() const noexcept;

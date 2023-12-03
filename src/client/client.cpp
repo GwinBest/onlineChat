@@ -1,5 +1,7 @@
 ﻿#include "client.h"
 
+#include "../userData/userData.h"
+
 namespace Network 
 {
 	Client& Client::GetInstance() noexcept
@@ -54,7 +56,7 @@ namespace Network
 
 			switch (type)
 			{
-			case Network::ActionType::kUserChatMessage:
+			case ActionType::kUserChatMessage:
 			{
 				constexpr const size_t receiveMessageSize = 4096;
 				char receiveMessage[4097];
@@ -67,15 +69,46 @@ namespace Network
 
 				break;
 			}
-			case Network::ActionType::kAddUserCredentialsToDatabase:
+			case ActionType::kAddUserCredentialsToDatabase:
 			{
 				break;
 			}
-			case Network::ActionType::kCheckUserExistence:
-			case Network::ActionType::kGetUserNameFromDatabase:
+			case ActionType::kCheckUserExistence:
+			case ActionType::kGetUserNameFromDatabase:
 			{
-				recv(_clientSocket, _serverResponse, sizeof(_serverResponse), NULL);
+				size_t responseSize;
+				char response[255];
 
+				recv(_clientSocket, reinterpret_cast<char*>(&responseSize), sizeof(responseSize), NULL);
+				recv(_clientSocket, response, responseSize, NULL);
+				response[responseSize] = '\0';
+
+				_serverResponse = response;
+				conditionalVariable.notify_one();
+
+				break;
+			}
+			case ActionType::kFindUsersByLogin:
+			{
+				size_t foundUsersCount = 0;
+				recv(_clientSocket, reinterpret_cast<char*>(&foundUsersCount), sizeof(foundUsersCount), NULL);
+
+				UserData::User* foundUsers = new UserData::User[foundUsersCount];
+				size_t i = 0;
+				while (foundUsersCount > 0)
+				{
+					char userLogin[50];
+					size_t userLoginLength;
+					recv(_clientSocket, reinterpret_cast<char*>(&userLoginLength), sizeof(userLoginLength), NULL);
+					recv(_clientSocket, userLogin, userLoginLength, NULL);
+					userLogin[userLoginLength] = '\0';
+
+					foundUsers[i++].SetUserLogin(userLogin);
+
+					foundUsersCount--;
+				}
+
+				_serverResponse = foundUsers;
 				conditionalVariable.notify_one();
 
 				break;
@@ -86,14 +119,6 @@ namespace Network
 			}
 			}
 		}
-	}
-
-	std::string Client::GetServerResponse() const noexcept
-	{
-		std::unique_lock<std::mutex> lock(mutex);
-		conditionalVariable.wait(lock);
-
-		return _serverResponse;
 	}
 
 	Client::~Client() 

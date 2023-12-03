@@ -26,7 +26,7 @@ namespace UserData
 		};
 
 		Network::Client::GetInstance().SendUserCredentials(request);
-		std::string serverResponse = Network::Client::GetInstance().GetServerResponse();
+		std::string serverResponse = Network::Client::GetInstance().GetServerResponse<std::string>();
 
 		return serverResponse;
 	}
@@ -42,7 +42,7 @@ namespace UserData
 		};
 
 		Network::Client::GetInstance().SendUserCredentials(request);
-		std::string serverResponse = Network::Client::GetInstance().GetServerResponse();
+		std::string serverResponse = Network::Client::GetInstance().GetServerResponse<std::string>();
 		
 		if (serverResponse == "Exist")
 		{
@@ -50,6 +50,20 @@ namespace UserData
 		}
 
 		return false;
+	}
+
+	User* User::FindUsersByLogin(std::string& userLogin)
+	{
+		Network::UserRequest request =
+		{
+			.actionType = Network::ActionType::kFindUsersByLogin,
+			.login = userLogin
+		};
+
+		Network::Client::GetInstance().SendUserCredentials(request);
+		User* response = Network::Client::GetInstance().GetServerResponse<User*>();
+
+		return response;
 	}
 
 	std::string User::GetUserName() const noexcept

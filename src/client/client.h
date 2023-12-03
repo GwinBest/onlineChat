@@ -2,17 +2,23 @@
 
 #include <winsock2.h>
 
+#include <condition_variable>
 #include <cstdint>
+#include <mutex>
 #include <string>
 #include <thread>
-#include <mutex>
-#include <condition_variable>
+#include <variant>
 
 #include "../messageBuffer/messageBuffer.h"
-#include "../userData/userData.h"
 
 #pragma comment (lib, "ws2_32.lib")
 #pragma warning (disable:4996)
+
+// forward declaration
+namespace UserData 
+{
+	class User; 
+}
 
 namespace Network
 {
@@ -22,7 +28,8 @@ namespace Network
 		kUserChatMessage				= 1,
 		kAddUserCredentialsToDatabase	= 2,
 		kCheckUserExistence				= 3,
-		kGetUserNameFromDatabase		= 4
+		kGetUserNameFromDatabase		= 4,
+		kFindUsersByLogin				= 5
 	};
 
 	struct UserRequest
@@ -36,6 +43,8 @@ namespace Network
 	class Client final
 	{
 	public:
+		using ServerResponse = std::variant<std::string, UserData::User*>;
+
 		Client(const Client&) = delete;
 		void operator= (const Client&) = delete;
 
@@ -45,7 +54,14 @@ namespace Network
 		void SendUserCredentials(UserRequest& userCredentials) const noexcept;
 
 		[[noreturn]] void ReceiveThread() const noexcept;
-		std::string GetServerResponse() const noexcept;
+		template<typename T>
+		T GetServerResponse() const noexcept
+		{
+			std::unique_lock<std::mutex> lock(mutex);
+			conditionalVariable.wait(lock);
+
+			return std::get<T>(_serverResponse);
+		}
 
 		~Client();
 
@@ -72,10 +88,9 @@ namespace Network
 		mutable std::mutex mutex;
 		mutable std::condition_variable conditionalVariable;
 
-		static constexpr const uint8_t _serverResponseSize = 255;
-		static inline char _serverResponse[_serverResponseSize];
+		mutable ServerResponse _serverResponse;
 
-		size_t _clientId = 0;
+		size_t _clientId;
 		const std::string _ipAddress = "127.0.0.1";
 		static constexpr uint32_t _port = 8080;
 	};

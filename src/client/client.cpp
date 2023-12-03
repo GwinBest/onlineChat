@@ -93,8 +93,15 @@ namespace Network
 				size_t foundUsersCount = 0;
 				recv(_clientSocket, reinterpret_cast<char*>(&foundUsersCount), sizeof(foundUsersCount), NULL);
 
-				UserData::User* foundUsers = new UserData::User[foundUsersCount];
-				foundUsers = nullptr;
+				UserData::User* foundUsers;
+				if (foundUsersCount != 0)
+				{
+					foundUsers = new UserData::User[foundUsersCount];
+				}
+				else
+				{
+					UserData::User* foundUsers = nullptr;
+				}
 
 				size_t i = 0;
 				while (foundUsersCount > 0)

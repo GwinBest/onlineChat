@@ -94,6 +94,8 @@ namespace Network
 				recv(_clientSocket, reinterpret_cast<char*>(&foundUsersCount), sizeof(foundUsersCount), NULL);
 
 				UserData::User* foundUsers = new UserData::User[foundUsersCount];
+				foundUsers = nullptr;
+
 				size_t i = 0;
 				while (foundUsersCount > 0)
 				{

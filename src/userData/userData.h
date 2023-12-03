@@ -34,6 +34,5 @@ namespace UserData
 		std::string _userLogin;
 		size_t _userPassword;
 	};
-} // !namespace UserData
 
-UserData::User currentUser;
+} // !namespace UserData

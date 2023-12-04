@@ -7,8 +7,8 @@
 #include <mutex>
 #include <string>
 #include <thread>
-#include <vector>
 #include <variant>
+#include <vector>
 
 #include "../messageBuffer/messageBuffer.h"
 
@@ -25,6 +25,7 @@ namespace Chat
 	class Chat;
 }
 
+//TODO add a core for client and server, const response size
 namespace Network
 {
 	enum class ActionType : uint32_t
@@ -39,12 +40,20 @@ namespace Network
 		kReceiveAllMessages = 7
 	};
 
-	struct UserRequest
+	struct UserPacket
 	{
-		ActionType actionType;
-		std::string name;
-		std::string login;
-		size_t password = 0;
+		ActionType actionType	= ActionType::kActionUndefined;
+		std::string name		= "";
+		std::string login		= "";
+		size_t password			= 0;
+	};
+
+	struct ChatPacket
+	{
+		ActionType actionType			= ActionType::kActionUndefined;
+		std::string chatName			= "";
+		std::string currentUserLogin	= "";
+		size_t chatId					= 0;
 	};
 
 	class Client final
@@ -58,23 +67,22 @@ namespace Network
 		static Client& GetInstance() noexcept;
 
 		void SendUserMessage(const std::string& currentUserLogin, const std::string& selectedUserLogin, const std::string data) const noexcept;
-		void SendUserCredentials(UserRequest& userCredentials) const noexcept;
-
-		void SendChatInfo(const std::string& name) noexcept;
+		void SendUserCredentialsPacket(const UserPacket& userCredentials) const noexcept;
+		void SendChatInfoPacket(const ChatPacket& chatInfo) const noexcept;
 
 		[[noreturn]] void ReceiveThread() const noexcept;
+		void ReceiveAllMessagesFromSelectedChat(std::string author, size_t chatId) const noexcept;
+
 		template<typename T>
 		T GetServerResponse() const noexcept
 		{
-			std::unique_lock<std::mutex> lock(mutex);
-			conditionalVariable.wait(lock);
+			std::unique_lock<std::mutex> lock(_mutex);
+			_conditionalVariable.wait(lock);
 
 			return std::get<T>(_serverResponse);
 		}
 
 		~Client();
-
-		void ReceiveAllMessagesFromSelectedChat(std::string author, size_t chatId) const noexcept;
 
 	private:
 		Client() noexcept;
@@ -96,8 +104,8 @@ namespace Network
 		SOCKADDR_IN _socketAddress;
 		ClientState _currentClientState = ClientState::kClientDisconnected;
 
-		mutable std::mutex mutex;
-		mutable std::condition_variable conditionalVariable;
+		mutable std::mutex _mutex;
+		mutable std::condition_variable _conditionalVariable;
 
 		mutable ServerResponse _serverResponse;
 

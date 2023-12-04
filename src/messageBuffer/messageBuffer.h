@@ -26,7 +26,7 @@ namespace Buffer
 	public:
 		Iterator(Node* first) : _current(first) {};
 
-		inline Iterator& operator++() noexcept
+		inline Iterator& operator++ () noexcept
 		{
 			_current = _current ? _current->next : nullptr;
 			return *this;
@@ -37,7 +37,7 @@ namespace Buffer
 			return _current == it._current;
 		}
 
-		inline bool operator!=(const Iterator& other) const noexcept 
+		inline bool operator!= (const Iterator& other) const noexcept 
 		{ 
 			return _current != other._current; 
 		}
@@ -65,12 +65,14 @@ namespace Buffer
 
 		void pushFront(const MessageType messageType, const char* data) noexcept;
 		void popFront() noexcept;
+
 		inline bool isEmpty() const noexcept;
 
 		inline Iterator begin() const noexcept 
 		{
 			return Iterator(_head);
 		}
+
 		inline Iterator end() const noexcept 
 		{ 
 			return Iterator(nullptr); 

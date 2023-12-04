@@ -17,6 +17,7 @@ namespace UserData
 
 			return true;
 		}
+
 		return false;
 	}
 
@@ -35,11 +36,6 @@ namespace UserData
 
 	void UserCredentialsFile::CloseFile() noexcept
 	{
-		if (_credentialsFile.is_open())
-		{
-			_credentialsFile.close();
-		}
-
 		if (_credentialsFile.is_open())
 		{
 			_credentialsFile.close();

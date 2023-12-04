@@ -1,17 +1,16 @@
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "../client/client.h"
-#include "../userData/userData.h"
 
 namespace Chat
 {
 	class Chat final
 	{
 	public:
-		static std::vector<Chat*> GetAvailableChatsForUser(const std::string& chatName) noexcept;
+		static std::vector<Chat*> GetAvailableChatsForUser(const std::string& currentUserLogin) noexcept;
 
 		void SetChatName(const std::string& chatName) noexcept;
 		void SetChatId(const size_t chatId) noexcept;

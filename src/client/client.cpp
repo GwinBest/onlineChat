@@ -3,6 +3,8 @@
 #include "../userData/userData.h"
 #include "../chat/chat.h"
 
+extern UserData::User currentUser;
+
 namespace Network 
 {
 	Client& Client::GetInstance() noexcept
@@ -91,10 +93,17 @@ namespace Network
 			{
 				constexpr const size_t receiveMessageSize = 4096;
 				char receiveMessage[4097];
-
-				if((recv(_clientSocket, receiveMessage, receiveMessageSize, NULL)) > 0)
+				uint32_t receivedSize;
+				char userLogin[50];
+				
+				recv(_clientSocket, userLogin, 50, NULL);
+				if (userLogin == currentUser.GetUserLogin())
 				{
-					Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kReceived, receiveMessage);
+					if ((receivedSize = recv(_clientSocket, receiveMessage, receiveMessageSize, NULL)) > 0)
+					{
+						receiveMessage[receivedSize] = '\0';
+						Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kReceived, receiveMessage);
+					}
 				}
 
 				break;

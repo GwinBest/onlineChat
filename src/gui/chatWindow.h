@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../chat/chat.h"
+#include "iImGuiWindow.h"
 #include "../client/client.h"
 #include "../messageBuffer/messageBuffer.h"
 #include "../userData/userData.h"
-#include "iImGuiWindow.h"
+#include "../chat/chat.h"
 
 extern UserData::User currentUser;
 

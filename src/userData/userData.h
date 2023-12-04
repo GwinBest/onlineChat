@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "../client/client.h"
+#include "userCredentialsFile.h"
 
 // defined in Windows.h
 #ifdef GetUserName

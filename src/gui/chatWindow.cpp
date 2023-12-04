@@ -8,7 +8,8 @@ namespace Gui
         static std::vector<UserData::User*> foundUsers;
         static std::vector<Chat::Chat*> availableChats;
         static bool isAvailableChatsUpdated = true;
-
+        static bool newChat = false;
+        static size_t qwe ;
         bool isSearch = false;
 
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				        // enable docking 
@@ -73,7 +74,13 @@ namespace Gui
                     {
                         if (ImGui::Selectable(foundUsers[i]->GetUserLogin().c_str(), chatSelected == i, 0, ImVec2(0, 50)))
                         {
+                            if (chatSelected != qwe)
+                            {
+                                newChat = true;
+                                qwe = i;
+                            }
                             chatSelected = i;
+
                         }
                     }
                 }
@@ -90,8 +97,12 @@ namespace Gui
                         
                         if (ImGui::Selectable(availableChats[i]->GetChatName().c_str(), chatSelected == i, 0, ImVec2(0, 50)))
                         {
+                            if (chatSelected != qwe)
+                            {
+                                newChat = true;
+                                qwe = i;
+                            }
                             chatSelected = i;
-
                         }
                     }
                 }
@@ -175,6 +186,7 @@ namespace Gui
                 //TODO: 4096 max message size
                 if (isSearch)
                 {
+                    isSearch = false;
                     Network::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), foundUsers[chatSelected]->GetUserLogin(), _inputBuffer);
                 }
                 else
@@ -182,7 +194,7 @@ namespace Gui
                 Network::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), availableChats[chatSelected]->GetChatName(), _inputBuffer);
                 }
 
-                //Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kSend, _inputBuffer.c_str());
+                Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kSend, _inputBuffer.c_str());
                 
                 isEnterPressed = false;
                 isButtonPressed = false;
@@ -197,8 +209,10 @@ namespace Gui
                 ImGuiStyle& windowStyle = ImGui::GetStyle();
                 windowStyle.Colors[ImGuiCol_ChildBg] = ImVec4(0.0941f, 0.0980f, 0.1137f, 1.00f);					// setup new color for begin child
 
-                if (chatSelected != -1) 
+                if (newChat) 
                 {
+                    newChat = false;
+
                     Network::Client::GetInstance().ReceiveAllMessagesFromSelectedChat(currentUser.GetUserLogin(), availableChats[chatSelected]->GetChatId());
                 }
 

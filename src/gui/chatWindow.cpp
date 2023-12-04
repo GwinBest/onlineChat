@@ -169,7 +169,8 @@ namespace Gui
             // button
             static bool isButtonPressed = false;
             {
-                ImVec2 buttonSize = ImVec2(35, 40);
+                //TODO: add arrow button
+                ImVec2 buttonSize = ImVec2(45, 40);
                 ImGui::SameLine();
                 ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 45);
                 if (ImGui::Button("send", buttonSize))

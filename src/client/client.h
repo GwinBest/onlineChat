@@ -114,7 +114,7 @@ namespace Network
 		mutable ServerResponse _serverResponse;
 
 		size_t _clientId;//remove
-		const std::string _ipAddress = "192.168.0.102";
+		const std::string _ipAddress = "127.0.0.1";
 		static constexpr uint32_t _port = 8080;
 	};
 

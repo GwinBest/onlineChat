@@ -33,9 +33,9 @@ namespace Network
 		send(_clientSocket, reinterpret_cast<char*>(&currentUserLoginSize), sizeof(currentUserLoginSize), NULL);
 		send(_clientSocket, currentUserLogin.c_str(), currentUserLoginSize, NULL);
 
-		size_t userLoginSize = selectedUserLogin.size();
-		send(_clientSocket, reinterpret_cast<char*>(&userLoginSize), sizeof(userLoginSize), NULL);
-		send(_clientSocket, selectedUserLogin.c_str(), userLoginSize, NULL);
+		size_t selectedUserLoginSize = selectedUserLogin.size();
+		send(_clientSocket, reinterpret_cast<char*>(&selectedUserLoginSize), sizeof(selectedUserLoginSize), NULL);
+		send(_clientSocket, selectedUserLogin.c_str(), selectedUserLoginSize, NULL);
 
 		size_t dataSize = data.size();
 		send(_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(dataSize), NULL);

@@ -55,6 +55,7 @@ namespace Gui
 		ImVec4 oldButtonColor = windowStyle.Colors[ImGuiCol_Button];
 		windowStyle.Colors[ImGuiCol_Button] = windowStyle.Colors[ImGuiCol_WindowBg];									// set the button color to the same 
 																														// as the bg window so that only the arrow is visible
+
 		int32_t backToLoginButtonWidth = 0;																				// loads from loadTextureFromFile
 		int32_t backToLoginButtonHeight = 0;																			// loads from loadTextureFromFile
 		ImTextureID backToLoginButtonTexture = nullptr;
@@ -85,7 +86,7 @@ namespace Gui
 		const float loginTextX = ImGui::GetWindowSize().x / 2 - ImGui::CalcTextSize(loginText.c_str()).x / 2;
 		ImGui::SetCursorPosX(loginTextX);
 		ImGui::Text(loginText.c_str());
-		//FIXME: gap between text and input text when fullscreen
+		//TODO: gap between text and input text when fullscreen
 
 		static constexpr float inputTextWidth = 300.0f;
 		ImVec4 oldInputTextColor = windowStyle.Colors[ImGuiCol_FrameBg];

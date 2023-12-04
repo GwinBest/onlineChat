@@ -3,8 +3,8 @@
 // for SetFileAttributesA
 #include <Windows.h>
 
-#include <string>
 #include <fstream>
+#include <string>
 
 namespace UserData
 {

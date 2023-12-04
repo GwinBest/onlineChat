@@ -35,4 +35,5 @@ namespace Gui
 		static inline bool _isSignUpButtonPressed = false;
 		static inline bool _isBackToLoginButtonPressed = false;
 	};
+
 } // !namespace Gui

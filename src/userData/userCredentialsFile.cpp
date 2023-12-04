@@ -22,7 +22,7 @@ namespace UserData
 
 	bool UserCredentialsFile::CreateNewFile() noexcept
 	{
-		_credentialsFile.open(_fileName, std::ios::in | std::ios::out  | std::ios::binary);
+		_credentialsFile.open(_fileName, std::ios::in | std::ios::out | std::ios::binary);
 		if (_credentialsFile.is_open())
 		{
 			SetFileAttributesA(_fileName, FILE_ATTRIBUTE_HIDDEN);
@@ -46,7 +46,7 @@ namespace UserData
 		}
 	}
 
-	void UserCredentialsFile::WriteCredentials(const std::string& name, const std::string& login,const size_t& password) noexcept
+	void UserCredentialsFile::WriteCredentials(const std::string& name, const std::string& login, const size_t& password) noexcept
 	{
 		const size_t nameLength = strlen(name.c_str());
 		const size_t loginLength = strlen(login.c_str());
@@ -56,7 +56,7 @@ namespace UserData
 
 		_credentialsFile.write(login.c_str(), login.size());
 		_credentialsFile.write(" ", sizeof(char));
-	
+
 		_credentialsFile.write(reinterpret_cast<char*>(&const_cast<size_t&>(password)), sizeof(password));
 	}
 

@@ -16,9 +16,9 @@
 #pragma warning (disable:4996)
 
 // forward declaration
-namespace UserData 
+namespace UserData
 {
-	class User; 
+	class User;
 }
 namespace Chat
 {
@@ -29,14 +29,14 @@ namespace Network
 {
 	enum class ActionType : uint32_t
 	{
-		kActionUndefined				= 0,
-		kUserChatMessage				= 1,
-		kAddUserCredentialsToDatabase	= 2,
-		kCheckUserExistence				= 3,
-		kGetUserNameFromDatabase		= 4,
-		kFindUsersByLogin				= 5,
-		kGetAvailableChatsForUser		= 6,
-		kReceiveAllMessages				= 7
+		kActionUndefined = 0,
+		kUserChatMessage = 1,
+		kAddUserCredentialsToDatabase = 2,
+		kCheckUserExistence = 3,
+		kGetUserNameFromDatabase = 4,
+		kFindUsersByLogin = 5,
+		kGetAvailableChatsForUser = 6,
+		kReceiveAllMessages = 7
 	};
 
 	struct UserRequest
@@ -86,8 +86,8 @@ namespace Network
 		enum class ClientState : uint8_t
 		{
 			kClientDisconnected = 0,
-			kCLientInited		= 1,
-			kClientConnected	= 2,
+			kCLientInited = 1,
+			kClientConnected = 2,
 		};
 
 		static constexpr WORD _dllVersion = MAKEWORD(2, 2);
@@ -102,7 +102,7 @@ namespace Network
 		mutable ServerResponse _serverResponse;
 
 		size_t _clientId;
-		const std::string _ipAddress = "127.0.0.1";
+		const std::string _ipAddress = "192.168.0.102";
 		static constexpr uint32_t _port = 8080;
 	};
 

@@ -1,7 +1,7 @@
 #include "UserData.h"
 
 namespace UserData
-{	
+{
 	void User::PushUserCredentialsToDatabase(const std::string& name, const std::string& login, const size_t password) noexcept
 	{
 		Network::UserRequest request =
@@ -20,7 +20,7 @@ namespace UserData
 		Network::UserRequest request =
 		{
 			.actionType = Network::ActionType::kGetUserNameFromDatabase,
-			.name  = "",
+			.name = "",
 			.login = login,
 			.password = password
 		};
@@ -43,7 +43,7 @@ namespace UserData
 
 		Network::Client::GetInstance().SendUserCredentials(request);
 		std::string serverResponse = Network::Client::GetInstance().GetServerResponse<std::string>();
-		
+
 		if (serverResponse == "Exist")
 		{
 			return true;

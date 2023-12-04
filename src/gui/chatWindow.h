@@ -17,7 +17,7 @@ namespace Gui
 
 	private:
 		void DrawGui() noexcept override;
-		
+
 		static size_t GetChatId() noexcept;
 	private:
 		static inline std::string _inputBuffer;

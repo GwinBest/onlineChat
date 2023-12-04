@@ -5,7 +5,7 @@
 
 extern UserData::User currentUser;
 
-namespace Network 
+namespace Network
 {
 	Client& Client::GetInstance() noexcept
 	{
@@ -67,7 +67,7 @@ namespace Network
 		send(_clientSocket, reinterpret_cast<char*>(&nameLength), sizeof(nameLength), NULL);
 		send(_clientSocket, name.c_str(), nameLength, NULL);
 	}
-	
+
 	void Client::ReceiveThread() const noexcept
 	{
 		while (true)
@@ -83,7 +83,7 @@ namespace Network
 				char receiveMessage[4097];
 				uint32_t receivedSize;
 				char userLogin[50];
-				
+
 				recv(_clientSocket, userLogin, 50, NULL);
 				if (userLogin == currentUser.GetUserLogin())
 				{
@@ -156,7 +156,7 @@ namespace Network
 				{
 					char chatName[50];
 					size_t chatNameLength;
-					Chat::Chat* foundChat= new Chat::Chat;
+					Chat::Chat* foundChat = new Chat::Chat;
 
 					size_t chatId;
 					recv(_clientSocket, reinterpret_cast<char*>(&chatId), sizeof(chatId), NULL);
@@ -216,7 +216,7 @@ namespace Network
 		}
 	}
 
-	Client::~Client() 
+	Client::~Client()
 	{
 		if (_currentClientState != ClientState::kClientDisconnected)
 			Client::Disconnect();
@@ -228,7 +228,7 @@ namespace Network
 		{
 			exit(SOCKET_ERROR);
 		}
-	
+
 		_socketAddress.sin_family = AF_INET;
 		_socketAddress.sin_addr.s_addr = inet_addr(_ipAddress.c_str());
 		_socketAddress.sin_port = htons(_port);
@@ -264,7 +264,7 @@ namespace Network
 	{
 		if (_currentClientState != ClientState::kClientDisconnected)
 		{
-			if (closesocket(_clientSocket) == SOCKET_ERROR) 
+			if (closesocket(_clientSocket) == SOCKET_ERROR)
 			{
 				exit(SOCKET_ERROR);
 			}
@@ -281,7 +281,7 @@ namespace Network
 	void Client::ReceiveAllMessagesFromSelectedChat(std::string author, size_t chatId) const noexcept
 	{
 		Buffer::MessageBuffer::getInstance().~MessageBuffer();
-		
+
 		ActionType type = ActionType::kReceiveAllMessages;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 

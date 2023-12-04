@@ -9,16 +9,16 @@
 
 enum class WindowState : uint8_t
 {
-	kLogin,
-	kSignUp,
-	kChat
+    kLogin,
+    kSignUp,
+    kChat
 };
 
 UserData::User currentUser;
 
 int main()
 {
-	Gui::GlfwWindow window;
+    Gui::GlfwWindow window;
     WindowState currentWindowState = WindowState::kLogin;
 
     std::string userName;
@@ -49,8 +49,8 @@ int main()
         currentWindowState = WindowState::kLogin;
     }
 
-	while (!glfwWindowShouldClose(window.GetGlfwWindow()))
-	{
+    while (!glfwWindowShouldClose(window.GetGlfwWindow()))
+    {
         switch (currentWindowState)
         {
         case WindowState::kLogin:
@@ -59,14 +59,14 @@ int main()
             window.Draw();
             window.PopWindow();
 
-            if (Gui::LoginWindow::IsSignUpLabelPressed()) 
+            if (Gui::LoginWindow::IsSignUpLabelPressed())
             {
                 currentWindowState = WindowState::kSignUp;
             }
             else if (Gui::LoginWindow::IsLoginButtonPressed())
             {
-                userLogin                       = Gui::LoginWindow::GetLogin();
-                std::string stringUserPassword  = Gui::LoginWindow::GetPassword();
+                userLogin = Gui::LoginWindow::GetLogin();
+                std::string stringUserPassword = Gui::LoginWindow::GetPassword();
 
                 userPassword = std::hash<std::string>{}(stringUserPassword);
 
@@ -105,11 +105,11 @@ int main()
             {
                 currentWindowState = WindowState::kLogin;
             }
-            else if (Gui::SignUpWindow::IsSignUpButtonPressed()) 
+            else if (Gui::SignUpWindow::IsSignUpButtonPressed())
             {
-                userName                        = Gui::SignUpWindow::GetName();
-                userLogin                       = Gui::SignUpWindow::GetLogin();
-                std::string stringUserPassword  = Gui::SignUpWindow::GetPassword();
+                userName = Gui::SignUpWindow::GetName();
+                userLogin = Gui::SignUpWindow::GetLogin();
+                std::string stringUserPassword = Gui::SignUpWindow::GetPassword();
 
                 userPassword = std::hash<std::string>{}(stringUserPassword);
 
@@ -144,7 +144,7 @@ int main()
             break;
         }
         }
-	}
+    }
 
-	return 0;
+    return 0;
 }

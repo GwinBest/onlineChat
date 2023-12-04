@@ -125,6 +125,10 @@ int main()
                         UserData::UserCredentialsFile::CloseFile();
                     }
 
+                    currentUser.SetUserName(userName);
+                    currentUser.SetUserLogin(userLogin);
+                    currentUser.SetUserPassword(userPassword);
+
                     UserData::User::PushUserCredentialsToDatabase(userName, userLogin, userPassword);
 
                     currentWindowState = WindowState::kChat;

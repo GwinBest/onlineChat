@@ -1,10 +1,12 @@
 #pragma once
 
-#include "iImGuiWindow.h"
+#include "../chat/chat.h"
 #include "../client/client.h"
 #include "../messageBuffer/messageBuffer.h"
 #include "../userData/userData.h"
-#include "../chat/chat.h"
+#include "iImGuiWindow.h"
+
+#include <memory>
 
 extern UserData::User currentUser;
 
@@ -18,7 +20,6 @@ namespace Gui
 	private:
 		void DrawGui() noexcept override;
 
-		static size_t GetChatId() noexcept;
 	private:
 		static inline std::string _inputBuffer;
 	};

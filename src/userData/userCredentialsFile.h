@@ -3,8 +3,8 @@
 // for SetFileAttributesA
 #include <Windows.h>
 
-#include <string>
 #include <fstream>
+#include <string>
 
 namespace UserData
 {
@@ -18,7 +18,7 @@ namespace UserData
 		[[nodiscard]] static bool CreateNewFile() noexcept;
 		static void CloseFile() noexcept;
 
-		static void WriteCredentials(const std::string& name, const std::string& login, const size_t& password) noexcept;
+		static void WriteCredentials(const std::string& userName, const std::string& userLogin, const size_t& userPassword) noexcept;
 		static void ReadCredentials(std::string& name, std::string& login, size_t& password) noexcept;
 
 	private:

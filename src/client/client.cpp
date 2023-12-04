@@ -1,7 +1,6 @@
 ﻿#include "client.h"
 
 #include "../userData/userData.h"
-#include "../chat/chat.h"
 
 extern UserData::User currentUser;
 
@@ -26,7 +25,8 @@ namespace Network
 
 	void Client::SendUserMessage(const std::string& currentUserLogin, const std::string& selectedUserLogin, const std::string data) const noexcept
 	{
-		ActionType type = ActionType::kUserChatMessage;
+		//TODO: do not send name and login length
+		ActionType type = ActionType::kSendChatMessage;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 
 		size_t currentUserLoginSize = currentUserLogin.size();
@@ -42,8 +42,10 @@ namespace Network
 		send(_clientSocket, data.c_str(), dataSize, NULL);
 	}
 
-	void Client::SendUserCredentials(UserRequest& userCredentials) const noexcept
+	void Client::SendUserCredentialsPacket(const UserPacket& userCredentials) const noexcept
 	{
+		//TODO: do not send name and login length
+
 		ActionType type = userCredentials.actionType;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 
@@ -55,17 +57,19 @@ namespace Network
 		send(_clientSocket, reinterpret_cast<char*>(&loginLength), sizeof(loginLength), NULL);
 		send(_clientSocket, userCredentials.login.c_str(), loginLength, NULL);
 
-		send(_clientSocket, reinterpret_cast<char*>(&userCredentials.password), sizeof(userCredentials.password), NULL);
+		send(_clientSocket, reinterpret_cast<char*>(&const_cast<size_t&>(userCredentials.password)), sizeof(userCredentials.password), NULL);
 	}
 
-	void Client::SendChatInfo(const std::string& name) noexcept
+	void Client::SendChatInfoPacket(const ChatPacket& chatInfo) const noexcept
 	{
-		ActionType type = ActionType::kGetAvailableChatsForUser;
+		//TODO: add send functions
+
+		ActionType type = chatInfo.actionType;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 
-		size_t nameLength = name.size();
-		send(_clientSocket, reinterpret_cast<char*>(&nameLength), sizeof(nameLength), NULL);
-		send(_clientSocket, name.c_str(), nameLength, NULL);
+		size_t currentUserLoginLength = chatInfo.currentUserLogin.size();
+		send(_clientSocket, reinterpret_cast<char*>(&currentUserLoginLength), sizeof(currentUserLoginLength), NULL);
+		send(_clientSocket, chatInfo.currentUserLogin.c_str(), currentUserLoginLength, NULL);
 	}
 
 	void Client::ReceiveThread() const noexcept
@@ -77,21 +81,18 @@ namespace Network
 
 			switch (type)
 			{
-			case ActionType::kUserChatMessage:
+			case ActionType::kSendChatMessage:
 			{
 				constexpr const size_t receiveMessageSize = 4096;
-				char receiveMessage[4097];
-				uint32_t receivedSize;
+				char receiveMessage[receiveMessageSize + 1];
 				char userLogin[50];
 
 				recv(_clientSocket, userLogin, 50, NULL);
 				if (userLogin == currentUser.GetUserLogin())
 				{
-					if ((receivedSize = recv(_clientSocket, receiveMessage, receiveMessageSize, NULL)) > 0)
-					{
-						receiveMessage[receivedSize] = '\0';
-						Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kReceived, receiveMessage);
-					}
+					recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);
+				
+					Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kReceived, receiveMessage);
 				}
 
 				break;
@@ -103,6 +104,7 @@ namespace Network
 			case ActionType::kCheckUserExistence:
 			case ActionType::kGetUserNameFromDatabase:
 			{
+				//TODO: do not receive size
 				size_t responseSize;
 				char response[255];
 
@@ -111,7 +113,7 @@ namespace Network
 				response[responseSize] = '\0';
 
 				_serverResponse = response;
-				conditionalVariable.notify_one();
+				_conditionalVariable.notify_one();
 
 				break;
 			}
@@ -120,14 +122,14 @@ namespace Network
 				size_t foundUsersCount = 0;
 				recv(_clientSocket, reinterpret_cast<char*>(&foundUsersCount), sizeof(foundUsersCount), NULL);
 
-				std::vector<UserData::User*> foundUsersVector;
+				std::vector<std::shared_ptr<UserData::User>> foundUsersVector;
 
-				size_t i = 0;
-				while (foundUsersCount > 0)
+				for (size_t i = 0; foundUsersCount > 0; ++i, --foundUsersCount)
 				{
+					// TODO: do not receive user login length  
 					char userLogin[50];
 					size_t userLoginLength;
-					UserData::User* foundUser = new UserData::User;
+					std::shared_ptr<UserData::User> foundUser = std::make_shared<UserData::User>();
 
 					recv(_clientSocket, reinterpret_cast<char*>(&userLoginLength), sizeof(userLoginLength), NULL);
 					recv(_clientSocket, userLogin, userLoginLength, NULL);
@@ -135,12 +137,10 @@ namespace Network
 
 					foundUser->SetUserLogin(userLogin);
 					foundUsersVector.push_back(foundUser);
-
-					foundUsersCount--;
 				}
 
 				_serverResponse = foundUsersVector;
-				conditionalVariable.notify_one();
+				_conditionalVariable.notify_one();
 
 				break;
 			}
@@ -149,14 +149,14 @@ namespace Network
 				size_t availableChatsCount = 0;
 				recv(_clientSocket, reinterpret_cast<char*>(&availableChatsCount), sizeof(availableChatsCount), NULL);
 
-				std::vector<Chat::Chat*> availableChatsVector;
+				std::vector<std::shared_ptr<Chat::Chat>> availableChatsVector;
 
-				size_t i = 0;
-				while (availableChatsCount > 0)
+				for (size_t i = 0; availableChatsCount > 0; ++i, --availableChatsCount)
 				{
+					//TODO: do not receive length
 					char chatName[50];
 					size_t chatNameLength;
-					Chat::Chat* foundChat = new Chat::Chat;
+					std::shared_ptr<Chat::Chat> foundChat = std::make_shared<Chat::Chat>();
 
 					size_t chatId;
 					recv(_clientSocket, reinterpret_cast<char*>(&chatId), sizeof(chatId), NULL);
@@ -170,30 +170,30 @@ namespace Network
 
 					availableChatsVector.push_back(foundChat);
 
-					availableChatsCount--;
 				}
 
 				_serverResponse = availableChatsVector;
-				conditionalVariable.notify_one();
+				_conditionalVariable.notify_one();
 
 				break;
 			}
-			case ActionType::kReceiveAllMessages:
+			case ActionType::kReceiveAllMessagesForSelectedChat:
 			{
-				size_t count;
-				recv(_clientSocket, reinterpret_cast<char*>(&count), sizeof(count), NULL);
+				size_t messageCount;
+				recv(_clientSocket, reinterpret_cast<char*>(&messageCount), sizeof(messageCount), NULL);
 
-				while (count > 0)
+				while (messageCount > 0)
 				{
 					constexpr const size_t receiveMessageSize = 4096;
-					char receiveMessage[4097];
-					uint32_t receivedSize;
+					char receiveMessage[receiveMessageSize + 1];
+
 					recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);
 					{
-						/*receiveMessage[receivedSize] = '\0';*/
-						size_t msgType;
-						recv(_clientSocket, reinterpret_cast<char*>(&msgType), sizeof(msgType), NULL);
-						if (msgType == 2)
+						//TODO:: set variable type Buffer::MessageType insted of size_t
+						size_t messageType;
+						recv(_clientSocket, reinterpret_cast<char*>(&messageType), sizeof(messageType), NULL);
+
+						if (messageType == 2)
 						{
 							Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kReceived, receiveMessage);
 						}
@@ -203,11 +203,10 @@ namespace Network
 
 						}
 					}
-					count--;
+
+					messageCount--;
 				}
 
-				_serverResponse = "qwe";
-				conditionalVariable.notify_one();
 				break;
 			}
 			default:
@@ -216,6 +215,23 @@ namespace Network
 			}
 			}
 		}
+	}
+
+	void Client::ReceiveAllMessagesFromSelectedChat(std::string author, size_t chatId) const noexcept
+	{
+		//TODO: do not send message length
+
+		Buffer::MessageBuffer::getInstance().~MessageBuffer();
+
+		ActionType type = ActionType::kReceiveAllMessagesForSelectedChat;
+		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
+
+		send(_clientSocket, reinterpret_cast<char*>(&chatId), sizeof(chatId), NULL);
+
+		size_t authorSize = author.size();
+		send(_clientSocket, reinterpret_cast<char*>(&authorSize), sizeof(authorSize), NULL);
+		send(_clientSocket, author.c_str(), authorSize, NULL);
+
 	}
 
 	Client::~Client()
@@ -279,23 +295,5 @@ namespace Network
 			_currentClientState = ClientState::kClientDisconnected;
 		}
 	}
-
-	void Client::ReceiveAllMessagesFromSelectedChat(std::string author, size_t chatId) const noexcept
-	{
-		Buffer::MessageBuffer::getInstance().~MessageBuffer();
-
-		ActionType type = ActionType::kReceiveAllMessages;
-		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
-
-		send(_clientSocket, reinterpret_cast<char*>(&chatId), sizeof(chatId), NULL);
-
-		size_t authorSize = author.size();
-		send(_clientSocket, reinterpret_cast<char*>(&authorSize), sizeof(authorSize), NULL);
-		send(_clientSocket, author.c_str(), authorSize, NULL);
-
-	}
-
-
-
 
 } // !namespace Network

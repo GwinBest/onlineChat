@@ -1,15 +1,16 @@
 #include "chatWindow.h"
 
+
 namespace Gui
 {
     void ChatWindow::DrawGui() noexcept
     {
-        //TODO: free memory
-        static std::vector<UserData::User*> foundUsers;
-        static std::vector<Chat::Chat*> availableChats;
+        //TODO: refactor
+        static std::vector<std::shared_ptr<UserData::User>> foundUsers;
+        static std::vector< std::shared_ptr<Chat::Chat>> availableChats;
         static bool isAvailableChatsUpdated = true;
         static bool newChat = false;
-        static size_t qwe;
+        static size_t sameChatSelected;
         bool isSearch = false;
 
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				        // enable docking 
@@ -74,10 +75,10 @@ namespace Gui
                 {
                     if (ImGui::Selectable(foundUsers[i]->GetUserLogin().c_str(), chatSelected == i, 0, ImVec2(0, 50)))
                     {
-                        if (chatSelected != qwe)
+                        if (chatSelected != sameChatSelected)
                         {
                             newChat = true;
-                            qwe = i;
+                            sameChatSelected = i;
                         }
                         chatSelected = i;
 
@@ -97,10 +98,10 @@ namespace Gui
 
                     if (ImGui::Selectable(availableChats[i]->GetChatName().c_str(), chatSelected == i, 0, ImVec2(0, 50)))
                     {
-                        if (chatSelected != qwe)
+                        if (chatSelected != sameChatSelected)
                         {
                             newChat = true;
-                            qwe = i;
+                            sameChatSelected = i;
                         }
                         chatSelected = i;
                     }
@@ -214,7 +215,7 @@ namespace Gui
                     newChat = false;
 
                     Network::Client::GetInstance().ReceiveAllMessagesFromSelectedChat(currentUser.GetUserLogin(), availableChats[chatSelected]->GetChatId());
-                    std::string response = Network::Client::GetInstance().GetServerResponse<std::string>();
+                   
                 }
 
                 ImGui::SetCursorPos(ImVec2(availableChatsWidth, availableChatsStartHeight));

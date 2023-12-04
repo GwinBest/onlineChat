@@ -214,6 +214,7 @@ namespace Gui
                     newChat = false;
 
                     Network::Client::GetInstance().ReceiveAllMessagesFromSelectedChat(currentUser.GetUserLogin(), availableChats[chatSelected]->GetChatId());
+                    std::string response = Network::Client::GetInstance().GetServerResponse<std::string>();
                 }
 
                 ImGui::SetCursorPos(ImVec2(availableChatsWidth, availableChatsStartHeight));

@@ -206,6 +206,8 @@ namespace Network
 					count--;
 				}
 
+				_serverResponse = "qwe";
+				conditionalVariable.notify_one();
 				break;
 			}
 			default:

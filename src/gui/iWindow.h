@@ -9,7 +9,8 @@ namespace Gui
 
         virtual void DrawGui() noexcept = 0;
 
-        enum class WindowState : uint8_t
+        //TODO: move to glfwWindow
+        enum class WindowState : uint8_t 
         {
             kWIndowUndefined    = 0,
             kWIndowInited       = 1,

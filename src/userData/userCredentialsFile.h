@@ -8,7 +8,7 @@
 
 namespace UserData
 {
-	static class UserCredentialsFile final
+	class UserCredentialsFile final
 	{
 	public:
 		UserCredentialsFile() = default;

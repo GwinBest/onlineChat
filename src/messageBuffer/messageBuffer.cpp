@@ -41,7 +41,6 @@ namespace Buffer
 		Node* newNode = new Node;
 		newNode->data = new char[dataLength + 1];
 		strcpy_s(newNode->data, dataLength + 1, data);
-
 		newNode->messageType = messageType;
 
 		tempNode->next = newNode;

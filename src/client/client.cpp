@@ -92,7 +92,7 @@ namespace Network
 				{
 					recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);
 				
-					Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kReceived, receiveMessage);
+					MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kReceived, std::string(receiveMessage)));
 				}
 
 				break;
@@ -195,18 +195,17 @@ namespace Network
 
 						if (messageType == 2)
 						{
-							Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kReceived, receiveMessage);
+							MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kReceived, std::string(receiveMessage)));
 						}
 						else
 						{
-							Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kSend, receiveMessage);
-
+							MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kSend, std::string(receiveMessage)));
 						}
 					}
 
 					messageCount--;
 				}
-
+				
 				break;
 			}
 			default:
@@ -221,7 +220,7 @@ namespace Network
 	{
 		//TODO: do not send message length
 
-		Buffer::MessageBuffer::getInstance().~MessageBuffer();
+		MessageBuffer::messageBuffer.clear();
 
 		ActionType type = ActionType::kReceiveAllMessagesForSelectedChat;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);

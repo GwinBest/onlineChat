@@ -7,14 +7,14 @@
 #include "../src/gui/signUpWindow.h"
 #include "../src/userData/userCredentialsFile.h"
 
+UserData::User currentUser;
+
 enum class WindowState : uint8_t
 {
     kLogin,
     kSignUp,
     kChat
 };
-
-UserData::User currentUser;
 
 int main()
 {

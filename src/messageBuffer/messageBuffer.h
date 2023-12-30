@@ -1,89 +1,29 @@
 #pragma once
 
 #include <cstdint>
+#include <list>
 #include <string>
+#include <memory>
 
-namespace Buffer
+namespace MessageBuffer
 {
-	enum class MessageType : uint8_t
+
+	enum class MessageStatus : uint8_t
 	{
-		kUndefined	= 0,
-		kSend		= 1,
-		kReceived	= 2
+		kUndefined		= 0,
+		kSend			= 1,
+		kReceived		= 2
 	};
 
-	struct Node
+	struct MessageNode
 	{
-		char* data;
-		MessageType messageType = MessageType::kUndefined;
-
-		Node* next = nullptr;
-		Node* previous = nullptr;
-	};
-
-	class Iterator final
-	{
-	public:
-		Iterator(Node* first) : _current(first) {};
-
-		inline Iterator& operator++ () noexcept
-		{
-			_current = _current ? _current->next : nullptr;
-			return *this;
-		}
-
-		inline bool operator== (const Iterator& it) const noexcept
-		{ 
-			return _current == it._current;
-		}
-
-		inline bool operator!= (const Iterator& other) const noexcept 
-		{ 
-			return _current != other._current; 
-		}
+		explicit MessageNode(MessageStatus messageType, std::string data) : _data(data), _messageType(messageType) {};
 		
-		inline Node& operator* ()const noexcept 
-		{
-			return *_current; 
-		}
-
-	private:
-		Node* _current;
+		std::string _data;
+		MessageStatus _messageType = MessageStatus::kUndefined;
 	};
 
-	class MessageBuffer final
-	{	
-	public:
-		using Iterator = Iterator;
+	extern std::list<MessageNode> messageBuffer;
 
-		MessageBuffer(const MessageBuffer&) = delete;
-		void operator= (const MessageBuffer&) = delete;
-
-		~MessageBuffer();
-
-		static MessageBuffer& getInstance() noexcept;
-
-		void pushFront(const MessageType messageType, const char* data) noexcept;
-		void popFront() noexcept;
-
-		inline bool isEmpty() const noexcept;
-
-		inline Iterator begin() const noexcept 
-		{
-			return Iterator(_head);
-		}
-
-		inline Iterator end() const noexcept 
-		{ 
-			return Iterator(nullptr); 
-		}
-
-	private:
-		MessageBuffer() = default;
-
-	private:
-		Node* _head = nullptr;
-	};
-
-} // !namespace Buffer
+} // !namespace MessageBuffer
 

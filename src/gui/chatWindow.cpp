@@ -1,5 +1,6 @@
 #include "chatWindow.h"
 
+extern std::list<MessageBuffer::MessageNode> MessageBuffer::messageBuffer;
 
 namespace Gui
 {
@@ -196,7 +197,7 @@ namespace Gui
                     Network::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), availableChats[chatSelected]->GetChatName(), _inputBuffer);
                 }
 
-                Buffer::MessageBuffer::getInstance().pushFront(Buffer::MessageType::kSend, _inputBuffer.c_str());
+                MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kSend, _inputBuffer));
 
                 isEnterPressed = false;
                 isButtonPressed = false;
@@ -225,7 +226,8 @@ namespace Gui
 
                 windowStyle.Colors[ImGuiCol_ChildBg] = ImVec4(0.1608f, 0.1804f, 0.2039f, 1.00f);					// return it's default color for begin child 
 
-                for (const auto& item : Buffer::MessageBuffer::getInstance())
+                size_t a = MessageBuffer::messageBuffer.size();
+                for (const auto& item : MessageBuffer::messageBuffer)
                 {
                     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
@@ -233,22 +235,22 @@ namespace Gui
                     static constexpr uint8_t paddingBetweenMessages = 5;
 
                     ImVec2 textPosition;
-                    float textWidth = ImGui::CalcTextSize(item.data).x;
-                    float textHeight = ImGui::CalcTextSize(item.data).y;
+                    float textWidth = ImGui::CalcTextSize(item._data.c_str()).x;
+                    float textHeight = ImGui::CalcTextSize(item._data.c_str()).y;
                     static const float textMaxWidth = ImGui::CalcTextSize(" ").x * maxCharacterOnOneLine;
 
-                    if (item.messageType == Buffer::MessageType::kReceived)
+                    if (item._messageType == MessageBuffer::MessageStatus::kReceived)
                     {
                         static constexpr uint8_t paddingFromAvailableChats = 15;
 
                         textPosition = ImVec2(paddingFromAvailableChats, ImGui::GetCursorPosY());
                         ImGui::PushTextWrapPos(availableChatsWidth + paddingFromAvailableChats);
                     }
-                    else if (item.messageType == Buffer::MessageType::kSend)
+                    else if (item._messageType == MessageBuffer::MessageStatus::kSend)
                     {
                         static constexpr uint8_t rightBorderPadding = 40;
 
-                        if (strlen(item.data) < maxCharacterOnOneLine)
+                        if (strlen(item._data.c_str()) < maxCharacterOnOneLine)
                         {
                             textPosition = ImVec2(ImGui::GetWindowWidth() - textWidth - rightBorderPadding, ImGui::GetCursorPosY() + 5);
                         }
@@ -265,7 +267,7 @@ namespace Gui
 
                     splitter.SetCurrentChannel(drawList, 1);
                     ImGui::SetCursorPos(textPosition);
-                    ImGui::Text(item.data);
+                    ImGui::Text(item._data.c_str());
                     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + paddingBetweenMessages);
                     ImGui::PopTextWrapPos();
 

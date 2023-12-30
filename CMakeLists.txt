@@ -29,15 +29,13 @@ add_executable (OnlineChat
 				"thirdParty/imgui/include/imgui_impl_opengl3.cpp"
 				"thirdParty/imgui/include/imgui_tables.cpp"
 				"thirdParty/imgui/include/imgui_widgets.cpp"
-				"src/messageBuffer/messageBuffer.h"
-				"src/messageBuffer/messageBuffer.cpp" 
 				"src/gui/chatWindow.h" 
 				"src/gui/chatWindow.cpp"  "src/gui/iImGuiWindow.h"  
 				"src/gui/loginWindow.h" "src/gui/loginWindow.cpp" 
 				"src/gui/signUpWindow.h" "src/gui/signUpWindow.cpp"
 				"thirdParty/imgui/glfw/include/GLFW/glfwLoadImage.h"
 				"thirdParty/imgui/glfw/include/GLFW/glfwLoadImage.cpp" "src/userData/userCredentialsFile.h"
-				"src/userData/userCredentialsFile.cpp" "src/userData/userData.cpp" "src/userData/userData.h" "src/chat/chat.h" "src/chat/chat.cpp")
+				"src/userData/userCredentialsFile.cpp" "src/userData/userData.cpp" "src/userData/userData.h" "src/chat/chat.h" "src/chat/chat.cpp"  "src/messageBuffer/messageBuffer.cpp")
 
 target_link_libraries(OnlineChat
 	opengl32.lib

@@ -27,6 +27,8 @@ namespace Chat
 	class Chat;
 }
 
+extern std::list<MessageBuffer::MessageNode> MessageBuffer::messageBuffer;
+
 // TODO: add a core for client and server, const response size, add callback
 namespace Network
 {

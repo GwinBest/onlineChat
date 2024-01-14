@@ -2,18 +2,19 @@
 
 namespace Chat
 {
-	//TODO: vector
-	std::vector<std::shared_ptr<Chat>> Chat::GetAvailableChatsForUser(const std::string& currentUserLogin) noexcept
+	std::vector<Chat> Chat::GetAvailableChats(const std::string& chatUserLogin) noexcept
 	{
+		//TODO: add error handle
+
 		Network::ChatPacket request =
 		{
-			.actionType = Network::ActionType::kGetAvailableChatsForUser,
-			.currentUserLogin = currentUserLogin,
+			.actionType = NetworkCore::ActionType::kGetAvailableChats,
+			.chatUserLogin = chatUserLogin,
 		};
 
 		Network::Client::GetInstance().SendChatInfoPacket(request);
 
-		return Network::Client::GetInstance().GetServerResponse<std::vector<std::shared_ptr<Chat>>>();
+		return Network::Client::GetInstance().GetServerResponse<std::vector<Chat>>();
 	}
 
 	void Chat::SetChatName(const std::string& chatName) noexcept

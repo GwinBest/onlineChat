@@ -2,7 +2,7 @@
 
 #include "../chat/chat.h"
 #include "../client/client.h"
-//#include "../messageBuffer/messageBuffer.h"
+#include "../messageBuffer/messageBuffer.h"
 #include "../userData/userData.h"
 #include "iImGuiWindow.h"
 

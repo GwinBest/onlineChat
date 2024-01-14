@@ -1,7 +1,6 @@
-﻿#include "client.h"
+﻿	#include "client.h"
 
 #include "../userData/userData.h"
-
 extern UserData::User currentUser;
 
 namespace Network
@@ -16,7 +15,7 @@ namespace Network
 				//TODO: add !connect handle
 			};
 
-			static std::thread receiveThread(&Network::Client::ReceiveThread, &Network::Client::GetInstance());
+			std::thread receiveThread(&Network::Client::ReceiveThread, &Network::Client::GetInstance());
 			receiveThread.detach();
 		}
 
@@ -25,8 +24,7 @@ namespace Network
 
 	void Client::SendUserMessage(const std::string& currentUserLogin, const std::string& selectedUserLogin, const std::string data) const noexcept
 	{
-		//TODO: do not send name and login length
-		ActionType type = ActionType::kSendChatMessage;
+		NetworkCore::ActionType type = NetworkCore::ActionType::kSendChatMessage;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 
 		size_t currentUserLoginSize = currentUserLogin.size();
@@ -44,9 +42,7 @@ namespace Network
 
 	void Client::SendUserCredentialsPacket(const UserPacket& userCredentials) const noexcept
 	{
-		//TODO: do not send name and login length
-
-		ActionType type = userCredentials.actionType;
+		NetworkCore::ActionType type = userCredentials.actionType;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 
 		size_t nameLength = userCredentials.name.size();
@@ -62,26 +58,28 @@ namespace Network
 
 	void Client::SendChatInfoPacket(const ChatPacket& chatInfo) const noexcept
 	{
-		//TODO: add send functions
-
-		ActionType type = chatInfo.actionType;
+		NetworkCore::ActionType type = chatInfo.actionType;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 
-		size_t currentUserLoginLength = chatInfo.currentUserLogin.size();
-		send(_clientSocket, reinterpret_cast<char*>(&currentUserLoginLength), sizeof(currentUserLoginLength), NULL);
-		send(_clientSocket, chatInfo.currentUserLogin.c_str(), currentUserLoginLength, NULL);
+		size_t chatUserLoginLength = chatInfo.chatUserLogin.size();
+		send(_clientSocket, reinterpret_cast<char*>(&chatUserLoginLength), sizeof(chatUserLoginLength), NULL);
+		send(_clientSocket, chatInfo.chatUserLogin.c_str(), chatUserLoginLength, NULL);
+
+		send(_clientSocket, reinterpret_cast<char*>(&const_cast<size_t&>(chatInfo.chatId)), sizeof(chatInfo.chatId), NULL);
 	}
 
 	void Client::ReceiveThread() const noexcept
 	{
-		while (true)
+		char serverResponse[NetworkCore::serverResponseSize];
+
+		while (_currentClientState != ClientState::kClientDisconnected)
 		{
-			ActionType type = ActionType::kActionUndefined;
+			NetworkCore::ActionType type = NetworkCore::ActionType::kActionUndefined;
 			recv(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 
 			switch (type)
 			{
-			case ActionType::kSendChatMessage:
+			case NetworkCore::ActionType::kSendChatMessage:
 			{
 				constexpr const size_t receiveMessageSize = 4096;
 				char receiveMessage[receiveMessageSize + 1];
@@ -92,71 +90,74 @@ namespace Network
 				{
 					recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);
 				
+					//TODO: add callback	
 					MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kReceived, std::string(receiveMessage)));
 				}
 
 				break;
 			}
-			case ActionType::kAddUserCredentialsToDatabase:
+			case NetworkCore::ActionType::kAddUserCredentialsToDatabase:
 			{
 				break;
 			}
-			case ActionType::kCheckUserExistence:
-			case ActionType::kGetUserNameFromDatabase:
+			case NetworkCore::ActionType::kCheckUserExistence:
 			{
-				//TODO: do not receive size
-				size_t responseSize;
-				char response[255];
+				recv(_clientSocket, reinterpret_cast<char*>(&_serverResponse), sizeof(bool), NULL);
 
-				recv(_clientSocket, reinterpret_cast<char*>(&responseSize), sizeof(responseSize), NULL);
-				recv(_clientSocket, response, responseSize, NULL);
-				response[responseSize] = '\0';
-
-				_serverResponse = response;
 				_conditionalVariable.notify_one();
 
 				break;
 			}
-			case ActionType::kFindUsersByLogin:
+			case NetworkCore::ActionType::kGetUserNameFromDatabase:
+			{
+				size_t responseSize;
+				recv(_clientSocket, reinterpret_cast<char*>(&responseSize), sizeof(responseSize), NULL);
+				recv(_clientSocket, serverResponse, responseSize, NULL);
+				serverResponse[responseSize] = '\0';
+
+				_serverResponse = serverResponse; 
+				_conditionalVariable.notify_one();
+
+				break;
+			}
+			case NetworkCore::ActionType::kFindUsersByLogin:
 			{
 				size_t foundUsersCount = 0;
 				recv(_clientSocket, reinterpret_cast<char*>(&foundUsersCount), sizeof(foundUsersCount), NULL);
 
-				std::vector<std::shared_ptr<UserData::User>> foundUsersVector;
+				std::vector<UserData::User> foundUsersVector;
 
 				for (size_t i = 0; foundUsersCount > 0; ++i, --foundUsersCount)
 				{
-					// TODO: do not receive user login length  
 					char userLogin[50];
 					size_t userLoginLength;
-					std::shared_ptr<UserData::User> foundUser = std::make_shared<UserData::User>();
+					UserData::User foundUser;
 
 					recv(_clientSocket, reinterpret_cast<char*>(&userLoginLength), sizeof(userLoginLength), NULL);
 					recv(_clientSocket, userLogin, userLoginLength, NULL);
 					userLogin[userLoginLength] = '\0';
 
-					foundUser->SetUserLogin(userLogin);
+					foundUser.SetUserLogin(userLogin);
 					foundUsersVector.push_back(foundUser);
 				}
 
-				_serverResponse = foundUsersVector;
+				_serverResponse = foundUsersVector; //TODO
 				_conditionalVariable.notify_one();
 
 				break;
 			}
-			case ActionType::kGetAvailableChatsForUser:
+			case NetworkCore::ActionType::kGetAvailableChats:
 			{
 				size_t availableChatsCount = 0;
 				recv(_clientSocket, reinterpret_cast<char*>(&availableChatsCount), sizeof(availableChatsCount), NULL);
 
-				std::vector<std::shared_ptr<Chat::Chat>> availableChatsVector;
+				std::vector<Chat::Chat> availableChatsVector;
 
 				for (size_t i = 0; availableChatsCount > 0; ++i, --availableChatsCount)
 				{
-					//TODO: do not receive length
 					char chatName[50];
 					size_t chatNameLength;
-					std::shared_ptr<Chat::Chat> foundChat = std::make_shared<Chat::Chat>();
+					Chat::Chat foundChat;
 
 					size_t chatId;
 					recv(_clientSocket, reinterpret_cast<char*>(&chatId), sizeof(chatId), NULL);
@@ -165,11 +166,10 @@ namespace Network
 					recv(_clientSocket, chatName, chatNameLength, NULL);
 					chatName[chatNameLength] = '\0';
 
-					foundChat->SetChatName(chatName);
-					foundChat->SetChatId(chatId);
+					foundChat.SetChatName(chatName);
+					foundChat.SetChatId(chatId);
 
 					availableChatsVector.push_back(foundChat);
-
 				}
 
 				_serverResponse = availableChatsVector;
@@ -177,33 +177,43 @@ namespace Network
 
 				break;
 			}
-			case ActionType::kReceiveAllMessagesForSelectedChat:
+			case NetworkCore::ActionType::kReceiveAllMessagesForSelectedChat:
 			{
 				size_t messageCount;
 				recv(_clientSocket, reinterpret_cast<char*>(&messageCount), sizeof(messageCount), NULL);
 
+				MessageBuffer::messageBuffer.clear();
+
 				while (messageCount > 0)
 				{
-					constexpr const size_t receiveMessageSize = 4096;
-					char receiveMessage[receiveMessageSize + 1];
+					 size_t receiveMessageSize ;
+					char receiveMessage[4096 + 1];
 
+					recv(_clientSocket, reinterpret_cast<char*>(&receiveMessageSize), sizeof(receiveMessageSize), NULL);
 					recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);
+					receiveMessage[receiveMessageSize] = '\0';
 					{
-						//TODO:: set variable type Buffer::MessageType insted of size_t
-						size_t messageType;
+						MessageBuffer::MessageStatus messageType;
 						recv(_clientSocket, reinterpret_cast<char*>(&messageType), sizeof(messageType), NULL);
 
-						if (messageType == 2)
+						if (messageType == MessageBuffer::MessageStatus::kReceived)
 						{
-							MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kReceived, std::string(receiveMessage)));
+							MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(messageType, std::string(receiveMessage)));
 						}
-						else
+						else if(messageType == MessageBuffer::MessageStatus::kSend)
 						{
-							MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kSend, std::string(receiveMessage)));
+							MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(messageType, std::string(receiveMessage)));
 						}
 					}
 
 					messageCount--;
+
+					if ((MessageBuffer::messageBuffer.size() + 1) % 15 == 0 || messageCount == 0)
+					{
+						_serverResponse = true; //TODO
+						_conditionalVariable.notify_one();
+					}
+
 				}
 				
 				break;
@@ -216,23 +226,6 @@ namespace Network
 		}
 	}
 
-	void Client::ReceiveAllMessagesFromSelectedChat(std::string author, size_t chatId) const noexcept
-	{
-		//TODO: do not send message length
-
-		MessageBuffer::messageBuffer.clear();
-
-		ActionType type = ActionType::kReceiveAllMessagesForSelectedChat;
-		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
-
-		send(_clientSocket, reinterpret_cast<char*>(&chatId), sizeof(chatId), NULL);
-
-		size_t authorSize = author.size();
-		send(_clientSocket, reinterpret_cast<char*>(&authorSize), sizeof(authorSize), NULL);
-		send(_clientSocket, author.c_str(), authorSize, NULL);
-
-	}
-
 	Client::~Client()
 	{
 		if (_currentClientState != ClientState::kClientDisconnected)
@@ -241,17 +234,25 @@ namespace Network
 
 	Client::Client() noexcept
 	{
-		if (WSAStartup(_dllVersion, &_wsaData))
+		if (WSAStartup(NetworkCore::dllVersion, &_wsaData))
 		{
+#ifndef NDEBUG
+			std::cout << "WSAstratup error: " << WSAGetLastError() << std::endl;
+#endif
+
 			exit(SOCKET_ERROR);
 		}
 
 		_socketAddress.sin_family = AF_INET;
-		_socketAddress.sin_addr.s_addr = inet_addr(_ipAddress.c_str());
-		_socketAddress.sin_port = htons(_port);
+		_socketAddress.sin_addr.s_addr = inet_addr(NetworkCore::ipAddress.c_str());
+		_socketAddress.sin_port = htons(NetworkCore::port);
 
 		if ((_clientSocket = socket(AF_INET, SOCK_STREAM, NULL)) == SOCKET_ERROR)
 		{
+#ifndef NDEBUG
+			std::cout << "socket error: " << WSAGetLastError() << std::endl;
+#endif
+
 			exit(SOCKET_ERROR);
 		}
 
@@ -262,15 +263,19 @@ namespace Network
 	{
 		if (_currentClientState != ClientState::kCLientInited)
 		{
+#ifndef NDEBUG
+			std::cout << "client already inited!" << std::endl;
+#endif
 			return false;
 		}
 
 		if (connect(_clientSocket, reinterpret_cast<SOCKADDR*>(&_socketAddress), sizeof(_socketAddress)) != 0)
 		{
+#ifndef NDEBUG
+			std::cout << "connect error: " << WSAGetLastError() << std::endl;
+#endif
 			return false;
 		}
-
-		recv(_clientSocket, reinterpret_cast<char*>(&_clientId), sizeof(_clientId), NULL);								//receive client id
 
 		_currentClientState = ClientState::kClientConnected;
 
@@ -283,11 +288,19 @@ namespace Network
 		{
 			if (closesocket(_clientSocket) == SOCKET_ERROR)
 			{
+#ifndef NDEBUG
+				std::cout << "closesocket error: " << WSAGetLastError() << std::endl;
+#endif
+
 				exit(SOCKET_ERROR);
 			}
 
 			if (WSACleanup() == SOCKET_ERROR)
 			{
+#ifndef NDEBUG
+				std::cout << "WSAcleanup error: " << WSAGetLastError() << std::endl;
+#endif
+
 				exit(SOCKET_ERROR);
 			}
 

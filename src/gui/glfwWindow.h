@@ -41,6 +41,13 @@ namespace Gui
         void Render() noexcept;
 
     private:
+        enum class WindowState : uint8_t
+        {
+            kWIndowUndefined = 0,
+            kWIndowInited = 1,
+            kWindowDeleted = 2
+        };
+
         const char* _glslVersion = "#version 130";
         GLFWwindow* _mainWindow = nullptr;
         const ImVec4 _windowBackgroundColor = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 
 #include "../client/client.h"
@@ -15,14 +14,13 @@ namespace UserData
 	class User final
 	{
 	public:
-
 		static void PushUserCredentialsToDatabase(const std::string& userName, const std::string& userLogin, const size_t userPassword) noexcept;
 
-		static std::string GetUserNameFromDatabase(const std::string& userLogin, const size_t password) noexcept;
+		static std::string GetUserNameFromDatabase(const std::string& userLogin, const size_t userPassword) noexcept;
 
-		static bool IsUserExist(const std::string& userLogin, const size_t password) noexcept;
+		static bool IsUserExist(const std::string& userLogin, const size_t userPassword) noexcept;
 
-		static std::vector<std::shared_ptr<User>> FindUsersByLogin(const std::string& userLogin) noexcept;
+		static std::vector<User> FindUsersByLogin(const std::string& userLogin) noexcept;
 
 		std::string GetUserName() const noexcept;
 		std::string GetUserLogin() const noexcept;

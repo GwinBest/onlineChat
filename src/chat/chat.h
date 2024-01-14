@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -11,14 +10,13 @@ namespace Chat
 	class Chat final
 	{
 	public:
-		//TODO: weak_ptr
-		static std::vector<std::shared_ptr<Chat>> GetAvailableChatsForUser(const std::string& currentUserLogin) noexcept;
+		static std::vector<Chat> GetAvailableChats(const std::string& chatUserLogin) noexcept;
 
 		void SetChatName(const std::string& chatName) noexcept;
 		void SetChatId(const size_t chatId) noexcept;
 
-		[[nodiscard]] inline std::string GetChatName() const noexcept;
-		[[nodiscard]] inline size_t GetChatId() const noexcept;
+		std::string GetChatName() const noexcept;
+		size_t GetChatId() const noexcept;
 
 	private:
 		std::string _chatName;

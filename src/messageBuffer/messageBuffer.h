@@ -3,11 +3,9 @@
 #include <cstdint>
 #include <list>
 #include <string>
-#include <memory>
 
 namespace MessageBuffer
 {
-
 	enum class MessageStatus : uint8_t
 	{
 		kUndefined		= 0,
@@ -15,12 +13,12 @@ namespace MessageBuffer
 		kReceived		= 2
 	};
 
-	struct MessageNode
+	struct MessageNode 
 	{
-		explicit MessageNode(MessageStatus messageType, std::string data) : _data(data), _messageType(messageType) {};
+		explicit MessageNode(MessageStatus messageType, std::string data) : data(data), messageType(messageType) {};
 		
-		std::string _data;
-		MessageStatus _messageType = MessageStatus::kUndefined;
+		std::string data;
+		MessageStatus messageType = MessageStatus::kUndefined;
 	};
 
 	extern std::list<MessageNode> messageBuffer;

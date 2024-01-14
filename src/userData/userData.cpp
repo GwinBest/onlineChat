@@ -4,9 +4,11 @@ namespace UserData
 {
 	void User::PushUserCredentialsToDatabase(const std::string& userName, const std::string& userLogin, const size_t userPassword) noexcept
 	{
+		//TODO: add error handle
+
 		Network::UserPacket request =
 		{
-			.actionType = Network::ActionType::kAddUserCredentialsToDatabase,
+			.actionType = NetworkCore::ActionType::kAddUserCredentialsToDatabase,
 			.name = userName,
 			.login = userLogin,
 			.password = userPassword
@@ -15,57 +17,55 @@ namespace UserData
 		Network::Client::GetInstance().SendUserCredentialsPacket(request);
 	}
 
-	std::string User::GetUserNameFromDatabase(const std::string& userLogin, const size_t password) noexcept
+	std::string User::GetUserNameFromDatabase(const std::string& userLogin, const size_t userPassword) noexcept
 	{
-		//TODO: send only login
+		//TODO: add error handle
+
 		Network::UserPacket request =
 		{
-			.actionType = Network::ActionType::kGetUserNameFromDatabase,
+			.actionType = NetworkCore::ActionType::kGetUserNameFromDatabase,
 			.name = "",
 			.login = userLogin,
-			.password = password
+			.password = userPassword
 		};
 
 		Network::Client::GetInstance().SendUserCredentialsPacket(request);
-		std::string serverResponse = Network::Client::GetInstance().GetServerResponse<std::string>();
 
-		return serverResponse;
+		return Network::Client::GetInstance().GetServerResponse<std::string>();
 	}
 
-	bool User::IsUserExist(const std::string& userLogin, const size_t password) noexcept
+	bool User::IsUserExist(const std::string& userLogin, const size_t userPassword) noexcept
 	{
-		//TODO: send only login
+		//TODO: add error handle
+
 		Network::UserPacket request =
 		{
-			.actionType = Network::ActionType::kCheckUserExistence,
+			.actionType = NetworkCore::ActionType::kCheckUserExistence,
 			.name = "",
 			.login = userLogin,
-			.password = password
+			.password = userPassword
 		};
 
 		Network::Client::GetInstance().SendUserCredentialsPacket(request);
-		std::string serverResponse = Network::Client::GetInstance().GetServerResponse<std::string>();
 
-		if (serverResponse == "Exist")	//TODO return value bool instead of string
-		{
-			return true;
-		}
-
-		return false;
+		return Network::Client::GetInstance().GetServerResponse<bool>();
 	}
 
-	std::vector< std::shared_ptr<User>> User::FindUsersByLogin(const std::string& userLogin) noexcept
+	std::vector<User> User::FindUsersByLogin(const std::string& userLogin) noexcept
 	{
+		//TODO: add error handle
+
 		Network::UserPacket request =
 		{
-			.actionType = Network::ActionType::kFindUsersByLogin,
-			.login = userLogin
+			.actionType = NetworkCore::ActionType::kFindUsersByLogin,
+			.name = "",
+			.login = userLogin,
+			.password = 0
 		};
 
 		Network::Client::GetInstance().SendUserCredentialsPacket(request);
-		std::vector< std::shared_ptr<User>> serverResponse = Network::Client::GetInstance().GetServerResponse<std::vector<std::shared_ptr<User>>>();
 
-		return serverResponse;
+		return Network::Client::GetInstance().GetServerResponse<std::vector<User>>();
 	}
 
 	std::string User::GetUserName() const noexcept

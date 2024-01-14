@@ -68,7 +68,7 @@ int main()
                 userLogin = Gui::LoginWindow::GetLogin();
                 std::string stringUserPassword = Gui::LoginWindow::GetPassword();
 
-                userPassword = std::hash<std::string>{}(stringUserPassword);
+                userPassword = std::hash<std::string>{}(stringUserPassword.c_str());
 
                 if (UserData::User::IsUserExist(userLogin, userPassword))
                 {

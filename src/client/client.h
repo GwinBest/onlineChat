@@ -1,18 +1,18 @@
 #pragma once
 
-#include <winsock2.h>
-
 #include <condition_variable>
-#include <cstdint>
-#include <memory>
 #include <mutex>
-#include <string>
 #include <thread>
 #include <variant>
 #include <vector>
 
+#ifndef NDEBUG
+#include <iostream>
+#endif // NDEBUG
+
 #include "../chat/chat.h"
 #include "../messageBuffer/messageBuffer.h"
+#include "../networkCore/networkCore.h"
 
 #pragma comment (lib, "ws2_32.lib")
 #pragma warning (disable:4996)
@@ -29,43 +29,28 @@ namespace Chat
 
 extern std::list<MessageBuffer::MessageNode> MessageBuffer::messageBuffer;
 
-// TODO: add a core for client and server, const response size, add callback
 namespace Network
 {
-	//TODO: enum uint8 instead of uint32
-	enum class ActionType : uint32_t
-	{
-		kActionUndefined					= 0,
-		kSendChatMessage					= 1,
-		kAddUserCredentialsToDatabase		= 2,
-		kCheckUserExistence					= 3,
-		kGetUserNameFromDatabase			= 4,
-		kFindUsersByLogin					= 5,
-
-		kGetAvailableChatsForUser			= 6,
-		kReceiveAllMessagesForSelectedChat	= 7
-	};
-
 	struct UserPacket
 	{
-		ActionType actionType				= ActionType::kActionUndefined;;
-		std::string name					= "";
-		std::string login					= "";
-		size_t password						= 0;
+		NetworkCore::ActionType actionType				= NetworkCore::ActionType::kActionUndefined;
+		std::string name								= "";
+		std::string login								= "";
+		size_t password									= 0;
 	};
 
 	struct ChatPacket
 	{
-		ActionType actionType				= ActionType::kActionUndefined;
-		std::string chatName				= "";
-		std::string currentUserLogin		= "";
-		size_t chatId						= 0;
+		NetworkCore::ActionType actionType				= NetworkCore::ActionType::kActionUndefined;
+		std::string chatName							= "";
+		std::string chatUserLogin						= "";
+		size_t chatId									= 0;
 	};
 
 	class Client final
 	{
 	public:
-		using ServerResponse = std::variant<std::string, std::vector<std::shared_ptr<UserData::User>>, std::vector<std::shared_ptr<Chat::Chat>>>;
+		using ServerResponse = std::variant<bool, std::string, std::vector<UserData::User>, std::vector<Chat::Chat>>;
 
 		Client(const Client&) = delete;
 		void operator= (const Client&) = delete;
@@ -76,8 +61,7 @@ namespace Network
 		void SendUserCredentialsPacket(const UserPacket& userCredentials) const noexcept;
 		void SendChatInfoPacket(const ChatPacket& chatInfo) const noexcept;
 
-		[[noreturn]] void ReceiveThread() const noexcept;
-		void ReceiveAllMessagesFromSelectedChat(std::string author, size_t chatId) const noexcept; // TODO: merge into one function for chat
+		void ReceiveThread() const noexcept;
 
 		template<typename T>
 		T GetServerResponse() const noexcept
@@ -104,7 +88,6 @@ namespace Network
 			kClientConnected	= 2,
 		};
 
-		static constexpr WORD _dllVersion = MAKEWORD(2, 2);
 		WSADATA _wsaData;
 		SOCKET _clientSocket;
 		SOCKADDR_IN _socketAddress;
@@ -114,10 +97,6 @@ namespace Network
 		mutable std::condition_variable _conditionalVariable;
 
 		mutable ServerResponse _serverResponse;
-
-		size_t _clientId;//remove
-		const std::string _ipAddress = "127.0.0.1";
-		static constexpr uint32_t _port = 8080;
 	};
 
-} // !namespase Network
+} // !namespace Network

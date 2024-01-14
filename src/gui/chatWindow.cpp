@@ -6,9 +6,8 @@ namespace Gui
 {
     void ChatWindow::DrawGui() noexcept
     {
-        //TODO: refactor
-        static std::vector<std::shared_ptr<UserData::User>> foundUsers;
-        static std::vector< std::shared_ptr<Chat::Chat>> availableChats;
+        static std::vector<UserData::User> foundUsers;
+        static std::vector<Chat::Chat> availableChats;
         static bool isAvailableChatsUpdated = true;
         static bool newChat = false;
         static size_t sameChatSelected;
@@ -19,6 +18,7 @@ namespace Gui
         ImGui::Begin("##main window");
 
         // available chats
+        
         static int32_t chatSelected = -1;
         static constexpr const size_t availableChatsStartHeight = 65;
         static constexpr const float availableChatsWidthScaleFactor = 3.0f;
@@ -74,7 +74,7 @@ namespace Gui
             {
                 for (size_t i = 0; i < foundUsers.size(); ++i)
                 {
-                    if (ImGui::Selectable(foundUsers[i]->GetUserLogin().c_str(), chatSelected == i, 0, ImVec2(0, 50)))
+                    if (ImGui::Selectable(foundUsers[i].GetUserLogin().c_str(), chatSelected == i, 0, ImVec2(0, 50)))
                     {
                         if (chatSelected != sameChatSelected)
                         {
@@ -90,14 +90,14 @@ namespace Gui
             {
                 if (isAvailableChatsUpdated)
                 {
-                    availableChats = Chat::Chat::GetAvailableChatsForUser(currentUser.GetUserLogin());
+                    availableChats = Chat::Chat::GetAvailableChats(currentUser.GetUserLogin());
                     isAvailableChatsUpdated = false;
                 }
 
                 for (size_t i = 0; i < availableChats.size(); ++i)
                 {
 
-                    if (ImGui::Selectable(availableChats[i]->GetChatName().c_str(), chatSelected == i, 0, ImVec2(0, 50)))
+                    if (ImGui::Selectable(availableChats[i].GetChatName().c_str(), chatSelected == i, 0, ImVec2(0, 50)))
                     {
                         if (chatSelected != sameChatSelected)
                         {
@@ -190,11 +190,11 @@ namespace Gui
                 if (isSearch)
                 {
                     isSearch = false;
-                    Network::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), foundUsers[chatSelected]->GetUserLogin(), _inputBuffer);
+                    Network::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), foundUsers[chatSelected].GetUserLogin(), _inputBuffer);
                 }
                 else
                 {
-                    Network::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), availableChats[chatSelected]->GetChatName(), _inputBuffer);
+                    Network::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), availableChats[chatSelected].GetChatName(), _inputBuffer);
                 }
 
                 MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kSend, _inputBuffer));
@@ -216,8 +216,16 @@ namespace Gui
                 {
                     newChat = false;
 
-                    Network::Client::GetInstance().ReceiveAllMessagesFromSelectedChat(currentUser.GetUserLogin(), availableChats[chatSelected]->GetChatId());
-                   
+                    Network::ChatPacket chatPacket =
+                    {
+                        .actionType = NetworkCore::ActionType::kReceiveAllMessagesForSelectedChat,
+                        .chatUserLogin = currentUser.GetUserLogin(),
+                        .chatId = availableChats[chatSelected].GetChatId(),
+                    };
+
+                    Network::Client::GetInstance().SendChatInfoPacket(chatPacket);
+
+                    Network::Client::GetInstance().GetServerResponse<bool>();
                 }
 
                 ImGui::SetCursorPos(ImVec2(availableChatsWidth, availableChatsStartHeight));
@@ -235,22 +243,22 @@ namespace Gui
                     static constexpr uint8_t paddingBetweenMessages = 5;
 
                     ImVec2 textPosition;
-                    float textWidth = ImGui::CalcTextSize(item._data.c_str()).x;
-                    float textHeight = ImGui::CalcTextSize(item._data.c_str()).y;
+                    float textWidth = ImGui::CalcTextSize(item.data.c_str()).x;
+                    float textHeight = ImGui::CalcTextSize(item.data.c_str()).y;
                     static const float textMaxWidth = ImGui::CalcTextSize(" ").x * maxCharacterOnOneLine;
 
-                    if (item._messageType == MessageBuffer::MessageStatus::kReceived)
+                    if (item.messageType == MessageBuffer::MessageStatus::kReceived)
                     {
                         static constexpr uint8_t paddingFromAvailableChats = 15;
 
                         textPosition = ImVec2(paddingFromAvailableChats, ImGui::GetCursorPosY());
                         ImGui::PushTextWrapPos(availableChatsWidth + paddingFromAvailableChats);
                     }
-                    else if (item._messageType == MessageBuffer::MessageStatus::kSend)
+                    else if (item.messageType == MessageBuffer::MessageStatus::kSend)
                     {
                         static constexpr uint8_t rightBorderPadding = 40;
 
-                        if (strlen(item._data.c_str()) < maxCharacterOnOneLine)
+                        if (strlen(item.data.c_str()) < maxCharacterOnOneLine)
                         {
                             textPosition = ImVec2(ImGui::GetWindowWidth() - textWidth - rightBorderPadding, ImGui::GetCursorPosY() + 5);
                         }
@@ -267,7 +275,7 @@ namespace Gui
 
                     splitter.SetCurrentChannel(drawList, 1);
                     ImGui::SetCursorPos(textPosition);
-                    ImGui::Text(item._data.c_str());
+                    ImGui::Text(item.data.c_str());
                     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + paddingBetweenMessages);
                     ImGui::PopTextWrapPos();
 
@@ -280,8 +288,8 @@ namespace Gui
                     splitter.Merge(drawList);
                 }
 
-                // Keep up at the bottom of the scroll region if we were already at the bottom at the beginning of the frame.
-                // Using a scrollbar or mouse-wheel will take away from the bottom edge.
+                        // Keep up at the bottom of the scroll region if we were already at the bottom at the beginning of the frame.
+                        // Using a scrollbar or mouse-wheel will take away from the bottom edge.
                 if (scrollToBottom || (autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()))
                 {
                     ImGui::SetScrollHereY(1.0f);
@@ -313,5 +321,8 @@ namespace Gui
 
         ImGui::End();
     }
+
+
+
 
 } // !namespace Gui

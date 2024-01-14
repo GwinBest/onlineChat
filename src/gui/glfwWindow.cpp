@@ -6,7 +6,7 @@ namespace Gui
 {
 	GlfwWindow::GlfwWindow() noexcept
 	{
-		_windowArray.reserve(3);
+		_windowArray.reserve(1);
 
 		Init();
 	}

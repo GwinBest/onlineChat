@@ -21,7 +21,7 @@ namespace MessageBuffer
 		MessageStatus messageType = MessageStatus::kUndefined;
 	};
 
-	extern std::list<MessageNode> messageBuffer;
+	inline std::list<MessageNode> messageBuffer;
 
 } // !namespace MessageBuffer
 

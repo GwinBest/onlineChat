@@ -1,9 +1,8 @@
-﻿	#include "client.h"
+﻿#include "client.h"
 
-#include "../userData/userData.h"
 extern UserData::User currentUser;
 
-namespace Network
+namespace ClientNetworking
 {
 	Client& Client::GetInstance() noexcept
 	{
@@ -15,7 +14,7 @@ namespace Network
 				//TODO: add !connect handle
 			};
 
-			std::thread receiveThread(&Network::Client::ReceiveThread, &Network::Client::GetInstance());
+			std::thread receiveThread(&Client::ReceiveThread, &Client::GetInstance());
 			receiveThread.detach();
 		}
 
@@ -102,7 +101,7 @@ namespace Network
 			}
 			case NetworkCore::ActionType::kCheckUserExistence:
 			{
-				recv(_clientSocket, reinterpret_cast<char*>(&_serverResponse), sizeof(bool), NULL);
+				recv(_clientSocket, reinterpret_cast<char*>(&NetworkCore::serverResponse), sizeof(bool), NULL);
 
 				_conditionalVariable.notify_one();
 
@@ -115,7 +114,7 @@ namespace Network
 				recv(_clientSocket, serverResponse, responseSize, NULL);
 				serverResponse[responseSize] = '\0';
 
-				_serverResponse = serverResponse; 
+				NetworkCore::serverResponse = serverResponse;
 				_conditionalVariable.notify_one();
 
 				break;
@@ -141,7 +140,7 @@ namespace Network
 					foundUsersVector.push_back(foundUser);
 				}
 
-				_serverResponse = foundUsersVector; //TODO
+				NetworkCore::serverResponse = foundUsersVector; //TODO
 				_conditionalVariable.notify_one();
 
 				break;
@@ -151,13 +150,13 @@ namespace Network
 				size_t availableChatsCount = 0;
 				recv(_clientSocket, reinterpret_cast<char*>(&availableChatsCount), sizeof(availableChatsCount), NULL);
 
-				std::vector<Chat::Chat> availableChatsVector;
+				std::vector<ChatSystem::Chat> availableChatsVector;
 
 				for (size_t i = 0; availableChatsCount > 0; ++i, --availableChatsCount)
 				{
 					char chatName[50];
 					size_t chatNameLength;
-					Chat::Chat foundChat;
+					ChatSystem::Chat foundChat;
 
 					size_t chatId;
 					recv(_clientSocket, reinterpret_cast<char*>(&chatId), sizeof(chatId), NULL);
@@ -172,7 +171,7 @@ namespace Network
 					availableChatsVector.push_back(foundChat);
 				}
 
-				_serverResponse = availableChatsVector;
+				NetworkCore::serverResponse = availableChatsVector;
 				_conditionalVariable.notify_one();
 
 				break;
@@ -210,7 +209,7 @@ namespace Network
 
 					if ((MessageBuffer::messageBuffer.size() + 1) % 15 == 0 || messageCount == 0)
 					{
-						_serverResponse = true; //TODO
+						NetworkCore::serverResponse = true; //TODO
 						_conditionalVariable.notify_one();
 					}
 

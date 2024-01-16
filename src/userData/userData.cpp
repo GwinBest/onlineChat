@@ -6,7 +6,7 @@ namespace UserData
 	{
 		//TODO: add error handle
 
-		Network::UserPacket request =
+		ClientNetworking::UserPacket request =
 		{
 			.actionType = NetworkCore::ActionType::kAddUserCredentialsToDatabase,
 			.name = userName,
@@ -14,14 +14,14 @@ namespace UserData
 			.password = userPassword
 		};
 
-		Network::Client::GetInstance().SendUserCredentialsPacket(request);
+		ClientNetworking::Client::GetInstance().SendUserCredentialsPacket(request);
 	}
 
 	std::string User::GetUserNameFromDatabase(const std::string& userLogin, const size_t userPassword) noexcept
 	{
 		//TODO: add error handle
 
-		Network::UserPacket request =
+		ClientNetworking::UserPacket request =
 		{
 			.actionType = NetworkCore::ActionType::kGetUserNameFromDatabase,
 			.name = "",
@@ -29,16 +29,16 @@ namespace UserData
 			.password = userPassword
 		};
 
-		Network::Client::GetInstance().SendUserCredentialsPacket(request);
+		ClientNetworking::Client::GetInstance().SendUserCredentialsPacket(request);
 
-		return Network::Client::GetInstance().GetServerResponse<std::string>();
+		return ClientNetworking::Client::GetInstance().GetServerResponse<std::string>();
 	}
 
 	bool User::IsUserExist(const std::string& userLogin, const size_t userPassword) noexcept
 	{
 		//TODO: add error handle
 
-		Network::UserPacket request =
+		ClientNetworking::UserPacket request =
 		{
 			.actionType = NetworkCore::ActionType::kCheckUserExistence,
 			.name = "",
@@ -46,16 +46,16 @@ namespace UserData
 			.password = userPassword
 		};
 
-		Network::Client::GetInstance().SendUserCredentialsPacket(request);
+		ClientNetworking::Client::GetInstance().SendUserCredentialsPacket(request);
 
-		return Network::Client::GetInstance().GetServerResponse<bool>();
+		return ClientNetworking::Client::GetInstance().GetServerResponse<bool>();
 	}
 
 	std::vector<User> User::FindUsersByLogin(const std::string& userLogin) noexcept
 	{
 		//TODO: add error handle
 
-		Network::UserPacket request =
+		ClientNetworking::UserPacket request =
 		{
 			.actionType = NetworkCore::ActionType::kFindUsersByLogin,
 			.name = "",
@@ -63,9 +63,9 @@ namespace UserData
 			.password = 0
 		};
 
-		Network::Client::GetInstance().SendUserCredentialsPacket(request);
+		ClientNetworking::Client::GetInstance().SendUserCredentialsPacket(request);
 
-		return Network::Client::GetInstance().GetServerResponse<std::vector<User>>();
+		return ClientNetworking::Client::GetInstance().GetServerResponse<std::vector<User>>();
 	}
 
 	std::string User::GetUserName() const noexcept

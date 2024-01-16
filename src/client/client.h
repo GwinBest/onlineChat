@@ -10,26 +10,15 @@
 #include <iostream>
 #endif // NDEBUG
 
-#include "../chat/chat.h"
 #include "../messageBuffer/messageBuffer.h"
 #include "../networkCore/networkCore.h"
 
 #pragma comment (lib, "ws2_32.lib")
 #pragma warning (disable:4996)
 
-// forward declaration
-namespace UserData
-{
-	class User;
-}
-namespace Chat
-{
-	class Chat;
-}
-
 extern std::list<MessageBuffer::MessageNode> MessageBuffer::messageBuffer;
 
-namespace Network
+namespace ClientNetworking
 {
 	struct UserPacket
 	{
@@ -50,7 +39,6 @@ namespace Network
 	class Client final
 	{
 	public:
-		using ServerResponse = std::variant<bool, std::string, std::vector<UserData::User>, std::vector<Chat::Chat>>;
 
 		Client(const Client&) = delete;
 		void operator= (const Client&) = delete;
@@ -69,7 +57,7 @@ namespace Network
 			std::unique_lock<std::mutex> lock(_mutex);
 			_conditionalVariable.wait(lock);
 
-			return std::get<T>(_serverResponse);
+			return std::get<T>(NetworkCore::serverResponse);
 		}
 
 		~Client();
@@ -95,8 +83,6 @@ namespace Network
 
 		mutable std::mutex _mutex;
 		mutable std::condition_variable _conditionalVariable;
-
-		mutable ServerResponse _serverResponse;
 	};
 
 } // !namespace Network

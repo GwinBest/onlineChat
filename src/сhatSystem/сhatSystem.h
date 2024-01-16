@@ -5,7 +5,7 @@
 
 #include "../client/client.h" 
 
-namespace Chat
+namespace ChatSystem
 {
 	class Chat final
 	{
@@ -23,4 +23,4 @@ namespace Chat
 		size_t _chatId;
 	};
 
-} // !namespace Chat
+} // !namespace ChatSystem

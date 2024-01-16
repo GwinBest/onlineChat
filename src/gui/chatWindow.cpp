@@ -7,7 +7,7 @@ namespace Gui
     void ChatWindow::DrawGui() noexcept
     {
         static std::vector<UserData::User> foundUsers;
-        static std::vector<Chat::Chat> availableChats;
+        static std::vector<ChatSystem::Chat> availableChats;
         static bool isAvailableChatsUpdated = true;
         static bool newChat = false;
         static size_t sameChatSelected;
@@ -90,7 +90,7 @@ namespace Gui
             {
                 if (isAvailableChatsUpdated)
                 {
-                    availableChats = Chat::Chat::GetAvailableChats(currentUser.GetUserLogin());
+                    availableChats = ChatSystem::Chat::GetAvailableChats(currentUser.GetUserLogin());
                     isAvailableChatsUpdated = false;
                 }
 
@@ -190,11 +190,11 @@ namespace Gui
                 if (isSearch)
                 {
                     isSearch = false;
-                    Network::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), foundUsers[chatSelected].GetUserLogin(), _inputBuffer);
+                    ClientNetworking::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), foundUsers[chatSelected].GetUserLogin(), _inputBuffer);
                 }
                 else
                 {
-                    Network::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), availableChats[chatSelected].GetChatName(), _inputBuffer);
+                    ClientNetworking::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), availableChats[chatSelected].GetChatName(), _inputBuffer);
                 }
 
                 MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kSend, _inputBuffer));
@@ -216,16 +216,16 @@ namespace Gui
                 {
                     newChat = false;
 
-                    Network::ChatPacket chatPacket =
+                    ClientNetworking::ChatPacket chatPacket =
                     {
                         .actionType = NetworkCore::ActionType::kReceiveAllMessagesForSelectedChat,
                         .chatUserLogin = currentUser.GetUserLogin(),
                         .chatId = availableChats[chatSelected].GetChatId(),
                     };
 
-                    Network::Client::GetInstance().SendChatInfoPacket(chatPacket);
+                    ClientNetworking::Client::GetInstance().SendChatInfoPacket(chatPacket);
 
-                    Network::Client::GetInstance().GetServerResponse<bool>();
+                    ClientNetworking::Client::GetInstance().GetServerResponse<bool>();
                 }
 
                 ImGui::SetCursorPos(ImVec2(availableChatsWidth, availableChatsStartHeight));

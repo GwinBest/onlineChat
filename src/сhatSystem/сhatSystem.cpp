@@ -1,20 +1,20 @@
-#include "chat.h"
+#include "ñhatSystem.h"
 
-namespace Chat
+namespace ChatSystem
 {
 	std::vector<Chat> Chat::GetAvailableChats(const std::string& chatUserLogin) noexcept
 	{
 		//TODO: add error handle
 
-		Network::ChatPacket request =
+		ClientNetworking::ChatPacket request =
 		{
 			.actionType = NetworkCore::ActionType::kGetAvailableChats,
 			.chatUserLogin = chatUserLogin,
 		};
 
-		Network::Client::GetInstance().SendChatInfoPacket(request);
+		ClientNetworking::Client::GetInstance().SendChatInfoPacket(request);
 
-		return Network::Client::GetInstance().GetServerResponse<std::vector<Chat>>();
+		return ClientNetworking::Client::GetInstance().GetServerResponse<std::vector<Chat>>();
 	}
 
 	void Chat::SetChatName(const std::string& chatName) noexcept
@@ -37,4 +37,4 @@ namespace Chat
 		return _chatId;
 	}
 
-} // !namespace Chat
+} // !namespace ChatSystem

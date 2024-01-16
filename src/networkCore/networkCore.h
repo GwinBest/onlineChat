@@ -7,8 +7,18 @@
 #include <variant>
 #include <vector>
 
-#include "../chat/chat.h"
+#include "../ñhatSystem/ñhatSystem.h"
 #include "../userData/userData.h"
+
+// forward declaration
+namespace UserData
+{
+	class User;
+}
+namespace ChatSystem
+{
+	class Chat;
+}
 
 namespace NetworkCore
 {
@@ -30,5 +40,8 @@ namespace NetworkCore
 	constexpr uint32_t port = 8080;
 
 	constexpr size_t serverResponseSize = 255;
+
+	using ServerResponse = std::variant<bool, std::string, std::vector<UserData::User>, std::vector<ChatSystem::Chat>>;
+	inline ServerResponse serverResponse;
 
 } // !namespace NetworkCore

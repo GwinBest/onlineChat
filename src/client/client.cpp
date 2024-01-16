@@ -140,7 +140,7 @@ namespace ClientNetworking
 					foundUsersVector.push_back(foundUser);
 				}
 
-				NetworkCore::serverResponse = foundUsersVector; //TODO
+				NetworkCore::serverResponse = foundUsersVector;
 				_conditionalVariable.notify_one();
 
 				break;

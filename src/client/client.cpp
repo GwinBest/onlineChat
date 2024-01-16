@@ -307,4 +307,4 @@ namespace ClientNetworking
 		}
 	}
 
-} // !namespace Network
+} // !namespace ClientNetworking

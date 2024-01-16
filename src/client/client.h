@@ -85,4 +85,4 @@ namespace ClientNetworking
 		mutable std::condition_variable _conditionalVariable;
 	};
 
-} // !namespace Network
+} // !namespace ClientNetworking

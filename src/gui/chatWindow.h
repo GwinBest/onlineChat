@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ñhatSystem/ñhatSystem.h"
+#include "../chatSystem/chatSystem.h"
 #include "../client/client.h"
 #include "../messageBuffer/messageBuffer.h"
 #include "../userData/userData.h"

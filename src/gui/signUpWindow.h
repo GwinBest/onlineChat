@@ -8,6 +8,7 @@ namespace Gui
 	{
 	public:
 		SignUpWindow() = default;
+		~SignUpWindow() override = default;
 
 		static bool IsSignUpButtonPressed() noexcept;
 		static bool IsBackToLoginButtonPressed() noexcept;

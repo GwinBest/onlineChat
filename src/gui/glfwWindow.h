@@ -21,7 +21,7 @@ namespace Gui
     {
     public:
         GlfwWindow() noexcept;
-        ~GlfwWindow();
+        ~GlfwWindow() override;
 
         void Draw() noexcept;
 

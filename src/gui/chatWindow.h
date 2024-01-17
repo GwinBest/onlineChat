@@ -17,6 +17,7 @@ namespace Gui
 	{
 	public:
 		ChatWindow() noexcept = default;
+		~ChatWindow() override = default;
 
 	private:
 		void DrawGui() noexcept override;

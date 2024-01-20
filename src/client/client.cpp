@@ -154,7 +154,7 @@ namespace ClientNetworking
 
 				for (size_t i = 0; availableChatsCount > 0; ++i, --availableChatsCount)
 				{
-					char chatName[50];
+					char chatName[50]; // TODO
 					size_t chatNameLength;
 					ChatSystem::Chat foundChat;
 
@@ -183,6 +183,7 @@ namespace ClientNetworking
 
 				MessageBuffer::messageBuffer.clear();
 
+				NetworkCore::serverResponse = false;
 				while (messageCount > 0)
 				{
 					 size_t receiveMessageSize ;
@@ -207,9 +208,9 @@ namespace ClientNetworking
 
 					messageCount--;
 
-					if ((MessageBuffer::messageBuffer.size() + 1) % 15 == 0 || messageCount == 0)
+					if (!std::get<bool>(NetworkCore::serverResponse) && ((MessageBuffer::messageBuffer.size() + 1) % 15 == 0 || messageCount == 0))
 					{
-						NetworkCore::serverResponse = true; //TODO
+						NetworkCore::serverResponse = true;
 						_conditionalVariable.notify_one();
 					}
 

@@ -69,4 +69,9 @@ namespace UserData
 		}
 	}
 
+	UserCredentialsFile::~UserCredentialsFile()
+	{
+		UserCredentialsFile::CloseFile();
+	}
+
 } // !namespace UserData

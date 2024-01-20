@@ -20,6 +20,8 @@ namespace UserData
 		static void WriteCredentials(const std::string& userName, const std::string& userLogin, const size_t& userPassword) noexcept;
 		static void ReadCredentials(std::string& name, std::string& login, size_t& password) noexcept;
 
+		~UserCredentialsFile();
+
 	private:
 		static inline const char* _fileName = ".loginFile.dat";
 		static inline std::fstream _credentialsFile;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../common/common.h"
 #include "iImGuiWindow.h"
 
 namespace Gui
@@ -22,8 +23,8 @@ namespace Gui
 		void DrawGui() noexcept override;
 	
 	private:
-		static inline char _inputBufferName[50] = "";
-		static inline char _inputBufferLogin[50] = "";
+		static inline char _inputBufferName[Common::userNameSize] = "";
+		static inline char _inputBufferLogin[Common::userLoginSize] = "";
 		static inline std::string _inputBufferPassword;
 
 		static inline bool _isInputNameEmpty = false;

@@ -82,9 +82,9 @@ namespace ClientNetworking
 			{
 				constexpr const size_t receiveMessageSize = 4096;
 				char receiveMessage[receiveMessageSize + 1];
-				char userLogin[50];
+				char userLogin[Common::userLoginSize];
 
-				recv(_clientSocket, userLogin, 50, NULL);
+				recv(_clientSocket, userLogin, sizeof(userLogin), NULL);
 				if (userLogin == currentUser.GetUserLogin())
 				{
 					recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);
@@ -128,7 +128,7 @@ namespace ClientNetworking
 
 				for (size_t i = 0; foundUsersCount > 0; ++i, --foundUsersCount)
 				{
-					char userLogin[50];
+					char userLogin[Common::userLoginSize];
 					size_t userLoginLength;
 					UserData::User foundUser;
 

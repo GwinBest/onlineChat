@@ -10,6 +10,7 @@
 #include <iostream>
 #endif // NDEBUG
 
+#include "../common/common.h"
 #include "../messageBuffer/messageBuffer.h"
 #include "../networkCore/networkCore.h"
 

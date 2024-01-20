@@ -21,18 +21,18 @@ namespace ClientNetworking
 		return instance;
 	}
 
-	void Client::SendUserMessage(const std::string& currentUserLogin, const std::string& selectedUserLogin, const std::string data) const noexcept
+	void Client::SendUserMessage(const std::string& sender, const std::string& receiver, const std::string data) const noexcept
 	{
 		NetworkCore::ActionType type = NetworkCore::ActionType::kSendChatMessage;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 
-		size_t currentUserLoginSize = currentUserLogin.size();
+		size_t currentUserLoginSize = sender.size();
 		send(_clientSocket, reinterpret_cast<char*>(&currentUserLoginSize), sizeof(currentUserLoginSize), NULL);
-		send(_clientSocket, currentUserLogin.c_str(), currentUserLoginSize, NULL);
+		send(_clientSocket, sender.c_str(), currentUserLoginSize, NULL);
 
-		size_t selectedUserLoginSize = selectedUserLogin.size();
+		size_t selectedUserLoginSize = receiver.size();
 		send(_clientSocket, reinterpret_cast<char*>(&selectedUserLoginSize), sizeof(selectedUserLoginSize), NULL);
-		send(_clientSocket, selectedUserLogin.c_str(), selectedUserLoginSize, NULL);
+		send(_clientSocket, receiver.c_str(), selectedUserLoginSize, NULL);
 
 		size_t dataSize = data.size();
 		send(_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(dataSize), NULL);
@@ -78,7 +78,7 @@ namespace ClientNetworking
 
 			switch (type)
 			{
-			case NetworkCore::ActionType::kSendChatMessage:
+			case NetworkCore::ActionType::kSendChatMessage:  // TODO: kReceived 
 			{
 				constexpr const size_t receiveMessageSize = 4096;
 				char receiveMessage[receiveMessageSize + 1];
@@ -89,7 +89,6 @@ namespace ClientNetworking
 				{
 					recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);
 				
-					//TODO: add callback	
 					MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kReceived, std::string(receiveMessage)));
 				}
 
@@ -186,7 +185,7 @@ namespace ClientNetworking
 				NetworkCore::serverResponse = false;
 				while (messageCount > 0)
 				{
-					 size_t receiveMessageSize ;
+					size_t receiveMessageSize ;
 					char receiveMessage[4096 + 1];
 
 					recv(_clientSocket, reinterpret_cast<char*>(&receiveMessageSize), sizeof(receiveMessageSize), NULL);
@@ -213,7 +212,6 @@ namespace ClientNetworking
 						NetworkCore::serverResponse = true;
 						_conditionalVariable.notify_one();
 					}
-
 				}
 				
 				break;

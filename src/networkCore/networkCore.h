@@ -25,13 +25,14 @@ namespace NetworkCore
 	enum class ActionType : uint8_t
 	{
 		kActionUndefined					= 0,
-		kSendChatMessage					= 1,
-		kAddUserCredentialsToDatabase		= 2,
-		kCheckUserExistence					= 3,
-		kGetUserNameFromDatabase			= 4,
-		kFindUsersByLogin					= 5,
-		kGetAvailableChats					= 6,
-		kReceiveAllMessagesForSelectedChat	= 7
+		kSendChatMessage,					
+		//kReceiveChatMessage,					
+		kAddUserCredentialsToDatabase,		
+		kCheckUserExistence,					
+		kGetUserNameFromDatabase,			
+		kFindUsersByLogin,					
+		kGetAvailableChats,					
+		kReceiveAllMessagesForSelectedChat
 	};
 
 	constexpr WORD dllVersion = MAKEWORD(2, 2);

@@ -46,7 +46,7 @@ namespace ClientNetworking
 
 		static Client& GetInstance() noexcept;
 
-		void SendUserMessage(const std::string& currentUserLogin, const std::string& selectedUserLogin, const std::string data) const noexcept;
+		void SendUserMessage(const std::string& sender, const std::string& receiver, const std::string data) const noexcept;
 		void SendUserCredentialsPacket(const UserPacket& userCredentials) const noexcept;
 		void SendChatInfoPacket(const ChatPacket& chatInfo) const noexcept;
 
@@ -73,8 +73,8 @@ namespace ClientNetworking
 		enum class ClientState : uint8_t
 		{
 			kClientDisconnected = 0,
-			kCLientInited		= 1,
-			kClientConnected	= 2,
+			kCLientInited,
+			kClientConnected,
 		};
 
 		WSADATA _wsaData;

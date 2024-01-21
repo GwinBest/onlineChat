@@ -58,7 +58,6 @@ namespace Gui
 		//TODO: gap between text and input text when fullscreen
 
 		static constexpr float inputTextWidth = 300.0f;
-
 		ImGuiStyle& windowStyle = ImGui::GetStyle();
 		ImVec4 oldInputTextColor = windowStyle.Colors[ImGuiCol_FrameBg];
 		ImVec4 inputTextEmptyColor = ImVec4(0.8f, 0.0f, 0.0f, 0.5f);

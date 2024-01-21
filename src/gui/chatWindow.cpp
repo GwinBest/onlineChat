@@ -6,54 +6,53 @@ namespace Gui
 {
     void ChatWindow::DrawGui() noexcept
     {
-        static std::vector<UserData::User> foundUsers;
-        static std::vector<ChatSystem::Chat> availableChats;
-        static bool isAvailableChatsUpdated = true;
-        static bool newChat = false;
-        static size_t sameChatSelected;
-        bool isSearch = false;
-
-        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				        // enable docking 
+        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				                    // enable docking 
 
         ImGui::Begin("##main window");
 
-        // available chats
-        
-        static int32_t chatSelected = -1;
-        static constexpr const size_t availableChatsStartHeight = 65;
-        static constexpr const float availableChatsWidthScaleFactor = 3.0f;
+        static std::vector<UserData::User> foundUsers;
+        constexpr float availableChatsWidthScaleFactor = 3.0f;
+        constexpr size_t availableChatsStartHeight = 65;
         float availableChatsWidth = ImGui::GetWindowWidth() / availableChatsWidthScaleFactor;
+
+        // search bar
         {
+            ImDrawList* drawList = ImGui::GetWindowDrawList();
+            drawList->AddRectFilled(ImVec2(0, 0), ImVec2(availableChatsWidth, availableChatsStartHeight), IM_COL32(41, 46, 52, 255));
 
-            // search
+            ImGuiStyle& windowStyle = ImGui::GetStyle();
+            const float oldRounding = windowStyle.FrameRounding;
+            const ImVec4 oldInputTextColor = windowStyle.Colors[ImGuiCol_FrameBg];
+            windowStyle.FrameRounding = 12.0f;
+            windowStyle.Colors[ImGuiCol_FrameBg] = ImVec4(0.0941f, 0.0980f, 0.1137f, 1.00f);
+
+            static std::string searchBarSearchRequest;
+            ImGui::SetCursorPos(ImVec2(55, 20));
+            ImGui::PushItemWidth(availableChatsWidth - 70.0f);
+            if (ImGui::InputTextWithHint("##search", "Search", &searchBarSearchRequest))
             {
-                ImDrawList* drawList = ImGui::GetWindowDrawList();
-                drawList->AddRectFilled(ImVec2(0, 0), ImVec2(availableChatsWidth, 65), IM_COL32(41, 46, 52, 255));
-
-                ImGuiStyle& windowStyle = ImGui::GetStyle();
-                const float oldRounding = windowStyle.FrameRounding;
-                const ImVec4 oldInputTextColor = windowStyle.Colors[ImGuiCol_FrameBg];
-                windowStyle.FrameRounding = 12.0f;
-                windowStyle.Colors[ImGuiCol_FrameBg] = ImVec4(0.0941f, 0.0980f, 0.1137f, 1.00f);
-
-                static std::string search;
-                ImGui::SetCursorPos(ImVec2(55, 20));
-                ImGui::PushItemWidth(availableChatsWidth - 70);
-                if (ImGui::InputTextWithHint("##search", "Search", &search))
-                {
-                    foundUsers = UserData::User::FindUsersByLogin(search);
-
-                }
-                if (search != "")
-                {
-                    isSearch = true;
-                }
-                ImGui::PopItemWidth();
-
-                windowStyle.FrameRounding = oldRounding;
-                windowStyle.Colors[ImGuiCol_FrameBg] = oldInputTextColor;
+                foundUsers.clear();
+                foundUsers = UserData::User::FindUsersByLogin(searchBarSearchRequest);
             }
 
+            if (searchBarSearchRequest.empty())
+            {
+                foundUsers.clear();
+            }
+
+            ImGui::PopItemWidth();
+
+            windowStyle.FrameRounding = oldRounding;
+            windowStyle.Colors[ImGuiCol_FrameBg] = oldInputTextColor;
+        }
+
+        static int32_t chatSelected = -1;
+        static bool newChatSelected = false;
+        static bool isAvailableChatsUpdated = true;
+        static std::vector<ChatSystem::Chat> availableChats;
+        
+        // available chats list
+        {
             ImVec2 availableChatsSize;
             if (ImGui::GetWindowWidth() < _defaultDisplayWidth)
             {
@@ -70,17 +69,18 @@ namespace Gui
             ImVec2 selectablePosition = { 0, 0 };
 
             ImGui::SetCursorPos(selectablePosition);
-            if (isSearch)
+
+            if (!foundUsers.empty())
             {
                 for (size_t i = 0; i < foundUsers.size(); ++i)
                 {
                     if (ImGui::Selectable(foundUsers[i].GetUserLogin().c_str(), chatSelected == i, 0, ImVec2(0, 50)))
                     {
-                        if (chatSelected != sameChatSelected)
+                        if (chatSelected != i)
                         {
-                            newChat = true;
-                            sameChatSelected = i;
+                            newChatSelected = true;
                         }
+
                         chatSelected = i;
 
                     }
@@ -99,11 +99,11 @@ namespace Gui
 
                     if (ImGui::Selectable(availableChats[i].GetChatName().c_str(), chatSelected == i, 0, ImVec2(0, 50)))
                     {
-                        if (chatSelected != sameChatSelected)
+                        if (chatSelected != i)
                         {
-                            newChat = true;
-                            sameChatSelected = i;
+                            newChatSelected = true;
                         }
+
                         chatSelected = i;
                     }
                 }
@@ -111,10 +111,14 @@ namespace Gui
 
             ImGui::SetItemAllowOverlap();
 
-            //ImGui::SetCursorPos(ImVec2(selectablePosition.x + 10, selectablePosition.y + 15));
-            //ImGui::Text("text");
-
-            selectablePosition.y += 50;
+            // TODO: for last message 
+            {
+                //ImGui::SetCursorPos(ImVec2(selectablePosition.x + 10, selectablePosition.y + 15));
+                //ImGui::Text("text");
+                //client::getlastMEssage()
+                // 
+                //selectablePosition.y += 50;
+            }
 
 
             // unselect current chat
@@ -132,20 +136,23 @@ namespace Gui
             // selected user info
             {
                 ImDrawList* drawList = ImGui::GetWindowDrawList();
-                drawList->AddRectFilled(ImVec2(availableChatsWidth, 0), ImVec2(ImGui::GetWindowSize().x, 65), IM_COL32(41, 46, 52, 255));
+                drawList->AddRectFilled(ImVec2(availableChatsWidth, 0), ImVec2(ImGui::GetWindowSize().x, availableChatsStartHeight), IM_COL32(41, 46, 52, 255));
             }
-
-            // input text
+            
             static bool isEnterPressed = false;
             static bool reclaimFocus = false;
             static bool scrollToBottom = false;
             static bool autoScroll = true;
+            constexpr float distanceFromRightToInputText = 60.0f;
+
+            // input text
             {
                 float oldFontScale = ImGui::GetFont()->Scale;
                 ImGui::GetFont()->Scale *= 1.4f;																	// set new font scale for input text
                 ImGui::PushFont(ImGui::GetFont());
 
-                ImVec2 inputTextSize = ImVec2(ImGui::GetWindowWidth() - availableChatsWidth - 60, 45);
+               
+                ImVec2 inputTextSize = ImVec2(ImGui::GetWindowWidth() - availableChatsWidth - distanceFromRightToInputText, 45);
                 ImGui::SetCursorPos(ImVec2(availableChatsWidth, ImGui::GetWindowHeight() - 45));
                 if (ImGui::InputTextMultilineWithHint("##input", "Write a message", &(_inputBuffer), inputTextSize, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CtrlEnterForNewLine))
                 {
@@ -167,29 +174,37 @@ namespace Gui
                 }
             }
 
-            // button
             static bool isButtonPressed = false;
+
+            // send button
             {
-                //TODO: add arrow button
-                ImVec2 buttonSize = ImVec2(45, 40);
+                ImGuiStyle& windowStyle = ImGui::GetStyle();
+                ImVec4 oldButtonColor = windowStyle.Colors[ImGuiCol_Button];
+                windowStyle.Colors[ImGuiCol_Button] = windowStyle.Colors[ImGuiCol_FrameBg];								        // set the button color to the same 
+                                                                                                                                // as the input text so that only picture is visible
                 ImGui::SameLine();
-                ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 45);
-                if (ImGui::Button("send", buttonSize))
+                ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() - distanceFromRightToInputText - 1, ImGui::GetCursorPos().y));
+                int32_t sendMessageButtonWidth = 0;																				// loads from loadTextureFromFile
+                int32_t sendMessageButtonHeight = 0;																			// loads from loadTextureFromFile
+                ImTextureID sendMessageButtonTexture = nullptr;
+                loadTextureFromFile(".\\images\\sendMessage.png", reinterpret_cast<GLuint*>(&sendMessageButtonTexture), &sendMessageButtonWidth, &sendMessageButtonHeight);
+                if (ImGui::ImageButton("##send message", sendMessageButtonTexture, ImVec2(sendMessageButtonWidth, sendMessageButtonHeight)))
                 {
                     isButtonPressed = true;
                     reclaimFocus = true;
 
                     scrollToBottom = true;
                 }
+
+                windowStyle.Colors[ImGuiCol_Button] = oldButtonColor;															// reset the button color to default
             }
 
             // send message 
-            if ((isEnterPressed || isButtonPressed) && _inputBuffer != "")
+            if ((isEnterPressed || isButtonPressed) && !_inputBuffer.empty())
             {
                 //TODO: 4096 max message size
-                if (isSearch)
+                if (!foundUsers.empty())
                 {
-                    isSearch = false;
                     ClientNetworking::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), foundUsers[chatSelected].GetUserLogin(), _inputBuffer);
                 }
                 else
@@ -204,7 +219,7 @@ namespace Gui
 
                 reclaimFocus = true;
 
-                _inputBuffer = "";
+                _inputBuffer.clear();
             }
 
             // display sent and received messages
@@ -212,11 +227,11 @@ namespace Gui
                 ImGuiStyle& windowStyle = ImGui::GetStyle();
                 windowStyle.Colors[ImGuiCol_ChildBg] = ImVec4(0.0941f, 0.0980f, 0.1137f, 1.00f);					// setup new color for begin child
 
-                if (newChat)
+                if (newChatSelected)
                 {
-                    newChat = false;
+                    newChatSelected = false;
 
-                    ClientNetworking::ChatPacket chatPacket =
+                    const ClientNetworking::ChatPacket chatPacket =
                     {
                         .actionType = NetworkCore::ActionType::kReceiveAllMessagesForSelectedChat,
                         .chatUserLogin = currentUser.GetUserLogin(),
@@ -288,8 +303,8 @@ namespace Gui
                     splitter.Merge(drawList);
                 }
 
-                        // Keep up at the bottom of the scroll region if we were already at the bottom at the beginning of the frame.
-                        // Using a scrollbar or mouse-wheel will take away from the bottom edge.
+                // Keep up at the bottom of the scroll region if we were already at the bottom at the beginning of the frame.
+                // Using a scrollbar or mouse-wheel will take away from the bottom edge.
                 if (scrollToBottom || (autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()))
                 {
                     ImGui::SetScrollHereY(1.0f);
@@ -312,8 +327,7 @@ namespace Gui
             float rectangleHeight = ImGui::CalcTextSize(textToDraw).y + textY;
             drawList->AddRectFilled(ImVec2(textX - 10, textY - 4),
                 ImVec2(rectangleLength + 10, rectangleHeight + 4),
-                IM_COL32(41, 46, 52, 255),
-                12.0f);																			                    // rounding					
+                IM_COL32(41, 46, 52, 255), 12.0f);	                            // 12.0f - rounding					
 
             ImGui::SetCursorPos(ImVec2(textX, textY));
             ImGui::Text(textToDraw);
@@ -321,8 +335,5 @@ namespace Gui
 
         ImGui::End();
     }
-
-
-
 
 } // !namespace Gui

@@ -21,6 +21,7 @@ namespace MessageBuffer
 		MessageStatus messageType = MessageStatus::kUndefined;
 	};
 
+	//TODO: fabric
 	inline std::list<MessageNode> messageBuffer;
 
 } // !namespace MessageBuffer

@@ -24,12 +24,12 @@ namespace Gui
 		return false;
 	}
 
-	char* SignUpWindow::GetName() noexcept
+	const char* SignUpWindow::GetName() noexcept
 	{
 		return _inputBufferName;
 	}
 
-	char* SignUpWindow::GetLogin() noexcept
+	const char* SignUpWindow::GetLogin() noexcept
 	{
 		return _inputBufferLogin;
 

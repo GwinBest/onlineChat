@@ -24,7 +24,7 @@ namespace Gui
 		return false;
 	}
 
-	char* LoginWindow::GetLogin() noexcept
+	const char* LoginWindow::GetLogin() noexcept
 	{
 		return _inputBufferLogin;
 	}

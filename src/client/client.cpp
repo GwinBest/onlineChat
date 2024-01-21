@@ -14,6 +14,7 @@ namespace ClientNetworking
 				//TODO: add !connect handle
 			};
 
+			//TODO std::async
 			std::thread receiveThread(&Client::ReceiveThread, &Client::GetInstance());
 			receiveThread.detach();
 		}

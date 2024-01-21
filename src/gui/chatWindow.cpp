@@ -258,7 +258,7 @@ namespace Gui
                     {
                         static constexpr uint8_t rightBorderPadding = 40;
 
-                        if (strlen(item.data.c_str()) < maxCharacterOnOneLine)
+                        if (item.data.size() < maxCharacterOnOneLine)
                         {
                             textPosition = ImVec2(ImGui::GetWindowWidth() - textWidth - rightBorderPadding, ImGui::GetCursorPosY() + 5);
                         }

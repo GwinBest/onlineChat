@@ -20,7 +20,7 @@ namespace UserData
 	std::string User::GetUserNameFromDatabase(const std::string& userLogin, const size_t userPassword) noexcept
 	{
 		//TODO: add error handle
-
+		//TODO: send only login
 		ClientNetworking::UserPacket request =
 		{
 			.actionType = NetworkCore::ActionType::kGetUserNameFromDatabase,
@@ -37,7 +37,7 @@ namespace UserData
 	bool User::IsUserExist(const std::string& userLogin, const size_t userPassword) noexcept
 	{
 		//TODO: add error handle
-
+		//TODO: send only login
 		ClientNetworking::UserPacket request =
 		{
 			.actionType = NetworkCore::ActionType::kCheckUserExistence,

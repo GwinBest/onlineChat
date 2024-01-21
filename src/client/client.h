@@ -58,6 +58,7 @@ namespace ClientNetworking
 			std::unique_lock<std::mutex> lock(_mutex);
 			_conditionalVariable.wait(lock);
 
+			//TODO: scoped_lock
 			return std::get<T>(NetworkCore::serverResponse);
 		}
 

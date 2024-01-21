@@ -6,7 +6,7 @@ namespace ChatSystem
 	{
 		//TODO: add error handle
 
-		ClientNetworking::ChatPacket request =
+		const ClientNetworking::ChatPacket request =
 		{
 			.actionType = NetworkCore::ActionType::kGetAvailableChats,
 			.chatUserLogin = chatUserLogin,

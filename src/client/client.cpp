@@ -153,7 +153,7 @@ namespace ClientNetworking
 
 				for (size_t i = 0; availableChatsCount > 0; ++i, --availableChatsCount)
 				{
-					char chatName[50]; // TODO
+					char chatName[50];
 					size_t chatNameLength;
 					ChatSystem::Chat foundChat;
 

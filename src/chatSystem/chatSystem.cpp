@@ -4,8 +4,6 @@ namespace ChatSystem
 {
 	std::vector<Chat> Chat::GetAvailableChats(const std::string& chatUserLogin) noexcept
 	{
-		//TODO: add error handle
-
 		const ClientNetworking::ChatPacket request =
 		{
 			.actionType = NetworkCore::ActionType::kGetAvailableChats,

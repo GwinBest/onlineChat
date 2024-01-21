@@ -4,9 +4,7 @@ namespace UserData
 {
 	void User::PushUserCredentialsToDatabase(const std::string& userName, const std::string& userLogin, const size_t userPassword) noexcept
 	{
-		//TODO: add error handle
-
-		ClientNetworking::UserPacket request =
+		const ClientNetworking::UserPacket request =
 		{
 			.actionType = NetworkCore::ActionType::kAddUserCredentialsToDatabase,
 			.name = userName,
@@ -19,9 +17,8 @@ namespace UserData
 
 	std::string User::GetUserNameFromDatabase(const std::string& userLogin, const size_t userPassword) noexcept
 	{
-		//TODO: add error handle
 		//TODO: send only login
-		ClientNetworking::UserPacket request =
+		const ClientNetworking::UserPacket request =
 		{
 			.actionType = NetworkCore::ActionType::kGetUserNameFromDatabase,
 			.name = "",
@@ -36,9 +33,8 @@ namespace UserData
 
 	bool User::IsUserExist(const std::string& userLogin, const size_t userPassword) noexcept
 	{
-		//TODO: add error handle
 		//TODO: send only login
-		ClientNetworking::UserPacket request =
+		const ClientNetworking::UserPacket request =
 		{
 			.actionType = NetworkCore::ActionType::kCheckUserExistence,
 			.name = "",
@@ -53,9 +49,7 @@ namespace UserData
 
 	std::vector<User> User::FindUsersByLogin(const std::string& userLogin) noexcept
 	{
-		//TODO: add error handle
-
-		ClientNetworking::UserPacket request =
+		const ClientNetworking::UserPacket request =
 		{
 			.actionType = NetworkCore::ActionType::kFindUsersByLogin,
 			.name = "",

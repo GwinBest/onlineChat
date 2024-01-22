@@ -9,8 +9,8 @@ namespace Gui
 
         virtual void DrawGui() noexcept = 0;
 
-        static constexpr int32_t _defaultDisplayWidth = 820;
-        static constexpr int32_t _defaultDisplayHeight = 700;
+        static constexpr int32_t defaultDisplayWidth = 820;
+        static constexpr int32_t defaultDisplayHeight = 700;
     };
 
 } // !namespace Gui

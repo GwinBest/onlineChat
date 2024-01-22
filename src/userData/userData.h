@@ -22,8 +22,8 @@ namespace UserData
 
 		static std::vector<User> FindUsersByLogin(const std::string& userLogin) noexcept;
 
-		std::string GetUserName() const noexcept;
-		std::string GetUserLogin() const noexcept;
+		const std::string& GetUserName() const noexcept;
+		const std::string& GetUserLogin() const noexcept;
 		size_t GetUserPassword() const noexcept;
 
 		void SetUserName(const std::string& userName) noexcept;

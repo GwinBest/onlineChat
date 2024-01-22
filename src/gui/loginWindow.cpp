@@ -29,7 +29,7 @@ namespace Gui
 		return _inputBufferLogin;
 	}
 
-	std::string LoginWindow::GetPassword() noexcept
+	const std::string& LoginWindow::GetPassword() noexcept
 	{
 		return _inputBufferPassword;
 	}

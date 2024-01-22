@@ -62,12 +62,12 @@ namespace UserData
 		return ClientNetworking::Client::GetInstance().GetServerResponse<std::vector<User>>();
 	}
 
-	std::string User::GetUserName() const noexcept
+	const std::string& User::GetUserName() const noexcept
 	{
 		return _userName;
 	}
 
-	std::string User::GetUserLogin() const noexcept
+	const std::string& User::GetUserLogin() const noexcept
 	{
 		return _userLogin;
 	}

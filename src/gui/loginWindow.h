@@ -14,7 +14,7 @@ namespace Gui
 		static bool IsLoginButtonPressed() noexcept;
 
 		static const char* GetLogin() noexcept;
-		static std::string GetPassword() noexcept;
+		static const std::string& GetPassword() noexcept;
 
 		static void SetShowUserNotFoundMessage(const bool value) noexcept;
 

@@ -15,7 +15,7 @@ namespace MessageBuffer
 
 	struct MessageNode 
 	{
-		explicit MessageNode(MessageStatus messageType, std::string data) : data(data), messageType(messageType) {};
+		explicit MessageNode(MessageStatus messageType, const std::string& data) : data(data), messageType(messageType) {};
 		
 		std::string data;
 		MessageStatus messageType = MessageStatus::kUndefined;

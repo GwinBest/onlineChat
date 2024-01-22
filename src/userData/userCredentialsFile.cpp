@@ -42,7 +42,7 @@ namespace UserData
 		}
 	}
 
-	void UserCredentialsFile::WriteCredentials(const std::string& userName, const std::string& userLogin, const size_t& userPassword) noexcept
+	void UserCredentialsFile::WriteCredentials(const std::string& userName, const std::string& userLogin, const size_t userPassword) noexcept
 	{
 		const size_t nameLength = strlen(userName.c_str());
 		const size_t loginLength = strlen(userLogin.c_str());

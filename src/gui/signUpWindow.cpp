@@ -35,7 +35,7 @@ namespace Gui
 
 	}
 
-	std::string SignUpWindow::GetPassword() noexcept
+	const std::string& SignUpWindow::GetPassword() noexcept
 	{
 		return _inputBufferPassword;
 

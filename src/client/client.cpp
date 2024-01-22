@@ -21,7 +21,7 @@ namespace ClientNetworking
 		return instance;
 	}
 
-	void Client::SendUserMessage(const std::string& sender, const std::string& receiver, const std::string data) const noexcept
+	void Client::SendUserMessage(const std::string& sender, const std::string& receiver, const char* data) const noexcept
 	{
 		NetworkCore::ActionType type = NetworkCore::ActionType::kSendChatMessage;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
@@ -34,9 +34,9 @@ namespace ClientNetworking
 		send(_clientSocket, reinterpret_cast<char*>(&selectedUserLoginSize), sizeof(selectedUserLoginSize), NULL);
 		send(_clientSocket, receiver.c_str(), selectedUserLoginSize, NULL);
 
-		size_t dataSize = data.size();
+		size_t dataSize = strlen(data);
 		send(_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(dataSize), NULL);
-		send(_clientSocket, data.c_str(), dataSize, NULL);
+		send(_clientSocket, data, dataSize, NULL);
 	}
 
 	void Client::SendUserCredentialsPacket(const UserPacket& userCredentials) const noexcept
@@ -80,16 +80,15 @@ namespace ClientNetworking
 			{
 			case NetworkCore::ActionType::kSendChatMessage:  // TODO: kReceived 
 			{
-				constexpr const size_t receiveMessageSize = 4096;
-				char receiveMessage[receiveMessageSize + 1];
+				char receiveMessage[Common::maxInputBufferSize];
 				char userLogin[Common::userLoginSize];
 
 				recv(_clientSocket, userLogin, sizeof(userLogin), NULL);
 				if (userLogin == currentUser.GetUserLogin())
 				{
-					recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);
+					recv(_clientSocket, receiveMessage, sizeof(receiveMessage) - 1, NULL);
 				
-					MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kReceived, std::string(receiveMessage)));
+					MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kReceived, receiveMessage));
 				}
 
 				break;
@@ -185,8 +184,8 @@ namespace ClientNetworking
 				NetworkCore::serverResponse = false;
 				while (messageCount > 0)
 				{
-					size_t receiveMessageSize ;
-					char receiveMessage[4096 + 1];
+					size_t receiveMessageSize;
+					char receiveMessage[Common::maxInputBufferSize];
 
 					recv(_clientSocket, reinterpret_cast<char*>(&receiveMessageSize), sizeof(receiveMessageSize), NULL);
 					recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);

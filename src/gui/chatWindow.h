@@ -2,6 +2,7 @@
 
 #include "../chatSystem/chatSystem.h"
 #include "../client/client.h"
+#include "../common/common.h"
 #include "../messageBuffer/messageBuffer.h"
 #include "../userData/userData.h"
 #include "iImGuiWindow.h"
@@ -22,7 +23,7 @@ namespace Gui
 		void DrawGui() noexcept override;
 
 	private:
-		static inline std::string _inputBuffer;
+		static inline char _inputBuffer[Common::maxInputBufferSize] = "";
 	};
 
 } // !namespace Gui

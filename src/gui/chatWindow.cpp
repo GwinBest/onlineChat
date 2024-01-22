@@ -143,7 +143,7 @@ namespace Gui
             static bool reclaimFocus = false;
             static bool scrollToBottom = false;
             static bool autoScroll = true;
-            constexpr float distanceFromRightToInputText = 60.0f;
+            constexpr float distanceFromRightToInputText = 45.0f;
 
             // input text
             {
@@ -151,10 +151,10 @@ namespace Gui
                 ImGui::GetFont()->Scale *= 1.4f;																	// set new font scale for input text
                 ImGui::PushFont(ImGui::GetFont());
 
-               
                 ImVec2 inputTextSize = ImVec2(ImGui::GetWindowWidth() - availableChatsWidth - distanceFromRightToInputText, 45);
                 ImGui::SetCursorPos(ImVec2(availableChatsWidth, ImGui::GetWindowHeight() - 45));
-                if (ImGui::InputTextMultilineWithHint("##input", "Write a message", &(_inputBuffer), inputTextSize, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CtrlEnterForNewLine))
+                if(ImGui::InputTextMultilineWithHint("##input", "Write a message", _inputBuffer, sizeof(_inputBuffer), 
+                    inputTextSize, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CtrlEnterForNewLine))
                 {
                     isEnterPressed = true;
                     reclaimFocus = true;
@@ -195,14 +195,13 @@ namespace Gui
 
                     scrollToBottom = true;
                 }
-
+               
                 windowStyle.Colors[ImGuiCol_Button] = oldButtonColor;															// reset the button color to default
             }
 
             // send message 
-            if ((isEnterPressed || isButtonPressed) && !_inputBuffer.empty())
+            if ((isEnterPressed || isButtonPressed) && _inputBuffer[0] != '\0')
             {
-                //TODO: 4096 max message size
                 if (!foundUsers.empty())
                 {
                     ClientNetworking::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), foundUsers[chatSelected].GetUserLogin(), _inputBuffer);
@@ -213,19 +212,20 @@ namespace Gui
                 }
 
                 MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kSend, _inputBuffer));
-
+                
                 isEnterPressed = false;
                 isButtonPressed = false;
 
                 reclaimFocus = true;
 
-                _inputBuffer.clear();
+                _inputBuffer[0] = '\0';
             }
 
             // display sent and received messages
             {
                 ImGuiStyle& windowStyle = ImGui::GetStyle();
-                windowStyle.Colors[ImGuiCol_ChildBg] = ImVec4(0.0941f, 0.0980f, 0.1137f, 1.00f);					// setup new color for begin child
+                ImVec4 oldColor = windowStyle.Colors[ImGuiCol_ChildBg];
+                windowStyle.Colors[ImGuiCol_ChildBg] = windowStyle.Colors[ImGuiCol_WindowBg];					// setup new color for begin child
 
                 if (newChatSelected)
                 {
@@ -247,9 +247,8 @@ namespace Gui
                 ImGui::BeginChild("##chat zone", ImVec2(ImGui::GetWindowWidth() - availableChatsWidth,
                     ImGui::GetWindowHeight() - 110));
 
-                windowStyle.Colors[ImGuiCol_ChildBg] = ImVec4(0.1608f, 0.1804f, 0.2039f, 1.00f);					// return it's default color for begin child 
+                windowStyle.Colors[ImGuiCol_ChildBg] = oldColor;					                            // return it's default color for begin child 
 
-                size_t a = MessageBuffer::messageBuffer.size();
                 for (const auto& item : MessageBuffer::messageBuffer)
                 {
                     ImDrawList* drawList = ImGui::GetWindowDrawList();

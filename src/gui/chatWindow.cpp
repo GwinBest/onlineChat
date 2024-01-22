@@ -54,7 +54,7 @@ namespace Gui
         // available chats list
         {
             ImVec2 availableChatsSize;
-            if (ImGui::GetWindowWidth() < _defaultDisplayWidth)
+            if (ImGui::GetWindowWidth() < defaultDisplayWidth)
             {
                 availableChatsSize = ImVec2(ImGui::GetWindowWidth(), 0);
             }
@@ -131,7 +131,7 @@ namespace Gui
         }
 
         // chat zone
-        if (ImGui::GetWindowWidth() >= _defaultDisplayWidth && chatSelected != -1)
+        if (ImGui::GetWindowWidth() >= defaultDisplayWidth && chatSelected != -1)
         {
             // selected user info
             {
@@ -313,7 +313,7 @@ namespace Gui
                 ImGui::EndChild();
             }
         }
-        else if (ImGui::GetWindowWidth() >= _defaultDisplayWidth && chatSelected == -1)
+        else if (ImGui::GetWindowWidth() >= defaultDisplayWidth && chatSelected == -1)
         {
             ImDrawList* drawList = ImGui::GetWindowDrawList();
 

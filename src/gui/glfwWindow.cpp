@@ -54,7 +54,7 @@ namespace Gui
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-		_mainWindow = glfwCreateWindow(_defaultDisplayWidth, _defaultDisplayHeight, "Online Chat", nullptr, nullptr);
+		_mainWindow = glfwCreateWindow(defaultDisplayWidth, defaultDisplayHeight, "Online Chat", nullptr, nullptr);
 		if (_mainWindow == nullptr)
 		{
 			return;

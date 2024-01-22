@@ -139,11 +139,11 @@ namespace Gui
                 drawList->AddRectFilled(ImVec2(availableChatsWidth, 0), ImVec2(ImGui::GetWindowSize().x, availableChatsStartHeight), IM_COL32(41, 46, 52, 255));
             }
             
-            static bool isEnterPressed = false;
+            bool isEnterPressed = false;
             static bool reclaimFocus = false;
             static bool scrollToBottom = false;
             static bool autoScroll = true;
-            constexpr float distanceFromRightToInputText = 45.0f;
+            static constexpr float distanceFromRightToInputText = 45.0f;
 
             // input text
             {
@@ -174,7 +174,7 @@ namespace Gui
                 }
             }
 
-            static bool isButtonPressed = false;
+            bool isButtonPressed = false;
 
             // send button
             {

@@ -2,7 +2,7 @@
 
 namespace ChatSystem
 {
-	std::vector<Chat> Chat::GetAvailableChats(const std::string& chatUserLogin) noexcept
+	std::vector<Chat> Chat::GetAvailableChatsFromDatabase(const std::string& chatUserLogin) noexcept
 	{
 		const ClientNetworking::ChatPacket request =
 		{

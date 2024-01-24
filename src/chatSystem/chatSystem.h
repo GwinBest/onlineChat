@@ -10,7 +10,7 @@ namespace ChatSystem
 	class Chat final
 	{
 	public:
-		static std::vector<Chat> GetAvailableChats(const std::string& chatUserLogin) noexcept;
+		static std::vector<Chat> GetAvailableChatsFromDatabase(const std::string& chatUserLogin) noexcept;
 
 		void SetChatName(const std::string& chatName) noexcept;
 		void SetChatId(const size_t chatId) noexcept;

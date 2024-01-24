@@ -90,7 +90,7 @@ namespace Gui
             {
                 if (isAvailableChatsUpdated)
                 {
-                    availableChats = ChatSystem::Chat::GetAvailableChats(currentUser.GetUserLogin());
+                    availableChats = ChatSystem::Chat::GetAvailableChatsFromDatabase(currentUser.GetUserLogin());
                     isAvailableChatsUpdated = false;
                 }
 

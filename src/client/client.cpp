@@ -52,7 +52,7 @@ namespace ClientNetworking
 		send(_clientSocket, reinterpret_cast<char*>(&loginLength), sizeof(loginLength), NULL);
 		send(_clientSocket, userCredentials.login.c_str(), loginLength, NULL);
 
-		send(_clientSocket, reinterpret_cast<char*>(&const_cast<size_t&>(userCredentials.password)), sizeof(userCredentials.password), NULL);
+		send(_clientSocket, reinterpret_cast<const char*>(&userCredentials.password), sizeof(userCredentials.password), NULL);
 	}
 
 	void Client::SendChatInfoPacket(const ChatPacket& chatInfo) const noexcept
@@ -64,7 +64,7 @@ namespace ClientNetworking
 		send(_clientSocket, reinterpret_cast<char*>(&chatUserLoginLength), sizeof(chatUserLoginLength), NULL);
 		send(_clientSocket, chatInfo.chatUserLogin.c_str(), chatUserLoginLength, NULL);
 
-		send(_clientSocket, reinterpret_cast<char*>(&const_cast<size_t&>(chatInfo.chatId)), sizeof(chatInfo.chatId), NULL);
+		send(_clientSocket, reinterpret_cast<const char*>(&chatInfo.chatId), sizeof(chatInfo.chatId), NULL);
 	}
 
 	void Client::ReceiveThread() const noexcept
@@ -88,7 +88,7 @@ namespace ClientNetworking
 				{
 					recv(_clientSocket, receiveMessage, sizeof(receiveMessage) - 1, NULL);
 				
-					MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kReceived, receiveMessage));
+					MessageBuffer::messageBuffer.emplace_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kReceived, receiveMessage));
 				}
 
 				break;
@@ -190,18 +190,17 @@ namespace ClientNetworking
 					recv(_clientSocket, reinterpret_cast<char*>(&receiveMessageSize), sizeof(receiveMessageSize), NULL);
 					recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);
 					receiveMessage[receiveMessageSize] = '\0';
-					{
-						MessageBuffer::MessageStatus messageType;
-						recv(_clientSocket, reinterpret_cast<char*>(&messageType), sizeof(messageType), NULL);
+				
+					MessageBuffer::MessageStatus messageType;
+					recv(_clientSocket, reinterpret_cast<char*>(&messageType), sizeof(messageType), NULL);
 
-						if (messageType == MessageBuffer::MessageStatus::kReceived)
-						{
-							MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(messageType, std::string(receiveMessage)));
-						}
-						else if(messageType == MessageBuffer::MessageStatus::kSend)
-						{
-							MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(messageType, std::string(receiveMessage)));
-						}
+					if (messageType == MessageBuffer::MessageStatus::kReceived)
+					{
+						MessageBuffer::messageBuffer.emplace_back(MessageBuffer::MessageNode(messageType, std::string(receiveMessage)));
+					}
+					else if (messageType == MessageBuffer::MessageStatus::kSend)
+					{
+						MessageBuffer::messageBuffer.emplace_back(MessageBuffer::MessageNode(messageType, std::string(receiveMessage)));
 					}
 
 					messageCount--;

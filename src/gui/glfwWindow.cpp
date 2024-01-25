@@ -70,7 +70,7 @@ namespace Gui
 		ImGuiIO& io = ImGui::GetIO();
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;		                                                // enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			                                                // enable Docking
-		io.Fonts->AddFontFromMemoryTTF(openSansRegular, sizeof(openSansRegular), 22.0f, 0, io.Fonts->GetGlyphRangesCyrillic());
+		io.Fonts->AddFontFromMemoryTTF(const_cast<unsigned char*>(openSansRegular), sizeof(openSansRegular), 22.0f, 0, io.Fonts->GetGlyphRangesCyrillic());
 
 		ImGuiContext& context = *GImGui;
 		context.FontAtlasOwnedByContext = false;																	// we don't need to destruct font as it static array

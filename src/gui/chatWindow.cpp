@@ -211,11 +211,8 @@ namespace Gui
                     ClientNetworking::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), availableChats[chatSelected].GetChatName(), _inputBuffer);
                 }
 
-                MessageBuffer::messageBuffer.push_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kSend, _inputBuffer));
+                MessageBuffer::messageBuffer.emplace_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kSend, _inputBuffer));
                 
-                isEnterPressed = false;
-                isButtonPressed = false;
-
                 reclaimFocus = true;
 
                 _inputBuffer[0] = '\0';
@@ -258,7 +255,6 @@ namespace Gui
 
                     ImVec2 textPosition;
                     float textWidth = ImGui::CalcTextSize(item.data.c_str()).x;
-                    float textHeight = ImGui::CalcTextSize(item.data.c_str()).y;
                     static const float textMaxWidth = ImGui::CalcTextSize(" ").x * maxCharacterOnOneLine;
 
                     if (item.messageType == MessageBuffer::MessageStatus::kReceived)

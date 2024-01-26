@@ -1,5 +1,8 @@
 ﻿#include "client.h"
 
+#include <thread>
+#include <vector>
+
 #include "../common/common.h"
 #include "../userData/user.h"
 #include "../messageBuffer/messageBuffer.h"

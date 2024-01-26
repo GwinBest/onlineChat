@@ -2,9 +2,6 @@
 
 #include <condition_variable>
 #include <mutex>
-#include <thread>
-#include <variant>
-#include <vector>
 
 #ifndef NDEBUG
 #include <iostream>

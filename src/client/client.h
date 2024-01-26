@@ -49,7 +49,7 @@ namespace ClientNetworking
 		void ReceiveThread() const noexcept;
 
 		template<typename T>
-		T GetServerResponse() const noexcept
+		const T& GetServerResponse() const noexcept
 		{
 			std::unique_lock<std::mutex> lock(_mutex);
 			_conditionalVariable.wait(lock);

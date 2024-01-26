@@ -1,7 +1,13 @@
 #include "chatWindow.h"
 
+#include "../chatSystem/chat.h"
+#include "../chatSystem/chatRepository.h"
+#include "../client/client.h"
+#include "../messageBuffer/messageBuffer.h"
+#include "../userData/user.h"
 #include "../userData/userRepository.h"
 
+extern UserData::User currentUser;
 extern std::list<MessageBuffer::MessageNode> MessageBuffer::messageBuffer;
 
 namespace Gui
@@ -92,7 +98,7 @@ namespace Gui
             {
                 if (isAvailableChatsUpdated)
                 {
-                    availableChats = ChatSystem::Chat::GetAvailableChatsFromDatabase(currentUser.GetUserLogin());
+                    availableChats = ChatSystem::ChatRepository::GetAvailableChatsFromDatabase(currentUser.GetUserLogin());
                     isAvailableChatsUpdated = false;
                 }
 

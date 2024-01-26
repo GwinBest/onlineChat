@@ -7,7 +7,7 @@
 #include <variant>
 #include <vector>
 
-#include "../chatSystem/chatSystem.h"
+#include "../chatSystem/chat.h"
 #include "../userData/user.h"
 
 // forward declaration

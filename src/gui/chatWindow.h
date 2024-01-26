@@ -1,17 +1,7 @@
 #pragma once
 
-#include "../chatSystem/chatSystem.h"
-#include "../client/client.h"
 #include "../common/common.h"
-#include "../messageBuffer/messageBuffer.h"
-#include "../userData/user.h"
-
 #include "iImGuiWindow.h"
-
-#include <memory>
-
-extern UserData::User currentUser;
-extern std::list<MessageBuffer::MessageNode> MessageBuffer::messageBuffer;
 
 namespace Gui
 {

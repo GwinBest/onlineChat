@@ -17,12 +17,12 @@ namespace UserData
 		return _userPassword;
 	}
 
-	void User::SetUserName(const std::string& userName) noexcept
+	void User::SetUserName(std::string_view userName) noexcept
 	{
 		_userName = userName;
 	}
 
-	void User::SetUserLogin(const std::string& userLogin) noexcept
+	void User::SetUserLogin(std::string_view userLogin) noexcept
 	{
 		_userLogin = userLogin;
 	}

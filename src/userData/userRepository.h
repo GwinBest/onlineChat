@@ -10,6 +10,13 @@ namespace UserData
 	class UserRepository final 
 	{
 	public:
+		UserRepository() = delete;
+		UserRepository(const UserRepository&) = delete;
+		UserRepository& operator=(const UserRepository&) = delete;
+		UserRepository(const UserRepository&&) = delete;
+		UserRepository& operator=(const UserRepository&&) = delete;
+		~UserRepository() = delete;
+
 		static void PushUserCredentialsToDatabase(const std::string& userName, const std::string& userLogin, const size_t userPassword) noexcept;
 
 		static std::string GetUserNameFromDatabase(const std::string& userLogin, const size_t userPassword) noexcept;

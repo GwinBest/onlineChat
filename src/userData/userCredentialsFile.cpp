@@ -44,9 +44,6 @@ namespace UserData
 
 	void UserCredentialsFile::WriteCredentials(const std::string& userName, const std::string& userLogin, const size_t userPassword) noexcept
 	{
-		const size_t nameLength = strlen(userName.c_str());
-		const size_t loginLength = strlen(userLogin.c_str());
-
 		if (_credentialsFile.is_open())
 		{
 			_credentialsFile.write(userName.c_str(), userName.size());
@@ -55,7 +52,7 @@ namespace UserData
 			_credentialsFile.write(userLogin.c_str(), userLogin.size());
 			_credentialsFile.write(" ", sizeof(char));
 
-			_credentialsFile.write(reinterpret_cast<char*>(&const_cast<size_t&>(userPassword)), sizeof(userPassword));
+			_credentialsFile.write(reinterpret_cast<const char*>(&userPassword), sizeof(userPassword));
 		}
 	}
 
@@ -67,11 +64,6 @@ namespace UserData
 			std::getline(_credentialsFile, userLogin, ' ');
 			_credentialsFile.read(reinterpret_cast<char*>(&userPassword), sizeof(userPassword));
 		}
-	}
-
-	UserCredentialsFile::~UserCredentialsFile()
-	{
-		UserCredentialsFile::CloseFile();
 	}
 
 } // !namespace UserData

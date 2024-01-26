@@ -46,3 +46,12 @@ target_link_libraries(OnlineChat
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET OnlineChat PROPERTY CXX_STANDARD 20)
 endif()
+
+#Server------------------------------------------
+add_executable(Server "serverApp/main.cpp" "src/server/server.h" "src/server/server.cpp")
+
+include_directories(thirdParty/mySql/include)
+
+add_compile_definitions(STATIC_CONCPP)
+target_link_libraries(Server ${CMAKE_SOURCE_DIR}/thirdParty/mySql/lib/mysqlcppconn-static.lib)
+

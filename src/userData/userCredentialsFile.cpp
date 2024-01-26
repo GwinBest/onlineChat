@@ -1,5 +1,7 @@
 #include "userCredentialsFile.h"
 
+#include <Windows.h>		// for SetFileAttributesA
+
 namespace UserData
 {
 	bool UserCredentialsFile::IsFileExists() noexcept

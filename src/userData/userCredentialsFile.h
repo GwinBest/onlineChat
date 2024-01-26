@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Windows.h>		// for SetFileAttributesA
-
 #include <fstream>
 #include <string>
 

@@ -10,14 +10,10 @@
 #include <iostream>
 #endif // NDEBUG
 
-#include "../common/common.h"
-#include "../messageBuffer/messageBuffer.h"
 #include "../networkCore/networkCore.h"
 
 #pragma comment (lib, "ws2_32.lib")
 #pragma warning (disable:4996)
-
-extern std::list<MessageBuffer::MessageNode> MessageBuffer::messageBuffer;
 
 namespace ClientNetworking
 {

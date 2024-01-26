@@ -3,8 +3,6 @@
 #include <string>
 #include <vector>
 
-#include "user.h"
-
 namespace UserData
 {
 	class User final

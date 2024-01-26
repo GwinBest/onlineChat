@@ -1,5 +1,11 @@
 ﻿#include "client.h"
 
+#include "../common/common.h"
+#include "../userData/user.h"
+#include "../messageBuffer/messageBuffer.h"
+
+extern std::list<MessageBuffer::MessageNode> MessageBuffer::messageBuffer;
+
 extern UserData::User currentUser;
 
 namespace ClientNetworking

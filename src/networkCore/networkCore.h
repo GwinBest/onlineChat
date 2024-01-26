@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "../chatSystem/chatSystem.h"
-#include "../userData/userData.h"
+#include "../userData/user.h"
 
 // forward declaration
 namespace UserData

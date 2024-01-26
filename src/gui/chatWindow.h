@@ -4,7 +4,8 @@
 #include "../client/client.h"
 #include "../common/common.h"
 #include "../messageBuffer/messageBuffer.h"
-#include "../userData/userData.h"
+#include "../userData/user.h"
+
 #include "iImGuiWindow.h"
 
 #include <memory>

@@ -1,11 +1,12 @@
 #include <functional>
 
-#include "../src/userData/userData.h"
+#include "../src/userData/user.h"
 #include "../src/gui/glfwWindow.h"
 #include "../src/gui/chatWindow.h"
 #include "../src/gui/loginWindow.h"
 #include "../src/gui/signUpWindow.h"
 #include "../src/userData/userCredentialsFile.h"
+#include "../src/userData/userRepository.h"
 
 UserData::User currentUser;
 
@@ -30,9 +31,9 @@ int main()
         UserData::UserCredentialsFile::ReadCredentials(userName, userLogin, userPassword);
         UserData::UserCredentialsFile::CloseFile();
 
-        if (UserData::User::IsUserExist(userLogin, userPassword))
+        if (UserData::UserRepository::IsUserExist(userLogin, userPassword))
         {
-            userName = UserData::User::GetUserNameFromDatabase(userLogin, userPassword);
+            userName = UserData::UserRepository::GetUserNameFromDatabase(userLogin, userPassword);
             currentUser.SetUserName(userName);
             currentUser.SetUserLogin(userLogin);
             currentUser.SetUserPassword(userPassword);
@@ -70,9 +71,9 @@ int main()
 
                 userPassword = std::hash<std::string>{}(stringUserPassword.c_str());
 
-                if (UserData::User::IsUserExist(userLogin, userPassword))
+                if (UserData::UserRepository::IsUserExist(userLogin, userPassword))
                 {
-                    userName = UserData::User::GetUserNameFromDatabase(userLogin, userPassword);
+                    userName = UserData::UserRepository::GetUserNameFromDatabase(userLogin, userPassword);
                     currentUser.SetUserName(userName);
                     currentUser.SetUserLogin(userLogin);
                     currentUser.SetUserPassword(userPassword);
@@ -113,7 +114,7 @@ int main()
 
                 userPassword = std::hash<std::string>{}(stringUserPassword);
 
-                if (UserData::User::IsUserExist(userLogin, userPassword))
+                if (UserData::UserRepository::IsUserExist(userLogin, userPassword))
                 {
                     Gui::SignUpWindow::SetShowUserAlreadyExistMessage(true);
                 }
@@ -129,7 +130,7 @@ int main()
                     currentUser.SetUserLogin(userLogin);
                     currentUser.SetUserPassword(userPassword);
 
-                    UserData::User::PushUserCredentialsToDatabase(userName, userLogin, userPassword);
+                    UserData::UserRepository::PushUserCredentialsToDatabase(userName, userLogin, userPassword);
 
                     currentWindowState = WindowState::kChat;
                 }

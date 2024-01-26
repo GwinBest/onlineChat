@@ -1,5 +1,7 @@
 #include "chatWindow.h"
 
+#include "../userData/userRepository.h"
+
 extern std::list<MessageBuffer::MessageNode> MessageBuffer::messageBuffer;
 
 namespace Gui
@@ -32,7 +34,7 @@ namespace Gui
             if (ImGui::InputTextWithHint("##search", "Search", &searchBarSearchRequest))
             {
                 foundUsers.clear();
-                foundUsers = UserData::User::FindUsersByLogin(searchBarSearchRequest);
+                foundUsers = UserData::UserRepository::FindUsersByLogin(searchBarSearchRequest);
             }
 
             if (searchBarSearchRequest.empty())

@@ -8,7 +8,7 @@ namespace ChatSystem
 	{
 		const ClientNetworking::ChatPacket request =
 		{
-			.actionType = NetworkCore::ActionType::kGetAvailableChats,
+			.actionType = NetworkCore::ActionType::kGetAvailableChatsForUser,
 			.chatUserLogin = chatUserLogin,
 		};
 

@@ -1,5 +1,9 @@
 #include <functional>
 
+#ifndef NDEBUG
+#include <iostream>
+#endif // !NDEBUG
+
 #include "../src/userData/user.h"
 #include "../src/gui/glfwWindow.h"
 #include "../src/gui/chatWindow.h"
@@ -130,7 +134,10 @@ int main()
                     currentUser.SetUserLogin(userLogin);
                     currentUser.SetUserPassword(userPassword);
 
-                    UserData::UserRepository::PushUserCredentialsToDatabase(userName, userLogin, userPassword);
+                    if (!UserData::UserRepository::PushUserCredentialsToDatabase(userName, userLogin, userPassword))
+                    {
+                        exit(-1);
+                    }
 
                     currentWindowState = WindowState::kChat;
                 }

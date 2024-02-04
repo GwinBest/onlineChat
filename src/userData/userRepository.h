@@ -17,11 +17,11 @@ namespace UserData
 		UserRepository& operator=(const UserRepository&&) = delete;
 		~UserRepository() = delete;
 
-		static void PushUserCredentialsToDatabase(const std::string& userName, const std::string& userLogin, const size_t userPassword) noexcept;
+		[[nodiscard]] static bool PushUserCredentialsToDatabase(const std::string& userName, const std::string& userLogin, const size_t userPassword) noexcept;
 
 		static std::string GetUserNameFromDatabase(const std::string& userLogin, const size_t userPassword) noexcept;
 
-		static bool IsUserExist(const std::string& userLogin, const size_t userPassword) noexcept;
+		[[nodiscard]] static bool IsUserExist(const std::string& userLogin, const size_t userPassword) noexcept;
 
 		static std::vector<User> FindUsersByLogin(const std::string& userLogin) noexcept;
 	};

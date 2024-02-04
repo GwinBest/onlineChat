@@ -1,5 +1,9 @@
 ﻿#include "client.h"
 
+#ifndef NDEBUG
+#include <iostream>
+#endif // !NDEBUG
+
 #include <thread>
 #include <vector>
 
@@ -103,9 +107,6 @@ namespace ClientNetworking
 				break;
 			}
 			case NetworkCore::ActionType::kAddUserCredentialsToDatabase:
-			{
-				break;
-			}
 			case NetworkCore::ActionType::kCheckUserExistence:
 			{
 				recv(_clientSocket, reinterpret_cast<char*>(&NetworkCore::serverResponse), sizeof(bool), NULL);
@@ -152,7 +153,7 @@ namespace ClientNetworking
 
 				break;
 			}
-			case NetworkCore::ActionType::kGetAvailableChats:
+			case NetworkCore::ActionType::kGetAvailableChatsForUser:
 			{
 				size_t availableChatsCount = 0;
 				recv(_clientSocket, reinterpret_cast<char*>(&availableChatsCount), sizeof(availableChatsCount), NULL);
@@ -243,7 +244,7 @@ namespace ClientNetworking
 		{
 #ifndef NDEBUG
 			std::cout << "WSAstratup error: " << WSAGetLastError() << std::endl;
-#endif
+#endif // !NDEBUG
 
 			exit(SOCKET_ERROR);
 		}
@@ -256,7 +257,7 @@ namespace ClientNetworking
 		{
 #ifndef NDEBUG
 			std::cout << "socket error: " << WSAGetLastError() << std::endl;
-#endif
+#endif // !NDEBUG
 
 			exit(SOCKET_ERROR);
 		}
@@ -270,7 +271,7 @@ namespace ClientNetworking
 		{
 #ifndef NDEBUG
 			std::cout << "client already inited!" << std::endl;
-#endif
+#endif // !NDEBUG
 			return false;
 		}
 
@@ -278,7 +279,7 @@ namespace ClientNetworking
 		{
 #ifndef NDEBUG
 			std::cout << "connect error: " << WSAGetLastError() << std::endl;
-#endif
+#endif // !NDEBUG
 			return false;
 		}
 
@@ -295,7 +296,7 @@ namespace ClientNetworking
 			{
 #ifndef NDEBUG
 				std::cout << "closesocket error: " << WSAGetLastError() << std::endl;
-#endif
+#endif // !NDEBUG
 
 				exit(SOCKET_ERROR);
 			}
@@ -304,7 +305,7 @@ namespace ClientNetworking
 			{
 #ifndef NDEBUG
 				std::cout << "WSAcleanup error: " << WSAGetLastError() << std::endl;
-#endif
+#endif // !NDEBUG
 
 				exit(SOCKET_ERROR);
 			}

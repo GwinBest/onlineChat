@@ -1,249 +1,311 @@
 #include "Server.h"
-#include <variant>
-void Server::Start() noexcept
+
+#include <WS2tcpip.h>
+
+#include <iostream>
+#include <thread>
+
+#include "../common/common.h"
+#include "../database/database.h"
+#include "../messageBuffer/messageBuffer.h"
+
+namespace ServerNetworking
 {
-	if (WSAStartup(_dllVersion, &_wsaData) != 0)
+	void Server::Start() noexcept
 	{
-		std::cout << "Error" << std::endl;
-		exit(1);
+		if (WSAStartup(NetworkCore::dllVersion, &_wsaData) != 0)
+		{
+			std::cout << "Error" << std::endl;
+			exit(SOCKET_ERROR);
+		}
+
+		_socketAddress.sin_addr.s_addr = inet_addr(NetworkCore::ipAddress.c_str());
+		_socketAddress.sin_port = htons(NetworkCore::port);
+		_socketAddress.sin_family = AF_INET;
+
+		_serverSocket = socket(AF_INET, SOCK_STREAM, NULL);
+		bind(_serverSocket, (SOCKADDR*)&_socketAddress, sizeof(_socketAddress));
+		listen(_serverSocket, SOMAXCONN);
 	}
 
-	_socketAddress.sin_addr.s_addr = inet_addr(_ipAddress.c_str());
-	_socketAddress.sin_port = htons(_port);
-	_socketAddress.sin_family = AF_INET;
-
-	_serverSocket = socket(AF_INET, SOCK_STREAM, NULL);
-	bind(_serverSocket, (SOCKADDR*)&_socketAddress, sizeof(_socketAddress));
-	listen(_serverSocket, SOMAXCONN);
-}
-
-void Server::Run() noexcept
-{
-	int sizeOfServerAddress = sizeof(_socketAddress);
-	SOCKET newConnection;
-	for (int i = 0; i < 100; i++)
+	void Server::Run() noexcept
 	{
-		newConnection = accept(_serverSocket, (SOCKADDR*)&_socketAddress, &sizeOfServerAddress);
+		int sizeOfServerAddress = sizeof(_socketAddress);
+		SOCKET newConnection;
 
-		if (newConnection == 0)
+		for (int i = 0; i < sizeof(_connections)/sizeof(_connections[0]); i++)
 		{
-			std::cout << "Error #2\n";
-		}
-		else
-		{
-			char clientIP[INET_ADDRSTRLEN];
-			inet_ntop(AF_INET, &(_socketAddress.sin_addr), clientIP, INET_ADDRSTRLEN);
+			newConnection = accept(_serverSocket, reinterpret_cast<SOCKADDR*>(&_socketAddress), &sizeOfServerAddress);
 
-			std::cout << "Client Connected! " << _connectionsCurrentCount << " " << clientIP << std::endl;
-
-			_connections[i] = newConnection;
-			_connectionsCurrentCount++;
-
-			std::thread clientThread(&Server::ClientHandler, this, i);
-			clientThread.detach();
-		}
-	}
-}
-
-void Server::ClientHandler(int index)
-{
-	std::string existedUserName;
-	std::string response;
-	bool boolResponce;
-
-	char request[255];
-
-	ActionType actionType;
-
-	int32_t recvLength = 0;
-
-	while (true)
-	{
-		if (recvLength = recv(_connections[index], (char*)&actionType, sizeof(actionType), NULL));
-		{
-			if (recvLength <= 0)
+			if (newConnection == 0)
 			{
-				closesocket(_connections[index]);
-				return;
+				std::cout << "Error #2\n";
 			}
-
-			switch (actionType)
+			else
 			{
-			case Server::ActionType::kSendChatMessage:
+				char clientIP[INET_ADDRSTRLEN];
+				inet_ntop(AF_INET, &(_socketAddress.sin_addr), clientIP, INET_ADDRSTRLEN);
+
+				std::cout << "Client Connected! " << _connectionsCurrentCount << " " << clientIP << std::endl;
+
+				_connections[i] = newConnection;
+				_connectionsCurrentCount++;
+
+				std::thread clientThread(&Server::ClientHandler, this, i);
+				clientThread.detach();
+			}
+		}
+	}
+
+	void Server::ClientHandler(int index)
+	{
+		NetworkCore::ActionType actionType;
+		int32_t recvReturnValue = 0;
+		sql::ResultSet* resultSet = nullptr;
+
+		while (true)
+		{
+			if (recvReturnValue = recv(_connections[index], reinterpret_cast<char*>(&actionType), sizeof(actionType), NULL))
 			{
-				size_t currentUserLoginSize;
-				char curentUserLogin[50];
-				recv(_connections[index], (char*)&currentUserLoginSize, sizeof(currentUserLoginSize), NULL);
-				recv(_connections[index], curentUserLogin, currentUserLoginSize, NULL);
-				curentUserLogin[currentUserLoginSize] = '\0';
-
-				size_t selectedUserLoginSize;
-				char selectedUserLogin[50];
-				recv(_connections[index], (char*)&selectedUserLoginSize, sizeof(selectedUserLoginSize), NULL);
-				recv(_connections[index], selectedUserLogin, selectedUserLoginSize, NULL);
-				selectedUserLogin[selectedUserLoginSize] = '\0';
-
-				char message[4097];
-				size_t messageSize;
-				recv(_connections[index], (char*)&messageSize, sizeof(messageSize), NULL);
-				recv(_connections[index], message, messageSize, NULL);
-				message[messageSize] = '\0';
-
-				try
+				if (recvReturnValue <= 0)
 				{
-					sql::Driver* driver;
-					sql::Connection* con;
-					sql::Statement* stmt;
-					sql::ResultSet* res = nullptr;
+					closesocket(_connections[index]);
+					index--;
 
-					driver = get_driver_instance();
-					con = driver->connect("127.0.0.1:3306", "root", "admin");
-					con->setSchema("onlinechat");
+					return;
+				}
 
-					snprintf(request, 255, "SELECT * FROM onlinechat.chats WHERE chatParticipants = '%s %s';", selectedUserLogin, curentUserLogin);
-					stmt = con->createStatement();
-					res = stmt->executeQuery(request);
+				switch (actionType)
+				{
+				case NetworkCore::ActionType::kSendChatMessage:
+				{
+					size_t senderUserLoginSize;
+					char senderUserLogin[Common::userLoginSize];
+					recv(_connections[index], reinterpret_cast<char*>(&senderUserLoginSize), sizeof(senderUserLoginSize), NULL);
+					recv(_connections[index], senderUserLogin, senderUserLoginSize, NULL);
+					senderUserLogin[senderUserLoginSize] = '\0';
 
-					if (!res->next())
+					size_t reciverUserLoginSize;
+					char reciverUserLogin[Common::userLoginSize];
+					recv(_connections[index], reinterpret_cast<char*>(&reciverUserLoginSize), sizeof(reciverUserLoginSize), NULL);
+					recv(_connections[index], reciverUserLogin, reciverUserLoginSize, NULL);
+					reciverUserLogin[reciverUserLoginSize] = '\0';
+
+					size_t messageSize;
+					char message[Common::maxInputBufferSize];
+					recv(_connections[index], reinterpret_cast<char*>(&messageSize), sizeof(messageSize), NULL);
+					recv(_connections[index], message, messageSize, NULL);
+					message[messageSize] = '\0';
+
+					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
+						"SELECT DISTINCT r1.chatId"
+						"FROM relations r1"
+						"JOIN relations r2 ON r1.chatId = r2.chatId"
+						"WHERE r1.userId = 1 AND r2.userId = 2;");
+
+					if (!resultSet->next())
 					{
-						snprintf(request, 255, "SELECT * FROM onlinechat.chats WHERE chatParticipants = '%s %s';", curentUserLogin, selectedUserLogin);
-						stmt = con->createStatement();
-						res = stmt->executeQuery(request);
-						if (!res->next())
-						{
-							snprintf(request, 255, "Insert into chats(chatParticipants, chatName) VALUES ('%s %s',' ');", curentUserLogin, selectedUserLogin);
-							stmt = con->createStatement();
-							stmt->executeUpdate(request);
+						Database::DatabaseHelper::GetInstance().ExecuteUpdate(
+							"INSERT INTO chats(chatParticipants, chatName)"
+							"VALUES('%s %s', ' ');",
+							senderUserLogin, reciverUserLogin);
 
-						}
+						Database::DatabaseHelper::GetInstance().ExecuteUpdate(
+							"INSERT INTO relations(userId, chatId)"
+							"VALUES(%d,%d);", 1, 2);
 					}
+					//TODO
+					size_t chatId = resultSet->getInt("chatId");
 
-					snprintf(request, 255, "SELECT * FROM onlinechat.chats WHERE chatParticipants = '%s %s';", selectedUserLogin, curentUserLogin);
-					stmt = con->createStatement();
-					res = stmt->executeQuery(request);
-					if (!res->next())
-					{
-						snprintf(request, 255, "SELECT * FROM onlinechat.chats WHERE chatParticipants = '%s %s';", curentUserLogin, selectedUserLogin);
-						stmt = con->createStatement();
-						res = stmt->executeQuery(request);
-						res->next();
-					}
-
-					size_t chatId = res->getInt("chatId");
-
-					snprintf(request, 255, "INSERT INTO messages (chatId, author, msg) VALUES ('%zu', '%s', '%s');", chatId, curentUserLogin, message);
-
-					stmt = con->createStatement();
-					stmt->executeUpdate(request);
+					Database::DatabaseHelper::GetInstance().ExecuteUpdate(
+						"INSERT INTO messages (chatId, author, msg)"
+						"VALUES (%zu, '%s', '%s');",
+						chatId, senderUserLogin, message);
 
 					for (size_t i = 0; i < _connectionsCurrentCount; ++i)
 					{
 						send(_connections[i], (char*)&actionType, sizeof(actionType), NULL);
-						send(_connections[i], selectedUserLogin, sizeof(selectedUserLogin), NULL);
+						send(_connections[i], senderUserLogin, sizeof(senderUserLogin), NULL);
 						send(_connections[i], message, 4096, NULL);
 					}
 
-					delete res;
-					delete stmt;
-					delete con;
+					break;
 				}
-				catch (sql::SQLException& e)
+				case NetworkCore::ActionType::kAddUserCredentialsToDatabase:
+				case NetworkCore::ActionType::kCheckUserExistence:
+				case NetworkCore::ActionType::kGetUserNameFromDatabase:
+				case NetworkCore::ActionType::kFindUsersByLogin:
 				{
-					std::cout << "error MySQL: " << e.what() << std::endl;
-				}
+					size_t userNameLength;
+					char userName[Common::userNameSize] = "";
+					recv(_connections[index], reinterpret_cast<char*>(&userNameLength), sizeof(userNameLength), NULL);
+					recv(_connections[index], userName, userNameLength, NULL);
+					userName[userNameLength] = '\0';
 
-				break;
-			}
-			case Server::ActionType::kAddUserCredentialsToDatabase:
-			case Server::ActionType::kCheckUserExistence:
-			case Server::ActionType::kGetUserNameFromDatabase:
-			case Server::ActionType::kFindUsersByLogin:
-			{
-				size_t nameLength;
-				char name[50];
-				recv(_connections[index], (char*)&nameLength, sizeof(nameLength), NULL);
-				recv(_connections[index], name, nameLength, NULL);
-				name[nameLength] = '\0';
+					size_t userLoginLength;
+					char userLogin[Common::userLoginSize] = "";
+					recv(_connections[index], reinterpret_cast<char*>(&userLoginLength), sizeof(userLoginLength), NULL);
+					recv(_connections[index], userLogin, userLoginLength, NULL);
+					userLogin[userLoginLength] = '\0';
 
-				size_t loginLength;
-				char login[50];
-				recv(_connections[index], (char*)&loginLength, sizeof(loginLength), NULL);
-				recv(_connections[index], login, loginLength, NULL);
-				login[loginLength] = '\0';
-
-				size_t password = 0;
-				recv(_connections[index], (char*)&password, sizeof(password), NULL);
-
-				try
-				{
-					sql::Driver* driver;
-					sql::Connection* con;
-					sql::Statement* stmt = nullptr;
-					sql::ResultSet* res = nullptr;
-
-					driver = get_driver_instance();
-					con = driver->connect("127.0.0.1:3306", "root", "admin");
-					con->setSchema("onlinechat");
+					size_t userPassword = 0;
+					recv(_connections[index], reinterpret_cast<char*>(&userPassword), sizeof(userPassword), NULL);
 
 					switch (actionType)
 					{
-					case Server::ActionType::kAddUserCredentialsToDatabase:
+					case NetworkCore::ActionType::kAddUserCredentialsToDatabase:
 					{
-						snprintf(request, 255, "%s%s%s%s%s%zu%s", "INSERT INTO users (userName, userLogin, userPassword) VALUES ('", name, "', '", login, "', '", password, "');");
-						stmt = con->createStatement();
-						stmt->executeUpdate(request);
+						bool result = false;
 
-						std::cout << "OK" << std::endl;
+						if (userName[0] == '\0')
+						{
+							std::cout << "Error to add user credentials to database - userName is empty" << std::endl;
+
+							send(_connections[index], (char*)&actionType, sizeof(actionType), NULL);
+							send(_connections[index], (char*)&result, sizeof(result), NULL);
+
+							break;
+						}
+
+						if (userLogin[0] == '\0')
+						{
+							std::cout << "Error to add user credentials to database - userLogin is empty" << std::endl;
+
+							send(_connections[index], (char*)&actionType, sizeof(actionType), NULL);
+							send(_connections[index], (char*)&result, sizeof(result), NULL);
+
+							break;
+						}
+
+						if (userPassword == 0)
+						{
+							std::cout << "Error to add user credentials to database - password is empty" << std::endl;
+
+							send(_connections[index], (char*)&actionType, sizeof(actionType), NULL);
+							send(_connections[index], (char*)&result, sizeof(result), NULL);
+
+							break;
+						}
+
+						result = Database::DatabaseHelper::GetInstance().ExecuteUpdate(
+							"INSERT INTO users(userName, userLogin, userPassword)"
+							"VALUES('%s', '%s', %zu);",
+							userName, userLogin, userPassword);
+
+						send(_connections[index], (char*)&actionType, sizeof(actionType), NULL);
+						send(_connections[index], (char*)&result, sizeof(result), NULL);
 
 						break;
 					}
-					case Server::ActionType::kCheckUserExistence:
+					case NetworkCore::ActionType::kCheckUserExistence:
 					{
-						//TODO: if login - "" - return
-						snprintf(request, 255, "SELECT * FROM onlinechat.users WHERE userLogin = '%s' AND userPassword = '%zu';", login, password);
-						stmt = con->createStatement();
-						res = stmt->executeQuery(request);
+						bool result = false;
 
-						if (!res->next())
+						if (userLogin[0] == '\0')
 						{
-							boolResponce = false;
+							std::cout << "Error to check user existence - userLogin is empty" << std::endl;
+
+							send(_connections[index], (char*)&actionType, sizeof(actionType), NULL);
+							send(_connections[index], (char*)&result, sizeof(result), NULL);
+
+							break;
 						}
-						else
+
+						if (userPassword == 0)
 						{
-							existedUserName = res->getString("userName");
-							boolResponce = true;
+							std::cout << "Error to check user existence - password is empty" << std::endl;
+
+							send(_connections[index], (char*)&actionType, sizeof(actionType), NULL);
+							send(_connections[index], (char*)&result, sizeof(result), NULL);
+
+							break;
+						}
+
+						resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
+							"SELECT * FROM users"
+							"WHERE userLogin = '%s' AND userPassword = %zu ;",
+							userLogin, userPassword);
+
+						if (resultSet->next())
+						{
+							result = true;
 						}
 
 						send(_connections[index], (char*)&actionType, sizeof(actionType), NULL);
-
-						send(_connections[index], (char*)&boolResponce, sizeof(bool), NULL);
+						send(_connections[index], (char*)&result, sizeof(result), NULL);
 
 						break;
 					}
-					case Server::ActionType::kGetUserNameFromDatabase:
+					case NetworkCore::ActionType::kGetUserNameFromDatabase:
 					{
-						response = existedUserName;
-						size_t resposeSize = response.size();
+						std::string result = "";
+						size_t resposeSize = result.size();
+
+						if (userLogin[0] == '\0')
+						{
+							std::cout << "Error to get user name - userLogin is empty" << std::endl;
+
+							send(_connections[index], (char*)&actionType, sizeof(actionType), NULL);
+
+							send(_connections[index], (char*)&resposeSize, sizeof(resposeSize), NULL);
+							send(_connections[index], result.c_str(), resposeSize, NULL);
+
+							break;
+						}
+
+						resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
+							"SELECT userName FROM users"
+							"WHERE userLogin = '%s';",
+							userLogin);
+
+						if (resultSet->next())
+						{
+							result = resultSet->getString("userName");
+						}
+
+						resposeSize = result.size();
 
 						send(_connections[index], (char*)&actionType, sizeof(actionType), NULL);
 
 						send(_connections[index], (char*)&resposeSize, sizeof(resposeSize), NULL);
-						send(_connections[index], response.c_str(), resposeSize, NULL);
+						send(_connections[index], result.c_str(), resposeSize, NULL);
 
 						break;
 					}
-					case Server::ActionType::kFindUsersByLogin:
+					case NetworkCore::ActionType::kFindUsersByLogin:
 					{
-						snprintf(request, 255, "SELECT * FROM onlinechat.users  where userLogin like '%s%%';", login);
-						stmt = con->createStatement();
-						res = stmt->executeQuery(request);
+						std::string result = "";
+						size_t resposeSize = result.size();
+
+						if (userLogin[0] == '\0')
+						{
+							std::cout << "Error to get user name - userLogin is empty" << std::endl;
+
+							send(_connections[index], (char*)&actionType, sizeof(actionType), NULL);
+
+							send(_connections[index], (char*)&resposeSize, sizeof(resposeSize), NULL);
+							send(_connections[index], result.c_str(), resposeSize, NULL);
+
+							break;
+						}
+
+						resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
+							"SELECT userLogin FROM users"
+							"WHERE userLogin like '%s%%';",
+							userLogin);
+
+						if (resultSet == nullptr)
+						{
+
+						}
+
 
 						size_t counter = 0;
-						std::string foundUsersLogin[100];
-						while (res->next())
+						std::string* foundUsersLogin = new std::string[resultSet->rowsCount()];
+
+						while (resultSet->next())
 						{
-							int	id = res->getInt("id");
-							foundUsersLogin[counter++] = res->getString("userLogin");
+							foundUsersLogin[counter++] = resultSet->getString("userLogin");
 						}
 
 						send(_connections[index], (char*)&actionType, sizeof(actionType), NULL);
@@ -252,186 +314,148 @@ void Server::ClientHandler(int index)
 						int i = 0;
 						while (counter > 0)
 						{
-							//TODO: do not send user login length
 							size_t resultLength = foundUsersLogin[i].size();
 
 							send(_connections[index], (char*)&resultLength, sizeof(resultLength), NULL);
 							send(_connections[index], foundUsersLogin[i++].c_str(), resultLength, NULL);
+
 							counter--;
 						}
+
+						delete[] foundUsersLogin;
 						break;
 					}
 					default:
 						break;
 					}
 
-					delete res;
-					delete stmt;
-					delete con;
+					break;
 				}
-				catch (sql::SQLException& e)
+				case NetworkCore::ActionType::kGetAvailableChatsForUser:
+				case NetworkCore::ActionType::kReceiveAllMessagesForSelectedChat:
 				{
-					std::cout << "error MySQL: " << e.what() << std::endl;
+					size_t userLoginSize;
+					char userLogin[Common::userLoginSize];
+					recv(_connections[index], reinterpret_cast<char*>(&userLoginSize), sizeof(userLoginSize), NULL);
+					recv(_connections[index], userLogin, userLoginSize, NULL);
+					userLogin[userLoginSize] = '\0';
 
-					delete name;
-					delete login;
-				}
+					size_t userId;
 
-				break;
-			}
-			case Server::ActionType::kGetAvailableChatsForUser:
-			case Server::ActionType::kReceiveAllMessagesForSelectedChat:
-			{
-				size_t loginSize;
-				char login[50];
-				recv(_connections[index], (char*)&loginSize, sizeof(loginSize), NULL);
-				recv(_connections[index], login, loginSize, NULL);
-				login[loginSize] = '\0';
+					size_t chatId;
+					recv(_connections[index], (char*)&chatId, sizeof(chatId), NULL);
 
-				size_t chatId;
-				recv(_connections[index], (char*)&chatId, sizeof(chatId), NULL);
-
-				switch (actionType)
-				{
-				case Server::ActionType::kGetAvailableChatsForUser:
-				{
-					try
+					switch (actionType)
 					{
-						sql::Driver* driver;
-						sql::Connection* con;
-						sql::Statement* stmt;
-						sql::ResultSet* res;
+					case NetworkCore::ActionType::kGetAvailableChatsForUser:
+					{
+						resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
+							"SELECT chat_id, chat_name "
+							"FROM user_chat_names "
+							"WHERE user_id = %zu;",
+							userId);
 
-						driver = get_driver_instance();
-						con = driver->connect("127.0.0.1:3306", "root", "admin");
-						con->setSchema("onlinechat");
+						if (resultSet == nullptr)
+						{
 
-						snprintf(request, 255, "SELECT * FROM onlinechat.chats where chatParticipants like '%%%s%%' ;", login);
-						stmt = con->createStatement();
-						res = stmt->executeQuery(request);
+						}
 
 						size_t counter = 0;
-						std::string result[100];
-						size_t resultInt[100];
-						while (res->next())
-						{
-							resultInt[counter] = res->getInt("chatId");
-							result[counter] = res->getString("chatParticipants");
-							size_t pos = result[counter].find(login);
-							if (pos != std::string::npos)
-							{
-								if (pos == 0)
-								{
-									result[counter].erase(pos, loginSize + 1);
-								}
-								else
-								{
-									result[counter].erase(pos - 1, loginSize + 1);
+						std::string* chatNameResult = new std::string[resultSet->rowsCount()];
+						size_t* chatIdResult = new size_t[resultSet->rowsCount()];
 
-								}
-							}
+						while (resultSet->next())
+						{
+							chatNameResult[counter] = resultSet->getString("chat_name");
+							chatIdResult[counter] = resultSet->getInt("chat_id");
+
 							counter++;
 						}
 
-						send(_connections[index], (char*)&actionType, sizeof(actionType), NULL);
-						send(_connections[index], (char*)&counter, sizeof(counter), NULL);
+						send(_connections[index], reinterpret_cast<char*>(&actionType), sizeof(actionType), NULL);
+						send(_connections[index], reinterpret_cast<char*>(&counter), sizeof(counter), NULL);
 
 						int i = 0;
 						while (counter > 0)
 						{
-							size_t resultLength = result[i].size();
-							send(_connections[index], (char*)&resultInt[i], sizeof(size_t), NULL);
+							send(_connections[index], reinterpret_cast<char*>(&chatIdResult[i]), sizeof(chatIdResult[0]), NULL);
 
-							send(_connections[index], (char*)&resultLength, sizeof(resultLength), NULL);
-							send(_connections[index], result[i].c_str(), resultLength, NULL);
+							size_t resultLength = chatNameResult[i].size();
+							send(_connections[index], reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
+							send(_connections[index], chatNameResult[i].c_str(), resultLength, NULL);
+
 							counter--;
 							i++;
 						}
 
-						delete res;
-						delete stmt;
-						delete con;
+						delete[] chatNameResult;
+						delete[] chatIdResult;
 
+						break;
 					}
-					catch (sql::SQLException& e)
+					case NetworkCore::ActionType::kReceiveAllMessagesForSelectedChat:
 					{
-						std::cout << "error MySQL: " << e.what() << std::endl;
-					}
+						resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
+							"SELECT * "
+							"FROM messages "
+							"WHERE chatId = %zu;",
+							chatId);
 
-					break;
-				}
-				case Server::ActionType::kReceiveAllMessagesForSelectedChat:
-				{
-
-					try {
-						sql::Driver* driver;
-						sql::Connection* con;
-						sql::Statement* stmt;
-						sql::ResultSet* res;
-
-						driver = get_driver_instance();
-						con = driver->connect("127.0.0.1:3306", "root", "admin");
-						con->setSchema("onlinechat");
-
-						char request[255];
-						snprintf(request, 255, "SELECT * FROM onlinechat.messages where chatId = '%zu';", chatId);
-						stmt = con->createStatement();
-						res = stmt->executeQuery(request);
-
-						std::string msg[1000];
-						uint8_t msgtype[1000];
-						size_t count = 0;
-						while (res->next())
+						if (resultSet == nullptr)
 						{
-							std::string author = res->getString("author");
-							msg[count] = res->getString("msg");
-							if (!strcmp(login, author.c_str()))
+
+						}
+
+						std::string* messagesResult = new std::string[resultSet->rowsCount()];
+						MessageBuffer::MessageStatus* messageTypeResult = new MessageBuffer::MessageStatus[resultSet->rowsCount()];
+						size_t count = 0;
+
+						while (resultSet->next())
+						{
+							std::string author = resultSet->getString("author");
+
+							messagesResult[count] = resultSet->getString("msg");
+
+							if (!strcmp(userLogin, author.c_str()))
 							{
-								msgtype[count] = 1;
+								messageTypeResult[count] = MessageBuffer::MessageStatus::kSend;
 							}
 							else
 							{
-								msgtype[count] = 2;
+								messageTypeResult[count] = MessageBuffer::MessageStatus::kReceived;
 							}
+
 							count++;
 						}
 
-						send(_connections[index], (char*)&actionType, sizeof(actionType), NULL);
-						send(_connections[index], (char*)&count, sizeof(count), NULL);
+						send(_connections[index], reinterpret_cast<char*>(&actionType), sizeof(actionType), NULL);
+						send(_connections[index], reinterpret_cast<char*>(&count), sizeof(count), NULL);
 
 
 						int i = 0;
 						while (count > 0)
 						{
-							size_t msgSize = msg[i].size();
-							send(_connections[index], (char*)&msgSize, sizeof(msgSize), NULL);
-							send(_connections[index], msg[i].c_str(), msgSize, NULL);
-							send(_connections[index], (char*)&msgtype[i++], sizeof(msgtype[i]), NULL);
+							size_t msgSize = messagesResult[i].size();
+							send(_connections[index], reinterpret_cast<char*>(&msgSize), sizeof(msgSize), NULL);
+							send(_connections[index], messagesResult[i].c_str(), msgSize, NULL);
+							send(_connections[index], reinterpret_cast<char*>(&messageTypeResult[i++]), sizeof(messageTypeResult[i]), NULL);
 							count--;
 						}
 
+						delete[] messagesResult;
+						delete[] messageTypeResult;
 
-						std::cout << "OK" << std::endl;
-
-						delete res;
-						delete stmt;
-						delete con;
-
+						break;
 					}
-					catch (sql::SQLException& e) {
-						std::cout << "error MySQL: " << e.what() << std::endl;
-
+					default:
+						break;
 					}
 
 					break;
 				}
 				}
-
-				break;
-			}
-			default:
-				break;
 			}
 		}
 	}
-}
+
+} // !namespace ServerNetworking

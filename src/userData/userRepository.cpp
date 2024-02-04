@@ -1,10 +1,12 @@
 #include "userRepository.h"
 
+
+
 #include "../client/client.h"
 
 namespace UserData
 {
-	void UserRepository::PushUserCredentialsToDatabase(const std::string& userName, const std::string& userLogin, const size_t userPassword) noexcept
+	bool UserRepository::PushUserCredentialsToDatabase(const std::string& userName, const std::string& userLogin, const size_t userPassword) noexcept
 	{
 		const ClientNetworking::UserPacket request =
 		{
@@ -15,6 +17,8 @@ namespace UserData
 		};
 
 		ClientNetworking::Client::GetInstance().SendUserCredentialsPacket(request);
+
+		return ClientNetworking::Client::GetInstance().GetServerResponse<bool>();
 	}
 
 	std::string UserRepository::GetUserNameFromDatabase(const std::string& userLogin, const size_t userPassword) noexcept
@@ -35,7 +39,6 @@ namespace UserData
 
 	bool UserRepository::IsUserExist(const std::string& userLogin, const size_t userPassword) noexcept
 	{
-		//TODO: send only login
 		const ClientNetworking::UserPacket request =
 		{
 			.actionType = NetworkCore::ActionType::kCheckUserExistence,

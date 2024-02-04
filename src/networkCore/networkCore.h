@@ -31,7 +31,7 @@ namespace NetworkCore
 		kCheckUserExistence,					
 		kGetUserNameFromDatabase,			
 		kFindUsersByLogin,					
-		kGetAvailableChats,					
+		kGetAvailableChatsForUser,
 		kReceiveAllMessagesForSelectedChat
 	};
 

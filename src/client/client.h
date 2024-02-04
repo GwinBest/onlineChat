@@ -3,10 +3,6 @@
 #include <condition_variable>
 #include <mutex>
 
-#ifndef NDEBUG
-#include <iostream>
-#endif // NDEBUG
-
 #include "../networkCore/networkCore.h"
 
 #pragma comment (lib, "ws2_32.lib")

@@ -48,7 +48,7 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
 endif()
 
 #Server------------------------------------------
-add_executable(Server "serverApp/main.cpp" "src/server/server.h" "src/server/server.cpp")
+add_executable(Server "serverApp/main.cpp" "src/server/server.h" "src/server/server.cpp" "src/database/database.h" "src/database/database.cpp")
 
 include_directories(thirdParty/mySql/include)
 

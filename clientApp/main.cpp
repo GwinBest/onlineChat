@@ -1,4 +1,4 @@
-#include <functional>
+﻿#include <functional>
 
 #ifndef NDEBUG
 #include <iostream>
@@ -21,6 +21,12 @@ enum class WindowState : uint8_t
     kChat
 };
 
+/// <summary>
+/// пререписать бд
+/// сообщения 
+/// запись id в файл
+/// </summary>
+/// <returns></returns>
 int main()
 {
     Gui::GlfwWindow window;
@@ -39,7 +45,6 @@ int main()
         if (UserData::UserRepository::IsUserExist(userLogin, userPassword))
         {
             //TODO
-            userName = UserData::UserRepository::GetUserNameFromDatabase(userLogin);
             userId = UserData::UserRepository::GetUserIdFromDatabase(userLogin);
 
             currentUser.SetUserName(userName);

@@ -262,7 +262,7 @@ namespace ServerNetworking
 				{
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
 						"SELECT * FROM users "
-						"WHERE userName = '%s' AND userLogin = '%s' ",
+						"WHERE userName = '%s' AND userLogin = '%s' "
 						"AND userPassword = %zu AND id = %zu;",
 						userPacket.name.c_str(), userPacket.login.c_str(),
 						userPacket.password, userPacket.id);

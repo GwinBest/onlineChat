@@ -21,12 +21,12 @@ namespace Database
         bool ExecuteUpdate(const std::string  query, ...);
 
         ~DatabaseHelper();
+
     private:
         DatabaseHelper();
 
         bool Connect() noexcept;
         void Disconnect() noexcept;
-
 
     private:
         sql::Driver* _driver = nullptr;

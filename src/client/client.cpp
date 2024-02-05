@@ -34,25 +34,31 @@ namespace ClientNetworking
 		return instance;
 	}
 
-	void Client::SendUserMessage(const std::string& sender, const std::string& receiver, const char* data) const noexcept
+	void Client::SendUserMessage(const UserData::User& sender, const UserData::User& receiver, const char* data) const noexcept
 	{
 		NetworkCore::ActionType type = NetworkCore::ActionType::kSendChatMessage;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 
-		size_t currentUserLoginSize = sender.size();
-		send(_clientSocket, reinterpret_cast<char*>(&currentUserLoginSize), sizeof(currentUserLoginSize), NULL);
-		send(_clientSocket, sender.c_str(), currentUserLoginSize, NULL);
+		size_t senderUserLoginSize = sender.GetUserLogin().size();
+		send(_clientSocket, reinterpret_cast<char*>(&senderUserLoginSize), sizeof(senderUserLoginSize), NULL);
+		send(_clientSocket, sender.GetUserLogin().c_str(), senderUserLoginSize, NULL);
 
-		size_t selectedUserLoginSize = receiver.size();
-		send(_clientSocket, reinterpret_cast<char*>(&selectedUserLoginSize), sizeof(selectedUserLoginSize), NULL);
-		send(_clientSocket, receiver.c_str(), selectedUserLoginSize, NULL);
+		size_t senderUserId = sender.GetUserId();
+		send(_clientSocket, reinterpret_cast<const char*>(&senderUserId), sizeof(senderUserId), NULL);
+
+		size_t receiverUserLoginSize = receiver.GetUserLogin().size();
+		send(_clientSocket, reinterpret_cast<char*>(&receiverUserLoginSize), sizeof(receiverUserLoginSize), NULL);
+		send(_clientSocket, receiver.GetUserLogin().c_str(), receiverUserLoginSize, NULL);
+
+		size_t receiverUserId = receiver.GetUserId();
+		send(_clientSocket, reinterpret_cast<const char*>(&receiverUserId), sizeof(receiverUserId), NULL);
 
 		size_t dataSize = strlen(data);
 		send(_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(dataSize), NULL);
 		send(_clientSocket, data, dataSize, NULL);
 	}
 
-	void Client::SendUserCredentialsPacket(const UserPacket& userCredentials) const noexcept
+	void Client::SendUserCredentialsPacket(const NetworkCore::UserPacket& userCredentials) const noexcept
 	{
 		NetworkCore::ActionType type = userCredentials.actionType;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
@@ -66,9 +72,12 @@ namespace ClientNetworking
 		send(_clientSocket, userCredentials.login.c_str(), loginLength, NULL);
 
 		send(_clientSocket, reinterpret_cast<const char*>(&userCredentials.password), sizeof(userCredentials.password), NULL);
+
+		send(_clientSocket, reinterpret_cast<const char*>(&userCredentials.id), sizeof(userCredentials.id), NULL);
+
 	}
 
-	void Client::SendChatInfoPacket(const ChatPacket& chatInfo) const noexcept
+	void Client::SendChatInfoPacket(const NetworkCore::ChatPacket& chatInfo) const noexcept
 	{
 		NetworkCore::ActionType type = chatInfo.actionType;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
@@ -91,15 +100,19 @@ namespace ClientNetworking
 
 			switch (type)
 			{
-			case NetworkCore::ActionType::kSendChatMessage:  // TODO: kReceived 
+			case NetworkCore::ActionType::kSendChatMessage:
 			{
-				char receiveMessage[Common::maxInputBufferSize];
-				char userLogin[Common::userLoginSize];
+				size_t userId;
 
-				recv(_clientSocket, userLogin, sizeof(userLogin), NULL);
-				if (userLogin == currentUser.GetUserLogin())
+				recv(_clientSocket, reinterpret_cast<char*>(&userId), sizeof(userId), NULL);
+				if (userId == currentUser.GetUserId())
 				{
-					recv(_clientSocket, receiveMessage, sizeof(receiveMessage) - 1, NULL);
+					size_t receivemessageSize;
+					char receiveMessage[Common::maxInputBufferSize];
+
+					recv(_clientSocket, reinterpret_cast<char*>(&receivemessageSize), sizeof(receivemessageSize), NULL);
+					recv(_clientSocket, receiveMessage, receivemessageSize, NULL);
+					receiveMessage[receivemessageSize] = '\0';
 				
 					MessageBuffer::messageBuffer.emplace_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kReceived, receiveMessage));
 				}
@@ -123,6 +136,16 @@ namespace ClientNetworking
 				serverResponse[responseSize] = '\0';
 
 				NetworkCore::serverResponse = serverResponse;
+				_conditionalVariable.notify_one();
+
+				break;
+			}
+			case NetworkCore::ActionType::kGetUserIdFromDatabase:
+			{
+				size_t response;
+				recv(_clientSocket, reinterpret_cast<char*>(&response), sizeof(response), NULL);
+
+				NetworkCore::serverResponse = response;
 				_conditionalVariable.notify_one();
 
 				break;
@@ -224,10 +247,23 @@ namespace ClientNetworking
 				
 				break;
 			}
-			default:
+			case NetworkCore::ActionType::kServerError:
 			{
+				size_t errorMessageSzie;
+				char errorMessage[4096 + 1];
+
+				recv(_clientSocket, reinterpret_cast<char*>(&errorMessageSzie), sizeof(errorMessageSzie), NULL);
+				recv(_clientSocket, errorMessage, errorMessageSzie, NULL);
+				errorMessage[errorMessageSzie] = '\0';
+
+#ifndef NDEBUG
+				std::cout << errorMessage << std::endl;
+#endif // !NDEBUG
+
 				break;
 			}
+			default:
+				break;
 			}
 		}
 	}

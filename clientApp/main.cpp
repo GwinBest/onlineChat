@@ -29,6 +29,7 @@ int main()
     std::string userName;
     std::string userLogin;
     size_t userPassword = 0;
+    size_t userId = 0;
 
     if (UserData::UserCredentialsFile::IsFileExists())
     {
@@ -37,10 +38,14 @@ int main()
 
         if (UserData::UserRepository::IsUserExist(userLogin, userPassword))
         {
-            userName = UserData::UserRepository::GetUserNameFromDatabase(userLogin, userPassword);
+            //TODO
+            userName = UserData::UserRepository::GetUserNameFromDatabase(userLogin);
+            userId = UserData::UserRepository::GetUserIdFromDatabase(userLogin);
+
             currentUser.SetUserName(userName);
             currentUser.SetUserLogin(userLogin);
             currentUser.SetUserPassword(userPassword);
+            currentUser.SetUserId(userId);
 
             currentWindowState = WindowState::kChat;
         }
@@ -77,10 +82,13 @@ int main()
 
                 if (UserData::UserRepository::IsUserExist(userLogin, userPassword))
                 {
-                    userName = UserData::UserRepository::GetUserNameFromDatabase(userLogin, userPassword);
+                    userName = UserData::UserRepository::GetUserNameFromDatabase(userLogin);
+                    userId = UserData::UserRepository::GetUserIdFromDatabase(userLogin);
+
                     currentUser.SetUserName(userName);
                     currentUser.SetUserLogin(userLogin);
                     currentUser.SetUserPassword(userPassword);
+                    currentUser.SetUserId(userId);
 
                     if (UserData::UserCredentialsFile::CreateNewFile())
                     {
@@ -130,14 +138,17 @@ int main()
                         UserData::UserCredentialsFile::CloseFile();
                     }
 
-                    currentUser.SetUserName(userName);
-                    currentUser.SetUserLogin(userLogin);
-                    currentUser.SetUserPassword(userPassword);
-
                     if (!UserData::UserRepository::PushUserCredentialsToDatabase(userName, userLogin, userPassword))
                     {
                         exit(-1);
                     }
+
+                    userId = UserData::UserRepository::GetUserIdFromDatabase(userLogin);
+
+                    currentUser.SetUserName(userName);
+                    currentUser.SetUserLogin(userLogin);
+                    currentUser.SetUserPassword(userPassword);
+                    currentUser.SetUserId(userId);
 
                     currentWindowState = WindowState::kChat;
                 }

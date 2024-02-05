@@ -28,6 +28,7 @@ namespace Database
 		catch (const sql::SQLException& e)
 		{
 			std::cout << e.what() << std::endl;
+			throw;
 		}
 
 		return nullptr;
@@ -52,6 +53,7 @@ namespace Database
 		catch (const sql::SQLException& e)
 		{
 			std::cout << e.what() << std::endl;
+			throw;
 		}
 		
 		return false;
@@ -88,7 +90,7 @@ namespace Database
 		catch (const sql::SQLException& e)
 		{
 			std::cout << e.what() << std::endl;
-			}
+		}
 
 		return false;
 	}

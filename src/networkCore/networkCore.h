@@ -24,15 +24,33 @@ namespace NetworkCore
 {
 	enum class ActionType : uint8_t
 	{
-		kActionUndefined					= 0,
+		kActionUndefined								= 0,
 		kSendChatMessage,					
-		//kReceiveChatMessage,					
 		kAddUserCredentialsToDatabase,		
 		kCheckUserExistence,					
-		kGetUserNameFromDatabase,			
+		kGetUserNameFromDatabase,
+		kGetUserIdFromDatabase,
 		kFindUsersByLogin,					
 		kGetAvailableChatsForUser,
-		kReceiveAllMessagesForSelectedChat
+		kReceiveAllMessagesForSelectedChat,
+		kServerError,
+	};
+
+	struct UserPacket
+	{
+		ActionType actionType = ActionType::kActionUndefined;
+		std::string name = "";
+		std::string login = "";
+		size_t password = 0;
+		size_t id = 0;
+	};
+
+	struct ChatPacket
+	{
+		ActionType actionType = ActionType::kActionUndefined;
+		std::string chatName = "";
+		std::string chatUserLogin = "";
+		size_t chatId = 0;
 	};
 
 	constexpr WORD dllVersion = MAKEWORD(2, 2);
@@ -42,7 +60,7 @@ namespace NetworkCore
 
 	constexpr size_t serverResponseSize = 255;
 
-	using ServerResponse = std::variant<bool, std::string, std::vector<UserData::User>, std::vector<ChatSystem::Chat>>;
+	using ServerResponse = std::variant<bool, size_t, std::string, std::vector<UserData::User>, std::vector<ChatSystem::Chat>>;
 	inline ServerResponse serverResponse;
 
 } // !namespace NetworkCore

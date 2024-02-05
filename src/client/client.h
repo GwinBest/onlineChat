@@ -10,22 +10,6 @@
 
 namespace ClientNetworking
 {
-	struct UserPacket
-	{
-		NetworkCore::ActionType actionType				= NetworkCore::ActionType::kActionUndefined;
-		std::string name								= "";
-		std::string login								= "";
-		size_t password									= 0;
-	};
-
-	struct ChatPacket
-	{
-		NetworkCore::ActionType actionType				= NetworkCore::ActionType::kActionUndefined;
-		std::string chatName							= "";
-		std::string chatUserLogin						= "";
-		size_t chatId									= 0;
-	};
-
 	class Client final
 	{
 	public:
@@ -35,9 +19,10 @@ namespace ClientNetworking
 
 		static Client& GetInstance() noexcept;
 
-		void SendUserMessage(const std::string& sender, const std::string& receiver, const char* data) const noexcept;
-		void SendUserCredentialsPacket(const UserPacket& userCredentials) const noexcept;
-		void SendChatInfoPacket(const ChatPacket& chatInfo) const noexcept;
+		//The sender and recipient objects must have login and id fields filled in
+		void SendUserMessage(const UserData::User& sender, const UserData::User& receiver, const char* data) const noexcept; 
+		void SendUserCredentialsPacket(const NetworkCore::UserPacket& userCredentials) const noexcept;
+		void SendChatInfoPacket(const NetworkCore::ChatPacket& chatInfo) const noexcept;
 
 		void ReceiveThread() const noexcept;
 

@@ -1,8 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
-#include <unordered_map>
 
 #include "../networkCore/networkCore.h"
 
@@ -19,13 +17,18 @@ namespace ServerNetworking
 
 	private:
 		void ClientHandler(int index);
+		
+		//void ReceiveUserMessage(UserData::User& sender, const UserData::User& receiver, const char* data) const noexcept;
+		NetworkCore::UserPacket ReceiveUserCredentialsPacket(size_t index) const noexcept;
+		//void ReceiveChatInfoPacket(const ChatPacket& chatInfo) const noexcept;
+
+		void SendServerErrorMessage(const size_t index, const std::string& errorMessage) const noexcept;
 
 	private:
 		WSADATA _wsaData;
 		SOCKET _serverSocket;
 		SOCKADDR_IN _socketAddress;
 
-		std::unordered_map< SOCKET, std::string> _connet;
 		SOCKET _connections[100];
 		uint8_t _connectionsCurrentCount = 0;
 	};

@@ -1,7 +1,6 @@
 #include "chatWindow.h"
 
 #include "../chatSystem/chat.h"
-#include "../chatSystem/chatRepository.h"
 #include "../client/client.h"
 #include "../messageBuffer/messageBuffer.h"
 #include "../userData/user.h"
@@ -98,7 +97,7 @@ namespace Gui
             {
                 if (isAvailableChatsUpdated)
                 {
-                    availableChats = ChatSystem::ChatRepository::GetAvailableChatsFromDatabase(currentUser.GetUserLogin());
+                    availableChats = UserData::UserRepository::GetAvailableChatsForUser(currentUser.GetUserId());
                     isAvailableChatsUpdated = false;
                 }
 
@@ -118,16 +117,6 @@ namespace Gui
             }
 
             ImGui::SetItemAllowOverlap();
-
-            // TODO: for last message 
-            {
-                //ImGui::SetCursorPos(ImVec2(selectablePosition.x + 10, selectablePosition.y + 15));
-                //ImGui::Text("text");
-                //client::getlastMEssage()
-                // 
-                //selectablePosition.y += 50;
-            }
-
 
             // unselect current chat
             if (ImGui::IsKeyPressed(ImGuiKey_Escape))
@@ -210,14 +199,20 @@ namespace Gui
             // send message 
             if ((isEnterPressed || isButtonPressed) && _inputBuffer[0] != '\0')
             {
+                UserData::User receiver;
+
                 if (!foundUsers.empty())
                 {
-                    ClientNetworking::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), foundUsers[chatSelected].GetUserLogin(), _inputBuffer);
+                    receiver.SetUserLogin(availableChats[chatSelected].GetChatName());
                 }
                 else
                 {
-                    ClientNetworking::Client::GetInstance().SendUserMessage(currentUser.GetUserLogin(), availableChats[chatSelected].GetChatName(), _inputBuffer);
+                    receiver.SetUserLogin(availableChats[chatSelected].GetChatName());
                 }
+
+                receiver.SetUserId(UserData::UserRepository::GetUserIdFromDatabase(receiver.GetUserLogin()));
+
+                ClientNetworking::Client::GetInstance().SendUserMessage(currentUser, receiver, _inputBuffer);
 
                 MessageBuffer::messageBuffer.emplace_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kSend, _inputBuffer));
                 
@@ -236,7 +231,7 @@ namespace Gui
                 {
                     newChatSelected = false;
 
-                    const ClientNetworking::ChatPacket chatPacket =
+                    const NetworkCore::ChatPacket chatPacket =
                     {
                         .actionType = NetworkCore::ActionType::kReceiveAllMessagesForSelectedChat,
                         .chatUserLogin = currentUser.GetUserLogin(),

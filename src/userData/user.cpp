@@ -12,9 +12,14 @@ namespace UserData
 		return _userLogin;
 	}
 
-	size_t User::GetUserPassword() const noexcept
+	const size_t User::GetUserPassword() const noexcept
 	{
 		return _userPassword;
+	}
+
+	const size_t User::GetUserId() const noexcept
+	{
+		return _userId;
 	}
 
 	void User::SetUserName(std::string_view userName) noexcept
@@ -30,6 +35,11 @@ namespace UserData
 	void User::SetUserPassword(const size_t userPassword) noexcept
 	{
 		_userPassword = userPassword;
+	}
+
+	void User::SetUserId(const size_t userId) noexcept
+	{
+		_userId = userId;
 	}
 
 } // !namespace UserData

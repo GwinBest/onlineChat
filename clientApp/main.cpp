@@ -39,14 +39,11 @@ int main()
 
     if (UserData::UserCredentialsFile::IsFileExists())
     {
-        UserData::UserCredentialsFile::ReadCredentials(userName, userLogin, userPassword);
+        UserData::UserCredentialsFile::ReadCredentials(userName, userLogin, userPassword, userId);
         UserData::UserCredentialsFile::CloseFile();
 
         if (UserData::UserRepository::IsUserExist(userLogin, userPassword))
         {
-            //TODO
-            userId = UserData::UserRepository::GetUserIdFromDatabase(userLogin);
-
             currentUser.SetUserName(userName);
             currentUser.SetUserLogin(userLogin);
             currentUser.SetUserPassword(userPassword);
@@ -97,7 +94,7 @@ int main()
 
                     if (UserData::UserCredentialsFile::CreateNewFile())
                     {
-                        UserData::UserCredentialsFile::WriteCredentials(userName, userLogin, userPassword);
+                        UserData::UserCredentialsFile::WriteCredentials(userName, userLogin, userPassword, userId);
                         UserData::UserCredentialsFile::CloseFile();
                     }
 
@@ -139,7 +136,7 @@ int main()
                 {
                     if (UserData::UserCredentialsFile::CreateNewFile())
                     {
-                        UserData::UserCredentialsFile::WriteCredentials(userName, userLogin, userPassword);
+                        UserData::UserCredentialsFile::WriteCredentials(userName, userLogin, userPassword, userId);
                         UserData::UserCredentialsFile::CloseFile();
                     }
 

@@ -72,6 +72,9 @@ namespace ServerNetworking
 			{
 				closesocket(_connections[index]);
 				index--;
+				
+				std::cout << GetLastError() << std::endl;
+				std::cout << "Client dissconnected: " << index << std::endl;
 
 				return;
 			}

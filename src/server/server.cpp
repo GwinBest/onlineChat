@@ -230,6 +230,13 @@ namespace ServerNetworking
 			{
 				NetworkCore::UserPacket userPacket = ReceiveUserCredentialsPacket(index);
 
+				if (userPacket.name.empty())
+				{
+					SendServerErrorMessage(index, "Server error: user login is empty");
+
+					break;
+				}
+
 				if (userPacket.login.empty())
 				{
 					SendServerErrorMessage(index, "Server error: user login is empty");
@@ -244,12 +251,21 @@ namespace ServerNetworking
 					break;
 				}
 
+				if (userPacket.id == 0)
+				{
+					SendServerErrorMessage(index, "Server error: user password is empty");
+
+					break;
+				}
+
 				try
 				{
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
 						"SELECT * FROM users "
-						"WHERE userLogin = '%s' AND userPassword = %zu;",
-						userPacket.login.c_str(), userPacket.password);
+						"WHERE userName = '%s' AND userLogin = '%s' ",
+						"AND userPassword = %zu AND id = %zu;",
+						userPacket.name.c_str(), userPacket.login.c_str(),
+						userPacket.password, userPacket.id);
 
 					bool result = false;
 

@@ -25,7 +25,7 @@ namespace UserData
 
 		static size_t GetUserIdFromDatabase(const std::string& userLogin) noexcept;
 
-		[[nodiscard]] static bool IsUserExist(const std::string& userLogin, const size_t userPassword) noexcept;
+		[[nodiscard]] static bool IsUserExist(const std::string userName, const std::string& userLogin, const size_t userPassword, const size_t userId) noexcept;
 
 		static std::vector<User> FindUsersByLogin(const std::string& userLogin) noexcept;
 

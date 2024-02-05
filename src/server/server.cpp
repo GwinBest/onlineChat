@@ -34,7 +34,7 @@ namespace ServerNetworking
 		int sizeOfServerAddress = sizeof(_socketAddress);
 		SOCKET newConnection;
 
-		for (int i = 0; i < sizeof(_connections)/sizeof(_connections[0]); i++)
+		for (int i = 0; i < sizeof(_connections) / sizeof(_connections[0]); i++)
 		{
 			newConnection = accept(_serverSocket, reinterpret_cast<SOCKADDR*>(&_socketAddress), &sizeOfServerAddress);
 
@@ -90,13 +90,13 @@ namespace ServerNetworking
 				recv(_connections[index], reinterpret_cast<char*>(&senderUserId), sizeof(senderUserId), NULL);
 
 				size_t reciverUserLoginSize;
-				char reciverUserLogin[Common::userLoginSize];
+				char receiverUserLogin[Common::userLoginSize];
 				recv(_connections[index], reinterpret_cast<char*>(&reciverUserLoginSize), sizeof(reciverUserLoginSize), NULL);
-				recv(_connections[index], reciverUserLogin, reciverUserLoginSize, NULL);
-				reciverUserLogin[reciverUserLoginSize] = '\0';
+				recv(_connections[index], receiverUserLogin, reciverUserLoginSize, NULL);
+				receiverUserLogin[reciverUserLoginSize] = '\0';
 
-				size_t reciverUserId;
-				recv(_connections[index], reinterpret_cast<char*>(&reciverUserId), sizeof(reciverUserId), NULL);
+				size_t receiverUserId;
+				recv(_connections[index], reinterpret_cast<char*>(&receiverUserId), sizeof(receiverUserId), NULL);
 
 				size_t messageSize;
 				char message[Common::maxInputBufferSize];
@@ -107,20 +107,20 @@ namespace ServerNetworking
 				try
 				{
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
-						"SELECT DISTINCT r1.chatId"
-						"FROM relations r1"
-						"JOIN relations r2 ON r1.chatId = r2.chatId"
+						"SELECT DISTINCT r1.chatId "
+						"FROM relations r1 "
+						"JOIN relations r2 ON r1.chatId = r2.chatId "
 						"WHERE r1.userId = %zu AND r2.userId = %zu;",
-						senderUserId, reciverUserId);
+						senderUserId, receiverUserId);
 
 					size_t chatId = 0;
 
 					if (!resultSet->next())
 					{
 						Database::DatabaseHelper::GetInstance().ExecuteUpdate(
-							"INSERT INTO chats(chatParticipants, chatName)"
+							"INSERT INTO chats(chatParticipants, chatName) "
 							"VALUES('%d %d', ' ');",
-							senderUserId, reciverUserId);
+							senderUserId, receiverUserId);
 
 						resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
 							"SELECT LAST_INSERT_ID();");
@@ -131,20 +131,20 @@ namespace ServerNetworking
 						}
 
 						Database::DatabaseHelper::GetInstance().ExecuteUpdate(
-							"INSERT INTO relations(userId, chatId)"
+							"INSERT INTO relations(userId, chatId) "
 							"VALUES "
 							"(%d,%d),"
 							"(%d,%d);",
 							senderUserId, chatId,
-							reciverUserId, chatId);
+							receiverUserId, chatId);
 
 						Database::DatabaseHelper::GetInstance().ExecuteUpdate(
-							"INSERT INTO user_chat_names(user_id, chat_id, chat_name)"
+							"INSERT INTO user_chat_names(user_id, chat_id, chat_name) "
 							"VALUES "
 							"(%d,%d,'%s'),"
 							"(%d,%d,'%s');",
-							senderUserId, chatId, reciverUserLogin,
-							reciverUserId, chatId, senderUserLogin);
+							senderUserId, chatId, receiverUserLogin,
+							receiverUserId, chatId, senderUserLogin);
 					}
 					else
 					{
@@ -152,7 +152,7 @@ namespace ServerNetworking
 					}
 
 					Database::DatabaseHelper::GetInstance().ExecuteUpdate(
-						"INSERT INTO messages (chatId, author, msg)"
+						"INSERT INTO messages (chatId, author, msg) "
 						"VALUES (%zu, '%zu', '%s');",
 						chatId, senderUserId, message);
 
@@ -206,9 +206,9 @@ namespace ServerNetworking
 				try
 				{
 					result = Database::DatabaseHelper::GetInstance().ExecuteUpdate(
-						"INSERT INTO users(userName, userLogin, userPassword)"
+						"INSERT INTO users(userName, userLogin, userPassword) "
 						"VALUES('%s', '%s', %zu);",
-						userPacket.name, userPacket.login, userPacket.password);
+						userPacket.name.c_str(), userPacket.login.c_str(), userPacket.password);
 
 					send(_connections[index], reinterpret_cast<char*>(&actionType), sizeof(actionType), NULL);
 					send(_connections[index], reinterpret_cast<char*>(&result), sizeof(result), NULL);
@@ -244,9 +244,9 @@ namespace ServerNetworking
 				try
 				{
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
-						"SELECT * FROM users"
-						"WHERE userLogin = '%s' AND userPassword = %zu ;",
-						userPacket.login, userPacket.password);
+						"SELECT * FROM users "
+						"WHERE userLogin = '%s' AND userPassword = %zu;",
+						userPacket.login.c_str(), userPacket.password);
 
 					bool result = false;
 
@@ -279,9 +279,9 @@ namespace ServerNetworking
 				try
 				{
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
-						"SELECT userName FROM users"
+						"SELECT userName FROM users "
 						"WHERE userLogin = '%s';",
-						userPacket.login);
+						userPacket.login.c_str());
 
 					std::string result = "";
 					size_t resposeSize = result.size();
@@ -319,9 +319,9 @@ namespace ServerNetworking
 				try
 				{
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
-						"SELECT userId FROM users"
+						"SELECT id FROM users "
 						"WHERE userLogin = '%s';",
-						userPacket.login);
+						userPacket.login.c_str());
 
 					size_t result = 0;
 
@@ -345,21 +345,16 @@ namespace ServerNetworking
 			{
 				NetworkCore::UserPacket userPacket = ReceiveUserCredentialsPacket(index);
 
-				if (userPacket.login.empty())
-				{
-					SendServerErrorMessage(index, "Server error: user login is empty");
 
-					break;
-				}
 
 				std::string* foundUsersLogin = nullptr;
 
 				try
 				{
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
-						"SELECT userLogin FROM users"
+						"SELECT userLogin FROM users "
 						"WHERE userLogin like '%s%%';",
-						userPacket.login);
+						userPacket.login.c_str());
 
 					size_t counter = 0;
 					foundUsersLogin = new std::string[resultSet->rowsCount()];

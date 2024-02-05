@@ -160,7 +160,7 @@ namespace ServerNetworking
 					{
 						send(_connections[i], reinterpret_cast<char*>(&actionType), sizeof(actionType), NULL);
 
-						send(_connections[i], reinterpret_cast<char*>(&senderUserId), sizeof(senderUserId), NULL);
+						send(_connections[i], reinterpret_cast<char*>(&receiverUserId), sizeof(receiverUserId), NULL);
 
 						size_t messageSize = strlen(message);
 						send(_connections[i], reinterpret_cast<char*>(&messageSize), sizeof(messageSize), NULL);

@@ -106,12 +106,12 @@ namespace ClientNetworking
 
 				recv(_clientSocket, reinterpret_cast<char*>(&userId), sizeof(userId), NULL);
 
-				size_t receivemessageSize;
+				size_t receiveMessageSize;
 				char receiveMessage[Common::maxInputBufferSize];
 
-				recv(_clientSocket, reinterpret_cast<char*>(&receivemessageSize), sizeof(receivemessageSize), NULL);
-				recv(_clientSocket, receiveMessage, receivemessageSize, NULL);
-				receiveMessage[receivemessageSize] = '\0';
+				recv(_clientSocket, reinterpret_cast<char*>(&receiveMessageSize), sizeof(receiveMessageSize), NULL);
+				recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);
+				receiveMessage[receiveMessageSize] = '\0';
 				
 				if (userId == currentUser.GetUserId())
 				{

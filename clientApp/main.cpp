@@ -42,7 +42,7 @@ int main()
         UserData::UserCredentialsFile::ReadCredentials(userName, userLogin, userPassword, userId);
         UserData::UserCredentialsFile::CloseFile();
 
-        if (UserData::UserRepository::IsUserExist(userLogin, userPassword))
+        if (UserData::UserRepository::IsUserExist(userName, userLogin, userPassword, userId))
         {
             currentUser.SetUserName(userName);
             currentUser.SetUserLogin(userLogin);
@@ -82,7 +82,7 @@ int main()
 
                 userPassword = std::hash<std::string>{}(stringUserPassword.c_str());
 
-                if (UserData::UserRepository::IsUserExist(userLogin, userPassword))
+                if (UserData::UserRepository::IsUserExist(userName, userLogin, userPassword, userId))
                 {
                     userName = UserData::UserRepository::GetUserNameFromDatabase(userLogin);
                     userId = UserData::UserRepository::GetUserIdFromDatabase(userLogin);
@@ -128,7 +128,7 @@ int main()
 
                 userPassword = std::hash<std::string>{}(stringUserPassword);
 
-                if (UserData::UserRepository::IsUserExist(userLogin, userPassword))
+                if (UserData::UserRepository::IsUserExist(userName, userLogin, userPassword, userId))
                 {
                     Gui::SignUpWindow::SetShowUserAlreadyExistMessage(true);
                 }

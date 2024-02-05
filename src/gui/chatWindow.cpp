@@ -22,6 +22,7 @@ namespace Gui
         constexpr size_t availableChatsStartHeight = 65;
         float availableChatsWidth = ImGui::GetWindowWidth() / availableChatsWidthScaleFactor;
 
+        static std::string searchBarSearchRequest;
         // search bar
         {
             ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -33,7 +34,6 @@ namespace Gui
             windowStyle.FrameRounding = 12.0f;
             windowStyle.Colors[ImGuiCol_FrameBg] = ImVec4(0.0941f, 0.0980f, 0.1137f, 1.00f);
 
-            static std::string searchBarSearchRequest;
             ImGui::SetCursorPos(ImVec2(55, 20));
             ImGui::PushItemWidth(availableChatsWidth - 70.0f);
             if (ImGui::InputTextWithHint("##search", "Search", &searchBarSearchRequest))
@@ -77,10 +77,15 @@ namespace Gui
 
             ImGui::SetCursorPos(selectablePosition);
 
-            if (!foundUsers.empty())
+            if (!foundUsers.empty() || !searchBarSearchRequest.empty())
             {
                 for (size_t i = 0; i < foundUsers.size(); ++i)
                 {
+                    if (foundUsers[i].GetUserLogin() == currentUser.GetUserLogin())
+                    {
+                        continue;
+                    }
+
                     if (ImGui::Selectable(foundUsers[i].GetUserLogin().c_str(), chatSelected == i, 0, ImVec2(0, 50)))
                     {
                         if (chatSelected != i)

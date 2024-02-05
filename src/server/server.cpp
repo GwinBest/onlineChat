@@ -99,7 +99,7 @@ namespace ServerNetworking
 				recv(_connections[index], reinterpret_cast<char*>(&receiverUserId), sizeof(receiverUserId), NULL);
 
 				size_t messageSize;
-				char message[Common::maxInputBufferSize];
+				char message[Common::maxInputBufferSize];	
 				recv(_connections[index], reinterpret_cast<char*>(&messageSize), sizeof(messageSize), NULL);
 				recv(_connections[index], message, messageSize, NULL);
 				message[messageSize] = '\0';

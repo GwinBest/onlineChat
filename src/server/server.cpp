@@ -345,8 +345,6 @@ namespace ServerNetworking
 			{
 				NetworkCore::UserPacket userPacket = ReceiveUserCredentialsPacket(index);
 
-
-
 				std::string* foundUsersLogin = nullptr;
 
 				try

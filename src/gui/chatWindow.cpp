@@ -208,7 +208,7 @@ namespace Gui
 
                 if (!foundUsers.empty())
                 {
-                    receiver.SetUserLogin(availableChats[chatSelected].GetChatName());
+                    receiver.SetUserLogin(foundUsers[chatSelected].GetUserLogin());
                 }
                 else
                 {
@@ -230,7 +230,7 @@ namespace Gui
                 ImVec4 oldColor = windowStyle.Colors[ImGuiCol_ChildBg];
                 windowStyle.Colors[ImGuiCol_ChildBg] = windowStyle.Colors[ImGuiCol_WindowBg];					// setup new color for begin child
 
-                if (newChatSelected)
+                if (newChatSelected && foundUsers.empty())
                 {
                     newChatSelected = false;
 

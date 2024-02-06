@@ -98,9 +98,6 @@ namespace ServerNetworking
 				recv(_connections[index], receiverUserLogin, receiverUserLoginSize, NULL);
 				receiverUserLogin[receiverUserLoginSize] = '\0';
 
-				size_t receiverUserId;
-				recv(_connections[index], reinterpret_cast<char*>(&receiverUserId), sizeof(receiverUserId), NULL);
-
 				size_t messageSize;
 				char message[Common::maxInputBufferSize];	
 				recv(_connections[index], reinterpret_cast<char*>(&messageSize), sizeof(messageSize), NULL);
@@ -109,6 +106,18 @@ namespace ServerNetworking
 
 				try
 				{
+					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
+						"SELECT id FROM users "
+						"WHERE userLogin = '%s';",
+						receiverUserLogin);
+
+					size_t receiverUserId = 0;
+
+					if (resultSet->next())
+					{
+						receiverUserId = resultSet->getInt("id");
+					}
+
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
 						"SELECT DISTINCT r1.chatId "
 						"FROM relations r1 "

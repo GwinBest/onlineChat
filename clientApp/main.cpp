@@ -17,11 +17,6 @@ enum class WindowState : uint8_t
     kChat
 };
 
-/// <summary>
-/// пререписать бд
-/// сообщения
-/// </summary>
-/// <returns></returns>
 int main()
 {
     Gui::GlfwWindow window;

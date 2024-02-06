@@ -36,7 +36,7 @@ namespace Database
         const sql::SQLString _hostName = "127.0.0.1:3306";
         const sql::SQLString _userName = "root";
         const sql::SQLString _password = "admin";
-        const sql::SQLString _schemaName = "onlinechat";
+        const sql::SQLString _schemaName = "online_chat";
 
         enum class DatabaseState : uint8_t
         {

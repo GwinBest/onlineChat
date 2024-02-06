@@ -74,7 +74,7 @@ namespace ServerNetworking
 				index--;
 				
 				std::cout << GetLastError() << std::endl;
-				std::cout << "Client dissconnected: " << index << std::endl;
+				std::cout << "Client disconnected: " << index << std::endl;
 
 				return;
 			}
@@ -107,22 +107,22 @@ namespace ServerNetworking
 				try
 				{
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
-						"SELECT id FROM users "
-						"WHERE userLogin = '%s';",
+						"SELECT user_id FROM users "
+						"WHERE user_login = '%s';",
 						receiverUserLogin);
 
 					size_t receiverUserId = 0;
 
 					if (resultSet->next())
 					{
-						receiverUserId = resultSet->getInt("id");
+						receiverUserId = resultSet->getInt("user_id");
 					}
 
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
-						"SELECT DISTINCT r1.chatId "
-						"FROM relations r1 "
-						"JOIN relations r2 ON r1.chatId = r2.chatId "
-						"WHERE r1.userId = %zu AND r2.userId = %zu;",
+						"SELECT DISTINCT r1.chat_id "
+						"FROM user_to_chat_relations r1 "
+						"JOIN user_to_chat_relations r2 ON r1.chat_id = r2.chat_id "
+						"WHERE r1.user_id = %zu AND r2.user_id = %zu;",
 						senderUserId, receiverUserId);
 
 					size_t chatId = 0;
@@ -130,42 +130,42 @@ namespace ServerNetworking
 					if (!resultSet->next())
 					{
 						Database::DatabaseHelper::GetInstance().ExecuteUpdate(
-							"INSERT INTO chats(chatParticipants, chatName) "
-							"VALUES('%d %d', ' ');",
-							senderUserId, receiverUserId);
+							"INSERT INTO chats(chat_participants) "
+							"VALUES('%s %s');",
+							senderUserLogin, receiverUserLogin);
 
 						resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
 							"SELECT LAST_INSERT_ID();");
 
 						if (resultSet->next())
 						{
-							chatId = resultSet->getInt("last_insert_id()");
+							chatId = resultSet->getInt("LAST_INSERT_ID()");
 						}
 
 						Database::DatabaseHelper::GetInstance().ExecuteUpdate(
-							"INSERT INTO relations(userId, chatId) "
+							"INSERT INTO user_to_chat_relations(user_id, chat_id) "
 							"VALUES "
-							"(%d,%d),"
-							"(%d,%d);",
+							"(%zu,%zu),"
+							"(%zu,%zu);",
 							senderUserId, chatId,
 							receiverUserId, chatId);
 
 						Database::DatabaseHelper::GetInstance().ExecuteUpdate(
-							"INSERT INTO user_chat_names(user_id, chat_id, chat_name) "
+							"INSERT INTO users_chat_names(user_id, chat_id, chat_name) "
 							"VALUES "
-							"(%d,%d,'%s'),"
-							"(%d,%d,'%s');",
+							"(%zu,%zu,'%s'),"
+							"(%zu,%zu,'%s');",
 							senderUserId, chatId, receiverUserLogin,
 							receiverUserId, chatId, senderUserLogin);
 					}
 					else
 					{
-						chatId = resultSet->getInt("chatId");
+						chatId = resultSet->getInt("chat_id");
 					}
 
 					Database::DatabaseHelper::GetInstance().ExecuteUpdate(
-						"INSERT INTO messages (chatId, author, msg) "
-						"VALUES (%zu, '%zu', '%s');",
+						"INSERT INTO messages (chat_id, author_id, message) "
+						"VALUES (%zu, %zu, '%s');",
 						chatId, senderUserId, message);
 
 					for (size_t i = 0; i < _connectionsCurrentCount; ++i)
@@ -218,7 +218,7 @@ namespace ServerNetworking
 				try
 				{
 					result = Database::DatabaseHelper::GetInstance().ExecuteUpdate(
-						"INSERT INTO users(userName, userLogin, userPassword) "
+						"INSERT INTO users(user_name, user_login, user_password) "
 						"VALUES('%s', '%s', %zu);",
 						userPacket.name.c_str(), userPacket.login.c_str(), userPacket.password);
 
@@ -239,13 +239,6 @@ namespace ServerNetworking
 			{
 				NetworkCore::UserPacket userPacket = ReceiveUserCredentialsPacket(index);
 
-				if (userPacket.name.empty())
-				{
-					SendServerErrorMessage(index, "Server error: user login is empty");
-
-					break;
-				}
-
 				if (userPacket.login.empty())
 				{
 					SendServerErrorMessage(index, "Server error: user login is empty");
@@ -260,21 +253,12 @@ namespace ServerNetworking
 					break;
 				}
 
-				if (userPacket.id == 0)
-				{
-					SendServerErrorMessage(index, "Server error: user password is empty");
-
-					break;
-				}
-
 				try
 				{
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
 						"SELECT * FROM users "
-						"WHERE userName = '%s' AND userLogin = '%s' "
-						"AND userPassword = %zu AND id = %zu;",
-						userPacket.name.c_str(), userPacket.login.c_str(),
-						userPacket.password, userPacket.id);
+						"WHERE user_login = '%s' AND user_password = %zu;",
+						userPacket.login.c_str(), userPacket.password);
 
 					bool result = false;
 
@@ -293,6 +277,36 @@ namespace ServerNetworking
 
 				break;
 			}
+			case NetworkCore::ActionType::kCheckIsUserDataFromFileValid:
+			{
+				NetworkCore::UserPacket userPacket = ReceiveUserCredentialsPacket(index);
+
+				try
+				{
+					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
+						"SELECT * FROM users "
+						"WHERE user_name = '%s' AND user_login = '%s' "
+						"AND user_password = %zu AND user_id = %zu;",
+						userPacket.name.c_str(), userPacket.login.c_str(),
+						userPacket.password, userPacket.id);
+
+					bool result = false;
+
+					if (resultSet->next())
+					{
+						result = true;
+					}
+
+					send(_connections[index], reinterpret_cast<char*>(&actionType), sizeof(actionType), NULL);
+					send(_connections[index], reinterpret_cast<char*>(&result), sizeof(result), NULL);
+				}
+				catch (const sql::SQLException& e)
+				{
+					SendServerErrorMessage(index, "Server error: server cant check is data from file valid");
+				}
+
+				break;
+			}
 			case NetworkCore::ActionType::kGetUserNameFromDatabase:
 			{
 				NetworkCore::UserPacket userPacket = ReceiveUserCredentialsPacket(index);
@@ -307,8 +321,8 @@ namespace ServerNetworking
 				try
 				{
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
-						"SELECT userName FROM users "
-						"WHERE userLogin = '%s';",
+						"SELECT user_name FROM users "
+						"WHERE user_login = '%s';",
 						userPacket.login.c_str());
 
 					std::string result = "";
@@ -316,7 +330,7 @@ namespace ServerNetworking
 
 					if (resultSet->next())
 					{
-						result = resultSet->getString("userName");
+						result = resultSet->getString("user_name");
 					}
 
 					resposeSize = result.size();
@@ -347,15 +361,15 @@ namespace ServerNetworking
 				try
 				{
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
-						"SELECT id FROM users "
-						"WHERE userLogin = '%s';",
+						"SELECT user_id FROM users "
+						"WHERE user_login = '%s';",
 						userPacket.login.c_str());
 
 					size_t result = 0;
 
 					if (resultSet->next())
 					{
-						result = resultSet->getInt("id");
+						result = resultSet->getInt("user_id");
 					}
 
 					send(_connections[index], reinterpret_cast<char*>(&actionType), sizeof(actionType), NULL);
@@ -378,8 +392,8 @@ namespace ServerNetworking
 				try
 				{
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
-						"SELECT userLogin FROM users "
-						"WHERE userLogin like '%s%%';",
+						"SELECT user_login FROM users "
+						"WHERE user_login like '%s%%';",
 						userPacket.login.c_str());
 
 					size_t counter = 0;
@@ -387,7 +401,7 @@ namespace ServerNetworking
 
 					while (resultSet->next())
 					{
-						foundUsersLogin[counter++] = resultSet->getString("userLogin");
+						foundUsersLogin[counter++] = resultSet->getString("user_login");
 					}
 
 					send(_connections[index], reinterpret_cast<char*>(&actionType), sizeof(actionType), NULL);
@@ -431,7 +445,7 @@ namespace ServerNetworking
 				{
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
 						"SELECT chat_id, chat_name "
-						"FROM user_chat_names "
+						"FROM users_chat_names "
 						"WHERE user_id = %zu;",
 						userPacket.id);
 
@@ -475,21 +489,11 @@ namespace ServerNetworking
 			}
 			case NetworkCore::ActionType::kReceiveAllMessagesForSelectedChat:
 			{
-				size_t userLoginSize;
-				char userLogin[Common::userLoginSize];
-				recv(_connections[index], reinterpret_cast<char*>(&userLoginSize), sizeof(userLoginSize), NULL);
-				recv(_connections[index], userLogin, userLoginSize, NULL);
-				userLogin[userLoginSize] = '\0';
+				size_t userId;
+				recv(_connections[index], reinterpret_cast<char*>(&userId), sizeof(userId), NULL);
 
 				size_t chatId;
 				recv(_connections[index], reinterpret_cast<char*>(&chatId), sizeof(chatId), NULL);
-
-				if (userLogin[0] == '\0')
-				{
-					SendServerErrorMessage(index, "Server error: user login is empty");
-
-					break;
-				}
 
 				if (chatId == 0)
 				{
@@ -506,7 +510,7 @@ namespace ServerNetworking
 					resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
 						"SELECT * "
 						"FROM messages "
-						"WHERE chatId = %zu;",
+						"WHERE chat_id = %zu;",
 						chatId);
 
 					messagesResult = new std::string[resultSet->rowsCount()];
@@ -515,11 +519,11 @@ namespace ServerNetworking
 
 					while (resultSet->next())
 					{
-						std::string author = resultSet->getString("author");
+						size_t messageAuthorId = resultSet->getInt("author_id");
 
-						messagesResult[count] = resultSet->getString("msg");
+						messagesResult[count] = resultSet->getString("message");
 
-						if (!strcmp(userLogin, author.c_str()))
+						if (messageAuthorId == userId)
 						{
 							messageTypeResult[count] = MessageBuffer::MessageStatus::kSend;
 						}

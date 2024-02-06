@@ -33,8 +33,8 @@ namespace ClientNetworking
 
 		return instance;
 	}
-
-	void Client::SendUserMessage(const UserData::User& sender, const UserData::User& receiver, const char* data) const noexcept
+	
+	void Client::SendUserMessage(const UserData::User& sender, const std::string& receiverUserLogin, const char* data) const noexcept
 	{
 		NetworkCore::ActionType type = NetworkCore::ActionType::kSendChatMessage;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
@@ -46,12 +46,9 @@ namespace ClientNetworking
 		size_t senderUserId = sender.GetUserId();
 		send(_clientSocket, reinterpret_cast<const char*>(&senderUserId), sizeof(senderUserId), NULL);
 
-		size_t receiverUserLoginSize = receiver.GetUserLogin().size();
+		size_t receiverUserLoginSize = receiverUserLogin.size();
 		send(_clientSocket, reinterpret_cast<char*>(&receiverUserLoginSize), sizeof(receiverUserLoginSize), NULL);
-		send(_clientSocket, receiver.GetUserLogin().c_str(), receiverUserLoginSize, NULL);
-
-		size_t receiverUserId = receiver.GetUserId();
-		send(_clientSocket, reinterpret_cast<const char*>(&receiverUserId), sizeof(receiverUserId), NULL);
+		send(_clientSocket, receiverUserLogin.c_str(), receiverUserLoginSize, NULL);
 
 		size_t dataSize = strlen(data);
 		send(_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(dataSize), NULL);

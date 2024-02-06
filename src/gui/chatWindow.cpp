@@ -215,9 +215,7 @@ namespace Gui
                     receiver.SetUserLogin(availableChats[chatSelected].GetChatName());
                 }
 
-                receiver.SetUserId(UserData::UserRepository::GetUserIdFromDatabase(receiver.GetUserLogin()));
-
-                ClientNetworking::Client::GetInstance().SendUserMessage(currentUser, receiver, _inputBuffer);
+                ClientNetworking::Client::GetInstance().SendUserMessage(currentUser, receiver.GetUserLogin(), _inputBuffer);
 
                 MessageBuffer::messageBuffer.emplace_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kSend, _inputBuffer));
                 

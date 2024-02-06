@@ -1,9 +1,5 @@
 ﻿#include <functional>
 
-#ifndef NDEBUG
-#include <iostream>
-#endif // !NDEBUG
-
 #include "../src/userData/user.h"
 #include "../src/gui/glfwWindow.h"
 #include "../src/gui/chatWindow.h"
@@ -23,8 +19,7 @@ enum class WindowState : uint8_t
 
 /// <summary>
 /// пререписать бд
-/// сообщения 
-/// запись id в файл
+/// сообщения
 /// </summary>
 /// <returns></returns>
 int main()
@@ -42,7 +37,7 @@ int main()
         UserData::UserCredentialsFile::ReadCredentials(userName, userLogin, userPassword, userId);
         UserData::UserCredentialsFile::CloseFile();
 
-        if (UserData::UserRepository::IsUserExist(userName, userLogin, userPassword, userId))
+        if (UserData::UserRepository::IsUserDataFromFileValid(userName, userLogin, userPassword, userId))
         {
             currentUser.SetUserName(userName);
             currentUser.SetUserLogin(userLogin);
@@ -82,7 +77,7 @@ int main()
 
                 userPassword = std::hash<std::string>{}(stringUserPassword.c_str());
 
-                if (UserData::UserRepository::IsUserExist(userName, userLogin, userPassword, userId))
+                if (UserData::UserRepository::IsUserExist(userLogin, userPassword))
                 {
                     userName = UserData::UserRepository::GetUserNameFromDatabase(userLogin);
                     userId = UserData::UserRepository::GetUserIdFromDatabase(userLogin);
@@ -128,7 +123,7 @@ int main()
 
                 userPassword = std::hash<std::string>{}(stringUserPassword);
 
-                if (UserData::UserRepository::IsUserExist(userName, userLogin, userPassword, userId))
+                if (UserData::UserRepository::IsUserExist(userLogin, userPassword))
                 {
                     Gui::SignUpWindow::SetShowUserAlreadyExistMessage(true);
                 }

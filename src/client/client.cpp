@@ -79,9 +79,7 @@ namespace ClientNetworking
 		NetworkCore::ActionType type = chatInfo.actionType;
 		send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 
-		size_t chatUserLoginLength = chatInfo.chatUserLogin.size();
-		send(_clientSocket, reinterpret_cast<char*>(&chatUserLoginLength), sizeof(chatUserLoginLength), NULL);
-		send(_clientSocket, chatInfo.chatUserLogin.c_str(), chatUserLoginLength, NULL);
+		send(_clientSocket, reinterpret_cast<const char*>(&chatInfo.chatUserId), sizeof(chatInfo.chatUserId), NULL);
 
 		send(_clientSocket, reinterpret_cast<const char*>(&chatInfo.chatId), sizeof(chatInfo.chatId), NULL);
 	}
@@ -118,6 +116,7 @@ namespace ClientNetworking
 				break;
 			}
 			case NetworkCore::ActionType::kAddUserCredentialsToDatabase:
+			case NetworkCore::ActionType::kCheckIsUserDataFromFileValid:
 			case NetworkCore::ActionType::kCheckUserExistence:
 			{
 				recv(_clientSocket, reinterpret_cast<char*>(&NetworkCore::serverResponse), sizeof(bool), NULL);

@@ -237,7 +237,7 @@ namespace Gui
                     const NetworkCore::ChatPacket chatPacket =
                     {
                         .actionType = NetworkCore::ActionType::kReceiveAllMessagesForSelectedChat,
-                        .chatUserLogin = currentUser.GetUserLogin(),
+                        .chatUserId = currentUser.GetUserId(),
                         .chatId = availableChats[chatSelected].GetChatId(),
                     };
 

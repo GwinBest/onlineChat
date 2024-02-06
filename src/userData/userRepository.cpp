@@ -46,15 +46,29 @@ namespace UserData
 		return ClientNetworking::Client::GetInstance().GetServerResponse<size_t>();
 	}
 
-	bool UserRepository::IsUserExist(const std::string userName, const std::string& userLogin, const size_t userPassword, const size_t userId) noexcept
+	bool UserRepository::IsUserDataFromFileValid(const std::string& userName, const std::string& userLogin, const size_t userPassword, const size_t userId) noexcept
 	{
 		const NetworkCore::UserPacket request =
 		{
-			.actionType = NetworkCore::ActionType::kCheckUserExistence,
+			.actionType = NetworkCore::ActionType::kCheckIsUserDataFromFileValid,
 			.name = userName,
 			.login = userLogin,
 			.password = userPassword,
 			.id = userId
+		};
+
+		ClientNetworking::Client::GetInstance().SendUserCredentialsPacket(request);
+
+		return ClientNetworking::Client::GetInstance().GetServerResponse<bool>();
+	}
+
+	bool UserRepository::IsUserExist(const std::string& userLogin, const size_t userPassword) noexcept
+	{
+		const NetworkCore::UserPacket request =
+		{
+			.actionType = NetworkCore::ActionType::kCheckUserExistence,
+			.login = userLogin,
+			.password = userPassword,
 		};
 
 		ClientNetworking::Client::GetInstance().SendUserCredentialsPacket(request);

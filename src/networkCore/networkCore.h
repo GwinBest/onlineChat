@@ -33,6 +33,7 @@ namespace NetworkCore
 		kFindUsersByLogin,					
 		kGetAvailableChatsForUser,
 		kReceiveAllMessagesForSelectedChat,
+		kCheckIsUserDataFromFileValid,
 		kServerError,
 	};
 
@@ -48,8 +49,7 @@ namespace NetworkCore
 	struct ChatPacket
 	{
 		ActionType actionType = ActionType::kActionUndefined;
-		std::string chatName = "";
-		std::string chatUserLogin = "";
+		size_t chatUserId = 0;
 		size_t chatId = 0;
 	};
 

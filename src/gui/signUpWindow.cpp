@@ -59,7 +59,7 @@ namespace Gui
 		int32_t backToLoginButtonWidth = 0;																				// loads from loadTextureFromFile
 		int32_t backToLoginButtonHeight = 0;																			// loads from loadTextureFromFile
 		ImTextureID backToLoginButtonTexture = nullptr;
-		loadTextureFromFile(".\\images\\arrowBack.png",reinterpret_cast<GLuint*>(&backToLoginButtonTexture), &backToLoginButtonWidth, &backToLoginButtonHeight);
+		loadTextureFromFile(".\\resources\\images\\arrowBack.png",reinterpret_cast<GLuint*>(&backToLoginButtonTexture), &backToLoginButtonWidth, &backToLoginButtonHeight);
 		if (ImGui::ImageButton("##back to login", backToLoginButtonTexture, ImVec2(backToLoginButtonWidth, backToLoginButtonHeight)))
 		{
 			_isBackToLoginButtonPressed = true;

@@ -30,8 +30,6 @@ namespace Database
 			std::cout << e.what() << std::endl;
 			throw;
 		}
-
-		return nullptr;
 	}
 
 	bool DatabaseHelper::ExecuteUpdate(const std::string query, ...)
@@ -55,8 +53,6 @@ namespace Database
 			std::cout << e.what() << std::endl;
 			throw;
 		}
-		
-		return false;
 	}
 
 	DatabaseHelper::~DatabaseHelper()

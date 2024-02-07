@@ -189,7 +189,7 @@ namespace Gui
                 int32_t sendMessageButtonWidth = 0;																				// loads from loadTextureFromFile
                 int32_t sendMessageButtonHeight = 0;																			// loads from loadTextureFromFile
                 ImTextureID sendMessageButtonTexture = nullptr;
-                loadTextureFromFile(".\\images\\sendMessage.png", reinterpret_cast<GLuint*>(&sendMessageButtonTexture), &sendMessageButtonWidth, &sendMessageButtonHeight);
+                loadTextureFromFile(".\\resources\\images\\sendMessage.png", reinterpret_cast<GLuint*>(&sendMessageButtonTexture), &sendMessageButtonWidth, &sendMessageButtonHeight);
                 if (ImGui::ImageButton("##send message", sendMessageButtonTexture, ImVec2(sendMessageButtonWidth, sendMessageButtonHeight)))
                 {
                     isButtonPressed = true;

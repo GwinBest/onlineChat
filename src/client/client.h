@@ -13,7 +13,6 @@ namespace ClientNetworking
 	class Client final
 	{
 	public:
-
 		Client(const Client&) = delete;
 		void operator= (const Client&) = delete;
 

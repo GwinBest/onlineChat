@@ -1,6 +1,40 @@
 # OnlineChat
-
+## Build Tools
+### [CMake](https://cmake.org/download/)
+## Database
+If you need to run the server, then download the [MySql](https://dev.mysql.com/downloads/workbench/)
+## Getting Started
+First, clone a repository
+```
+git clone https://github.com/GwinBest/OnlineChat.git
+```
+Then, make a build folder
+```
+cd OnlineChat
+mkdir build
+cd build
+```
+Run cmake 
+```
+cmake ..
+```
+To build all apps run
+```
+cmake --build .
+```
+Or, if you want to specify
+```
+cmake --build . --target (serverApp | clientApp)
+```
 # MySQL setup
+First create a new connection with the following parametrs
+```
+Hostname: 127.0.0.1
+Port: 3306
+Username: root
+Password: root
+```
+After connection, run the following code to create all necessary tables
 ``` SQL
 CREATE SCHEMA `online_chat` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
 

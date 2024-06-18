@@ -1,5 +1,9 @@
 #include "signUpWindow.h"
 
+#include "../utils/loadImage.h"
+
+#include <imgui_internal.h>
+
 namespace Gui
 {
 	bool SignUpWindow::IsSignUpButtonPressed() noexcept
@@ -48,7 +52,8 @@ namespace Gui
 
 	void SignUpWindow::DrawGui() noexcept
 	{
-		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);							// enable docking 
+		
+		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);							// enable docking 
 
 		ImGui::Begin("##signUp window");
 		ImGuiStyle& windowStyle = ImGui::GetStyle();

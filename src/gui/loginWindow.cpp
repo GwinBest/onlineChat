@@ -1,5 +1,7 @@
 #include "loginWindow.h"
 
+#include <imgui_internal.h>
+
 namespace Gui
 {
 	bool LoginWindow::IsSignUpLabelPressed() noexcept
@@ -41,7 +43,7 @@ namespace Gui
 
 	void LoginWindow::DrawGui() noexcept
 	{
-		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);							// enable docking 
+		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);							// enable docking 
 		
 		ImGui::Begin("##login window");
 

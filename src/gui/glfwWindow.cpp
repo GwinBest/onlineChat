@@ -2,6 +2,8 @@
 
 #include "fonts/openSansRegular.h"
 
+#include <imgui_internal.h>
+
 namespace Gui
 {
 	GlfwWindow::GlfwWindow() noexcept

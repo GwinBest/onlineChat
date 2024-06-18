@@ -5,6 +5,10 @@
 #include "../messageBuffer/messageBuffer.h"
 #include "../userData/user.h"
 #include "../userData/userRepository.h"
+#include "../utils/loadImage.h"
+
+#include <imgui_internal.h>
+
 
 extern UserData::User currentUser;
 extern std::list<MessageBuffer::MessageNode> MessageBuffer::messageBuffer;
@@ -13,7 +17,7 @@ namespace Gui
 {
     void ChatWindow::DrawGui() noexcept
     {
-        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				                    // enable docking 
+        ImGui::DockSpaceOverViewport(0,ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoTabBar);				                    // enable docking 
 
         ImGui::Begin("##main window");
 
@@ -155,7 +159,7 @@ namespace Gui
 
                 ImVec2 inputTextSize = ImVec2(ImGui::GetWindowWidth() - availableChatsWidth - distanceFromRightToInputText, 45);
                 ImGui::SetCursorPos(ImVec2(availableChatsWidth, ImGui::GetWindowHeight() - 45));
-                if(ImGui::InputTextMultilineWithHint("##input", "Write a message", _inputBuffer, sizeof(_inputBuffer), 
+                if(ImGui::InputTextMultiline("##input", _inputBuffer, sizeof(_inputBuffer), 
                     inputTextSize, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CtrlEnterForNewLine))
                 {
                     isEnterPressed = true;
@@ -189,7 +193,7 @@ namespace Gui
                 int32_t sendMessageButtonWidth = 0;																				// loads from loadTextureFromFile
                 int32_t sendMessageButtonHeight = 0;																			// loads from loadTextureFromFile
                 ImTextureID sendMessageButtonTexture = nullptr;
-                loadTextureFromFile(".\\resources\\images\\sendMessage.png", reinterpret_cast<GLuint*>(&sendMessageButtonTexture), &sendMessageButtonWidth, &sendMessageButtonHeight);
+                loadTextureFromFile("./resources/images/sendMessage.png", reinterpret_cast<GLuint*>(&sendMessageButtonTexture), &sendMessageButtonWidth, &sendMessageButtonHeight);
                 if (ImGui::ImageButton("##send message", sendMessageButtonTexture, ImVec2(sendMessageButtonWidth, sendMessageButtonHeight)))
                 {
                     isButtonPressed = true;

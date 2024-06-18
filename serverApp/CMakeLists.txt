@@ -2,6 +2,12 @@ include_directories(
     ../thirdParty/mySql/include
 )
 
+file(COPY 
+    ${CMAKE_SOURCE_DIR}/thirdParty/mySql/lib/libssl-1_1-x64.dll
+    ${CMAKE_SOURCE_DIR}/thirdParty/mySql/lib/libcrypto-1_1-x64.dll
+    DESTINATION ${CMAKE_BINARY_DIR}/serverApp
+)
+
 add_executable(Server
     main.cpp
     ../src/server/server.h
@@ -12,4 +18,7 @@ add_executable(Server
 
 add_compile_definitions(STATIC_CONCPP)
 
-target_link_libraries(Server PUBLIC ${CMAKE_SOURCE_DIR}/thirdParty/mySql/lib/mysqlcppconn-static.lib)
+target_link_libraries(Server PUBLIC 
+    ${CMAKE_SOURCE_DIR}/thirdParty/mySql/lib/mysqlcppconn-static.lib
+)
+

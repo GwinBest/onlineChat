@@ -1,4 +1,9 @@
 # OnlineChat
+## How to clone
+This repo uses gitmodules, so clone it recursive:
+```
+git clone --recursive https://github.com/GwinBest/OnlineChat.git
+```
 ## Build Tools
 ### [CMake](https://cmake.org/download/)
 ## Database

@@ -19,8 +19,8 @@ namespace UserData
 
     private:
         size_t _userId = 0;
-        std::string _userName = {};
-        std::string _userLogin = {};
+        std::string _userName;
+        std::string _userLogin;
         size_t _userPassword = 0;
     };
 

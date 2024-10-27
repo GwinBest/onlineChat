@@ -3,31 +3,26 @@
 #include <fstream>
 #include <string>
 
+#include "userData/user.h"
+
 namespace UserData
 {
-	class UserCredentialsFile final
-	{
-	public:
-		UserCredentialsFile() = delete;
-		UserCredentialsFile(const UserCredentialsFile&) = delete;
-		UserCredentialsFile& operator=(const UserCredentialsFile&) = delete;
-		UserCredentialsFile(const UserCredentialsFile&&) = delete;
-		UserCredentialsFile& operator=(const UserCredentialsFile&&) = delete;
-		~UserCredentialsFile() = delete;
+    class UserCredentialsFile final
+    {
+    public:
+        [[nodiscard]] static bool IsFileExists() noexcept;
 
-		static bool IsFileExists() noexcept;
+        [[nodiscard]] static bool CreateNewFile() noexcept;
+        static void CloseFile() noexcept;
 
-		[[nodiscard]] static bool CreateNewFile() noexcept;
-		static void CloseFile() noexcept;
+        static void WriteCredentials(const User& user) noexcept;
+        static User ReadCredentials() noexcept;
 
-		static void WriteCredentials(const std::string& userName, const std::string& userLogin, const size_t userPassword, const size_t userId) noexcept;
-		static void ReadCredentials(std::string& userName, std::string& userLogin, size_t& userPassword, size_t& usedId) noexcept;
+    private:
+        static inline const char* _fileName = ".loginFile.dat";
+        static inline std::fstream _credentialsFile;
 
-	private:
-		static inline const char* _fileName = ".loginFile.dat";
-		static inline std::fstream _credentialsFile;
-
-		static inline bool _isFileExists = false;
-	};
+        static inline bool _isFileExists = false;
+    };
 
 } // !namespace UserData

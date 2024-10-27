@@ -19,7 +19,7 @@ namespace UserData
         static User ReadCredentials() noexcept;
 
     private:
-        static inline const char* _fileName = ".loginFile.dat";
+        static constexpr const char* _fileName = ".loginFile.dat";
         static inline std::fstream _credentialsFile;
 
         static inline bool _isFileExists = false;

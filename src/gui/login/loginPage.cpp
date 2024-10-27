@@ -2,8 +2,6 @@
 
 #include "ui_loginPage.h"
 
-#include "gui/colors/colors.h"
-
 #include "userData/user.h"
 #include "userData/userRepository.h"
 

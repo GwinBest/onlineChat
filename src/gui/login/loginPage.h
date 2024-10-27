@@ -2,6 +2,8 @@
 
 #include <QWidget>
 
+#include "gui/colors/colors.h"
+
 // forward declaration
 namespace Ui { class LoginPage; }
 
@@ -27,13 +29,13 @@ namespace Gui
         inline QString GetInputStyleSheet(const QString& primaryColor) const noexcept
         {
             return "QLineEdit { \
-                    background-color: rgba(0, 0, 0, 0); \
-                    border: none; \
+                    background-color: " + QString(colorTransparent) + ";" +
+                "border: none; \
                     border-bottom: 1px solid " + primaryColor + ";}" +
                 "QLineEdit:focus {\
-                    background-color: rgba(0,0,0,0);\
-                    border: none;\
-                    border-bottom: 1px solid rgb(0, 255, 132);}";
+                    background-color: " + QString(colorTransparent) + "; " +
+                "border: none; \
+                    border-bottom: 1px solid " + QString(colorLightGreen) + ";}";
         }
 
     private:

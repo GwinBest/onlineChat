@@ -8,6 +8,12 @@
 #include "../src/userData/userCredentialsFile.h"
 #include "../src/userData/userRepository.h"
 
+
+#include "../src/gui/login/loginPage.h"
+
+#include "gui/mainWindow.h"
+#include <QApplication>
+
 UserData::User currentUser;
 
 enum class WindowState : uint8_t
@@ -17,9 +23,14 @@ enum class WindowState : uint8_t
     kChat
 };
 
-int main()
+int main(int argc, char** argv)
 {
-    Gui::GlfwWindow window;
+    QApplication app(argc, argv);
+    MainWindow window;
+    window.show();
+    /*Gui::LoginPage page;
+    page.show();*/
+    /*Gui::GlfwWindow window;
     WindowState currentWindowState = WindowState::kLogin;
 
     std::string userName;
@@ -159,7 +170,7 @@ int main()
             break;
         }
         }
-    }
+    }*/
 
-    return 0;
+    return app.exec();
 }

@@ -17,6 +17,8 @@ namespace Gui
         explicit LoginPage(QWidget* parent = nullptr);
         ~LoginPage() override;
 
+        void ResetUiStyle() const noexcept;
+
     signals:
         void LoginSuccessful() const;
         void DisplaySignInPage() const;
@@ -26,7 +28,7 @@ namespace Gui
         void OnSignInButtonClicked() const noexcept;
 
     private:
-        inline QString GetInputStyleSheet(const QString& primaryColor) const noexcept
+        inline QString SetInputStyleSheet(const QString& primaryColor) const noexcept
         {
             return "QLineEdit { \
                     background-color: " + QString(colorTransparent) + ";" +

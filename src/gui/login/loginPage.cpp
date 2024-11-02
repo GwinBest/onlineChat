@@ -1,9 +1,13 @@
 #include "loginPage.h"
-
 #include "ui_loginPage.h"
 
+#include <string>
+
 #include "userData/user.h"
+#include "userData/userCredentialsFile.h"
 #include "userData/userRepository.h"
+
+extern UserData::User currentUser;
 
 namespace Gui
 {
@@ -22,51 +26,67 @@ namespace Gui
         delete _ui;
     }
 
+    void LoginPage::ResetUiStyle() const noexcept
+    {
+        _ui->loginInput->setStyleSheet(SetInputStyleSheet(colorBlue));
+        _ui->loginInput->clear();
+
+        _ui->passwordInput->setStyleSheet(SetInputStyleSheet(colorBlue));
+        _ui->passwordInput->clear();
+    }
+
     void LoginPage::OnLoginButtonClicked() const noexcept
     {
         bool isDataValid = true;
         bool isFieldEmpty = false;
 
-        QString login = _ui->loginInput->text().trimmed();
-        QString password = _ui->passwordInput->text().trimmed();
+        const std::string login = _ui->loginInput->text().trimmed().toStdString();
+        const std::string password = _ui->passwordInput->text().trimmed().toStdString();
 
-        if (login.isEmpty())
+        if (login.empty())
         {
-            _ui->loginInput->setStyleSheet(GetInputStyleSheet(colorRed));
+            _ui->loginInput->setStyleSheet(SetInputStyleSheet(colorRed));
             isFieldEmpty = true;
         }
         else
         {
-            _ui->loginInput->setStyleSheet(GetInputStyleSheet(colorBlue));
+            _ui->loginInput->setStyleSheet(SetInputStyleSheet(colorBlue));
         }
 
-        if (password.isEmpty())
+        if (password.empty())
         {
-            _ui->passwordInput->setStyleSheet(GetInputStyleSheet(colorRed));
+            _ui->passwordInput->setStyleSheet(SetInputStyleSheet(colorRed));
             isFieldEmpty = true;
         }
         else
         {
-            _ui->passwordInput->setStyleSheet(GetInputStyleSheet(colorBlue));
+            _ui->passwordInput->setStyleSheet(SetInputStyleSheet(colorBlue));
         }
 
-        if (!isFieldEmpty)
+        if (isFieldEmpty) return;
+
+        currentUser.SetUserLogin(login);
+        currentUser.SetUserPassword(std::hash<std::string>{}(password));
+
+        isDataValid = UserData::UserRepository::IsUserExist(currentUser);
+
+        if (!isDataValid) return;
+
+        currentUser.SetUserId(UserData::UserRepository::GetUserIdFromDatabase(login));
+        currentUser.SetUserName(UserData::UserRepository::GetUserNameFromDatabase(login));
+
+        if (UserData::UserCredentialsFile::CreateNewFile())
         {
-            UserData::User currentUser;
-            currentUser.SetUserLogin(login.toStdString());
-            currentUser.SetUserPassword(password.toInt());
-
-            //isDataValid = UserData::UserRepository::IsUserExist(currentUser);
+            UserData::UserCredentialsFile::WriteCredentials(currentUser);
+            UserData::UserCredentialsFile::CloseFile();
         }
 
-        if (isDataValid)
-        {
-            emit LoginSuccessful();
-        }
+        emit LoginSuccessful();
     }
 
     void LoginPage::OnSignInButtonClicked() const noexcept
     {
         emit DisplaySignInPage();
     }
+
 } // !namespace Gui

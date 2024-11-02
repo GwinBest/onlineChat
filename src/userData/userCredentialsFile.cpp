@@ -1,10 +1,13 @@
 #include "userCredentialsFile.h"
 
+#ifdef WIN32
 #include <Windows.h>		// for SetFileAttributesA
 
 #ifdef GetUserName
 #undef GetUserName
 #endif // GetUserName
+
+#endif // WIN32
 
 namespace UserData
 {
@@ -49,15 +52,19 @@ namespace UserData
     {
         if (_credentialsFile.is_open())
         {
-            _credentialsFile.write(user.GetUserName().c_str(), user.GetUserName().size());
+            const std::string userName = user.GetUserName();
+            _credentialsFile.write(userName.c_str(), userName.size());
             _credentialsFile.write(" ", sizeof(char));
 
-            _credentialsFile.write(user.GetUserLogin().c_str(), user.GetUserLogin().size());
+            const std::string userLogin = user.GetUserLogin();
+            _credentialsFile.write(userLogin.c_str(), userLogin.size());
             _credentialsFile.write(" ", sizeof(char));
 
-            _credentialsFile.write(reinterpret_cast<const char*>(user.GetUserPassword()), sizeof(user.GetUserPassword()));
+            const size_t userPassword = user.GetUserPassword();
+            _credentialsFile.write(reinterpret_cast<const char*>(&userPassword), sizeof(userPassword));
 
-            _credentialsFile.write(reinterpret_cast<const char*>(user.GetUserId()), sizeof(user.GetUserId()));
+            const size_t userId = user.GetUserId();
+            _credentialsFile.write(reinterpret_cast<const char*>(&userId), sizeof(userId));
         }
     }
 

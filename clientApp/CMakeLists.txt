@@ -45,6 +45,9 @@ file(COPY ${CMAKE_SOURCE_DIR}/resources DESTINATION ${CMAKE_BINARY_DIR}/clientAp
 
 set(SOURCE_FILES
     main.cpp
+     ../src/gui/signIn/signInPage.cpp
+     ../src/gui/signIn/signInPage.h
+     ../src/gui/signIn/signInPage.ui
      ../src/gui/mainWindow.h
      ../src/gui/mainWindow.cpp
      ../src/gui/mainWindow.ui

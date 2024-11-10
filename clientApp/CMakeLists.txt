@@ -36,7 +36,7 @@ target_link_libraries(imgui glfw)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/src
-    ../resources
+    ${CMAKE_SOURCE_DIR}/resources
     ${CMAKE_SOURCE_DIR}/thirdParty/mySql/include
     ${stb_src_path}
 )
@@ -45,35 +45,30 @@ file(COPY ${CMAKE_SOURCE_DIR}/resources DESTINATION ${CMAKE_BINARY_DIR}/clientAp
 
 set(SOURCE_FILES
     main.cpp
-     ../src/gui/signIn/signInPage.cpp
-     ../src/gui/signIn/signInPage.h
-     ../src/gui/signIn/signInPage.ui
-     ../src/gui/mainWindow.h
-     ../src/gui/mainWindow.cpp
-     ../src/gui/mainWindow.ui
-    ../src/gui/colors/colors.h
-    ../src/gui/login/loginPage.cpp
-    ../src/gui/login/loginPage.h
-    ../src/gui/login/loginPage.ui
-    ../src/client/client.cpp
-    ../src/gui/glfwWindow.cpp
-    ../src/gui/chatWindow.h
-    ../src/gui/chatWindow.cpp
-    ../src/gui/iImGuiWindow.h
-    ../src/gui/loginWindow.h
-    ../src/gui/loginWindow.cpp
-    ../src/gui/signUpWindow.h
-    ../src/gui/signUpWindow.cpp
-    ../src/userData/userCredentialsFile.h
-    ../src/userData/userCredentialsFile.cpp
-    ../src/userData/user.h
-    ../src/chatSystem/chat.h
-    ../src/chatSystem/chat.cpp
-    ../src/networkCore/networkCore.h
-    ../src/common/common.h
-    ../src/userData/userRepository.h
-    ../src/userData/userRepository.cpp
-    ../src/utils/loadImage.cpp
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/chatPage.cpp
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/chatPage.h
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/chatPage.ui
+    ${CMAKE_SOURCE_DIR}/src/gui/signIn/signInPage.cpp
+    ${CMAKE_SOURCE_DIR}/src/gui/signIn/signInPage.h
+    ${CMAKE_SOURCE_DIR}/src/gui/signIn/signInPage.ui
+    ${CMAKE_SOURCE_DIR}/src/gui/mainWindow.h
+    ${CMAKE_SOURCE_DIR}/src/gui/mainWindow.cpp
+    ${CMAKE_SOURCE_DIR}/src/gui/mainWindow.ui
+    ${CMAKE_SOURCE_DIR}/src/gui/colors/colors.h
+    ${CMAKE_SOURCE_DIR}/src/gui/login/loginPage.cpp
+    ${CMAKE_SOURCE_DIR}/src/gui/login/loginPage.h
+    ${CMAKE_SOURCE_DIR}/src/gui/login/loginPage.ui
+    ${CMAKE_SOURCE_DIR}/src/client/client.cpp
+    ${CMAKE_SOURCE_DIR}/src/userData/userCredentialsFile.h
+    ${CMAKE_SOURCE_DIR}/src/userData/userCredentialsFile.cpp
+    ${CMAKE_SOURCE_DIR}/src/userData/user.h
+    ${CMAKE_SOURCE_DIR}/src/chatSystem/chat.h
+    ${CMAKE_SOURCE_DIR}/src/chatSystem/chat.cpp
+    ${CMAKE_SOURCE_DIR}/src/networkCore/networkCore.h
+    ${CMAKE_SOURCE_DIR}/src/common/common.h
+    ${CMAKE_SOURCE_DIR}/src/userData/userRepository.h
+    ${CMAKE_SOURCE_DIR}/src/userData/userRepository.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/loadImage.cpp
 )
 
 add_executable(OnlineChat ${SOURCE_FILES})

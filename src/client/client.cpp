@@ -7,9 +7,9 @@
 #include <thread>
 #include <vector>
 
-#include "../common/common.h"
-#include "../userData/user.h"
-#include "../messageBuffer/messageBuffer.h"
+#include "common/common.h"
+#include "userData/user.h"
+#include "messageBuffer/messageBuffer.h"
 
 extern std::list<MessageBuffer::MessageNode> MessageBuffer::messageBuffer;
 
@@ -17,21 +17,29 @@ extern UserData::User currentUser;
 
 namespace ClientNetworking
 {
-    Client& Client::GetInstance() noexcept
+    std::optional<Client*> Client::GetInstance() noexcept
     {
         static Client instance;
         if (instance._currentClientState != ClientState::kClientConnected)
         {
+            constexpr uint8_t attemptsToConnect = 3;
+            uint8_t currentAttempt = 1;
+
             while (!instance.Connect())
             {
-                //TODO: add !connect handle
+                if (currentAttempt >= attemptsToConnect)
+                {
+                    return std::nullopt;
+                }
+
+                ++currentAttempt;
             };
 
-            std::thread receiveThread(&Client::ReceiveThread, &Client::GetInstance());
+            std::thread receiveThread(&Client::ReceiveThread, Client::GetInstance().value());
             receiveThread.detach();
         }
 
-        return instance;
+        return &instance;
     }
 
     void Client::SendUserMessage(const UserData::User& sender, const std::string& receiverUserLogin, const char* data) const noexcept

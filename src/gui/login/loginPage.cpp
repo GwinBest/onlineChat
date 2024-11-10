@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <QMessageBox>
+
 #include "userData/user.h"
 #include "userData/userCredentialsFile.h"
 #include "userData/userRepository.h"
@@ -37,7 +39,6 @@ namespace Gui
 
     void LoginPage::OnLoginButtonClicked() const noexcept
     {
-        bool isDataValid = true;
         bool isFieldEmpty = false;
 
         const std::string login = _ui->loginInput->text().trimmed().toStdString();
@@ -68,12 +69,27 @@ namespace Gui
         currentUser.SetUserLogin(login);
         currentUser.SetUserPassword(std::hash<std::string>{}(password));
 
-        isDataValid = UserData::UserRepository::IsUserExist(currentUser);
+        std::optional<bool> isDataValid = UserData::UserRepository::IsUserExist(currentUser);
 
-        if (!isDataValid) return;
+        if (!isDataValid.has_value())
+        {
+            QMessageBox::critical(nullptr, "Error", "Cant connect to the server");
+            return;
+        }
 
-        currentUser.SetUserId(UserData::UserRepository::GetUserIdFromDatabase(login));
-        currentUser.SetUserName(UserData::UserRepository::GetUserNameFromDatabase(login));
+        if (!isDataValid.value()) return;
+
+        std::optional<size_t> userId = UserData::UserRepository::GetUserIdFromDatabase(login);
+        std::optional<std::string> userName = UserData::UserRepository::GetUserNameFromDatabase(login);
+
+        if (!userId.has_value() || !userName.has_value())
+        {
+            QMessageBox::critical(nullptr, "Error", "Cant connect to the server");
+            return;
+        }
+
+        currentUser.SetUserId(userId.value());
+        currentUser.SetUserName(userName.value());
 
         if (UserData::UserCredentialsFile::CreateNewFile())
         {

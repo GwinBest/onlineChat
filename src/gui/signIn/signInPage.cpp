@@ -44,7 +44,6 @@ namespace Gui
 
     void SignInPage::OnSignInButtonPressed() const noexcept
     {
-        bool isDataValid = true;
         bool isFieldEmpty = false;
 
         const std::string name = _ui->nameInput->text().trimmed().toStdString();
@@ -87,7 +86,15 @@ namespace Gui
         currentUser.SetUserLogin(login);
         currentUser.SetUserPassword(std::hash<std::string>{}(password));
 
-        if (UserData::UserRepository::IsUserExist(currentUser))
+        std::optional<bool> isUserExist = UserData::UserRepository::IsUserExist(currentUser);
+
+        if (!isUserExist.has_value())
+        {
+            QMessageBox::critical(nullptr, "Error", "Cant connect to the server");
+            return;
+        }
+
+        if (isUserExist.value())
         {
             _ui->userNotFoundLabel->setVisible(true);
             return;
@@ -103,13 +110,29 @@ namespace Gui
             UserData::UserCredentialsFile::CloseFile();
         }
 
-        if (!UserData::UserRepository::PushUserCredentialsToDatabase(currentUser))
+        std::optional<bool> isPushSuccessful = UserData::UserRepository::PushUserCredentialsToDatabase(currentUser);
+
+        if (!isPushSuccessful.has_value())
         {
-            QMessageBox::critical(nullptr, "Error", "Cant register user to database");
+            QMessageBox::critical(nullptr, "Error", "Cant connect to the server");
+            return;
+        }
+
+        if (!isPushSuccessful.value())
+        {
+            QMessageBox::critical(nullptr, "Error", "Cant register user on the server");
             return;
         };
 
-        currentUser.SetUserId(UserData::UserRepository::GetUserIdFromDatabase(login));
+        std::optional<size_t> userId = UserData::UserRepository::GetUserIdFromDatabase(login);
+
+        if (!userId.has_value())
+        {
+            QMessageBox::critical(nullptr, "Error", "Cant connect to the server");
+            return;
+        }
+
+        currentUser.SetUserId(userId.value());
 
         emit SignInSuccessful();
     }

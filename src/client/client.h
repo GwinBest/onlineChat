@@ -19,7 +19,7 @@ namespace ClientNetworking
         Client(const Client&) = delete;
         void operator= (const Client&) = delete;
 
-        static std::optional<Client*> GetInstance() noexcept;
+        static std::optional<std::reference_wrapper<Client>> GetInstance() noexcept;
 
         //The sender objects must have login and id fields filled in
         void SendUserMessage(const UserData::User& sender, const std::string& receiverUserLogin, const char* data) const noexcept;

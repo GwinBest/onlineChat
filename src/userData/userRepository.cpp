@@ -20,12 +20,12 @@ namespace UserData
             .password = user.GetUserPassword()
         };
 
-        std::optional<ClientNetworking::Client*> instance = ClientNetworking::Client::GetInstance();
+        std::optional<std::reference_wrapper<ClientNetworking::Client>> instance = ClientNetworking::Client::GetInstance();
         if (!instance.has_value()) return std::nullopt;
 
-        instance.value()->SendUserCredentialsPacket(request);
+        instance.value().get().SendUserCredentialsPacket(request);
 
-        return instance.value()->GetServerResponse<bool>();
+        return instance.value().get().GetServerResponse<bool>();
     }
 
     std::optional<std::string> UserRepository::GetUserNameFromDatabase(const std::string& userLogin) noexcept
@@ -36,12 +36,12 @@ namespace UserData
             .login = userLogin
         };
 
-        std::optional<ClientNetworking::Client*> instance = ClientNetworking::Client::GetInstance();
+        std::optional<std::reference_wrapper<ClientNetworking::Client>> instance = ClientNetworking::Client::GetInstance();
         if (!instance.has_value()) return std::nullopt;
 
-        instance.value()->SendUserCredentialsPacket(request);
+        instance.value().get().SendUserCredentialsPacket(request);
 
-        return instance.value()->GetServerResponse<std::string>();
+        return instance.value().get().GetServerResponse<std::string>();
     }
 
     std::optional<size_t> UserRepository::GetUserIdFromDatabase(const std::string& userLogin) noexcept
@@ -52,12 +52,12 @@ namespace UserData
             .login = userLogin
         };
 
-        std::optional<ClientNetworking::Client*> instance = ClientNetworking::Client::GetInstance();
+        std::optional<std::reference_wrapper<ClientNetworking::Client>> instance = ClientNetworking::Client::GetInstance();
         if (!instance.has_value()) return std::nullopt;
 
-        instance.value()->SendUserCredentialsPacket(request);
+        instance.value().get().SendUserCredentialsPacket(request);
 
-        return instance.value()->GetServerResponse<size_t>();
+        return instance.value().get().GetServerResponse<size_t>();
     }
 
     std::optional<bool> UserRepository::IsUserDataFromFileValid(const User& user) noexcept
@@ -71,12 +71,12 @@ namespace UserData
             .id = user.GetUserId()
         };
 
-        std::optional<ClientNetworking::Client*> instance = ClientNetworking::Client::GetInstance();
+        std::optional<std::reference_wrapper<ClientNetworking::Client>> instance = ClientNetworking::Client::GetInstance();
         if (!instance.has_value()) return std::nullopt;
 
-        instance.value()->SendUserCredentialsPacket(request);
+        instance.value().get().SendUserCredentialsPacket(request);
 
-        return instance.value()->GetServerResponse<bool>();
+        return instance.value().get().GetServerResponse<bool>();
     }
 
     std::optional<bool> UserRepository::IsUserExist(const User& user) noexcept
@@ -88,12 +88,12 @@ namespace UserData
             .password = user.GetUserPassword()
         };
 
-        std::optional<ClientNetworking::Client*> instance = ClientNetworking::Client::GetInstance();
+        std::optional<std::reference_wrapper<ClientNetworking::Client>> instance = ClientNetworking::Client::GetInstance();
         if (!instance.has_value()) return std::nullopt;
 
-        instance.value()->SendUserCredentialsPacket(request);
+        instance.value().get().SendUserCredentialsPacket(request);
 
-        return instance.value()->GetServerResponse<bool>();
+        return instance.value().get().GetServerResponse<bool>();
     }
 
     std::optional<std::vector<User>> UserRepository::FindUsersByLogin(const std::string& userLogin) noexcept
@@ -104,12 +104,12 @@ namespace UserData
             .login = userLogin,
         };
 
-        std::optional<ClientNetworking::Client*> instance = ClientNetworking::Client::GetInstance();
+        std::optional<std::reference_wrapper<ClientNetworking::Client>> instance = ClientNetworking::Client::GetInstance();
         if (!instance.has_value()) return std::nullopt;
 
-        instance.value()->SendUserCredentialsPacket(request);
+        instance.value().get().SendUserCredentialsPacket(request);
 
-        return instance.value()->GetServerResponse<std::vector<User>>();
+        return instance.value().get().GetServerResponse<std::vector<User>>();
     }
 
     std::optional<std::vector<ChatSystem::Chat>> UserRepository::GetAvailableChatsForUser(const size_t userId) noexcept
@@ -120,13 +120,12 @@ namespace UserData
             .id = userId,
         };
 
-        std::optional<ClientNetworking::Client*> instance = ClientNetworking::Client::GetInstance();
+        std::optional<std::reference_wrapper<ClientNetworking::Client>> instance = ClientNetworking::Client::GetInstance();
         if (!instance.has_value()) return std::nullopt;
 
-        instance.value()->SendUserCredentialsPacket(request);
+        instance.value().get().SendUserCredentialsPacket(request);
 
-        return instance.value()->GetServerResponse<std::vector<ChatSystem::Chat>>();
+        return instance.value().get().GetServerResponse<std::vector<ChatSystem::Chat>>();
     }
-
 } // !namespace UserData
 

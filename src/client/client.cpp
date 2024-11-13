@@ -17,7 +17,7 @@ extern UserData::User currentUser;
 
 namespace ClientNetworking
 {
-    std::optional<Client*> Client::GetInstance() noexcept
+    std::optional<std::reference_wrapper<Client>> Client::GetInstance() noexcept
     {
         static Client instance;
         if (instance._currentClientState != ClientState::kClientConnected)
@@ -39,7 +39,7 @@ namespace ClientNetworking
             receiveThread.detach();
         }
 
-        return &instance;
+        return instance;
     }
 
     void Client::SendUserMessage(const UserData::User& sender, const std::string& receiverUserLogin, const char* data) const noexcept

@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
-#include "userData/user.h"
-
 #include "chatSystem/chat.h"
+
+#include "userData/user.h"
 
 namespace UserData
 {

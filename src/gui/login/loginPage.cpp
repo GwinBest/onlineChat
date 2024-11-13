@@ -19,6 +19,8 @@ namespace Gui
     {
         _ui->setupUi(this);
 
+        ResetUiStyle();
+
         connect(_ui->loginButton, &QPushButton::clicked, this, &LoginPage::OnLoginButtonClicked);
         connect(_ui->signInButton, &QPushButton::clicked, this, &LoginPage::OnSignInButtonClicked);
     }
@@ -35,6 +37,8 @@ namespace Gui
 
         _ui->passwordInput->setStyleSheet(SetInputStyleSheet(colorBlue));
         _ui->passwordInput->clear();
+
+        _ui->userNotFound->setVisible(false);
     }
 
     void LoginPage::OnLoginButtonClicked() const noexcept
@@ -69,15 +73,23 @@ namespace Gui
         currentUser.SetUserLogin(login);
         currentUser.SetUserPassword(std::hash<std::string>{}(password));
 
-        std::optional<bool> isDataValid = UserData::UserRepository::IsUserExist(currentUser);
+        std::optional<bool> isUserExist = UserData::UserRepository::IsUserExist(currentUser);
 
-        if (!isDataValid.has_value())
+        if (!isUserExist.has_value())
         {
             QMessageBox::critical(nullptr, "Error", "Cant connect to the server");
             return;
         }
 
-        if (!isDataValid.value()) return;
+        if (!isUserExist.value())
+        {
+            _ui->userNotFound->setVisible(true);
+            return;
+        }
+        else
+        {
+            _ui->userNotFound->setVisible(false);
+        }
 
         std::optional<size_t> userId = UserData::UserRepository::GetUserIdFromDatabase(login);
         std::optional<std::string> userName = UserData::UserRepository::GetUserNameFromDatabase(login);

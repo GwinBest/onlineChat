@@ -19,7 +19,7 @@ namespace Gui
     {
         _ui->setupUi(this);
 
-        _ui->userNotFoundLabel->setVisible(false);
+        ResetUiStyle();
 
         connect(_ui->signInButton, &QPushButton::clicked, this, &SignInPage::OnSignInButtonPressed);
         connect(_ui->loginButton, &QPushButton::clicked, this, &SignInPage::OnLoginButtonPressed);
@@ -40,6 +40,8 @@ namespace Gui
 
         _ui->passwordInput->setStyleSheet(SetInputStyleSheet(colorBlue));
         _ui->passwordInput->clear();
+
+        _ui->userExistLabel->setVisible(false);
     }
 
     void SignInPage::OnSignInButtonPressed() const noexcept
@@ -96,12 +98,12 @@ namespace Gui
 
         if (isUserExist.value())
         {
-            _ui->userNotFoundLabel->setVisible(true);
+            _ui->userExistLabel->setVisible(true);
             return;
         }
         else
         {
-            _ui->userNotFoundLabel->setVisible(false);
+            _ui->userExistLabel->setVisible(false);
         }
 
         if (UserData::UserCredentialsFile::CreateNewFile())

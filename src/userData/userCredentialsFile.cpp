@@ -1,7 +1,7 @@
 #include "userCredentialsFile.h"
 
 #ifdef WIN32
-#include <Windows.h>		// for SetFileAttributesA
+#include <Windows.h> // for SetFileAttributesA
 
 #ifdef GetUserName
 #undef GetUserName
@@ -9,15 +9,17 @@
 
 #endif // WIN32
 
+#include <string>
+
 namespace UserData
 {
-    bool UserCredentialsFile::IsFileExists() noexcept
+    bool UserCredentialsFile::IsFileExists()
     {
         _credentialsFile.open(_fileName, std::ios::in | std::ios::out | std::ios::binary);
         return _credentialsFile.is_open();
     }
 
-    bool UserCredentialsFile::CreateNewFile() noexcept
+    bool UserCredentialsFile::CreateNewFile()
     {
         _credentialsFile.open(_fileName, std::ios::in | std::ios::out | std::ios::binary);
         if (_credentialsFile.is_open())
@@ -28,7 +30,7 @@ namespace UserData
             return true;
         }
 
-        _credentialsFile.open(_fileName, std::ios::in | std::ios::out | std::ios::trunc | std::ios::binary);        // if file already exist - clear it
+        _credentialsFile.open(_fileName, std::ios::in | std::ios::out | std::ios::trunc | std::ios::binary); // if file already exist - clear it
         if (_credentialsFile.is_open())
         {
 #ifdef WIN32
@@ -40,7 +42,7 @@ namespace UserData
         return false;
     }
 
-    void UserCredentialsFile::CloseFile() noexcept
+    void UserCredentialsFile::CloseFile()
     {
         if (_credentialsFile.is_open())
         {
@@ -48,16 +50,16 @@ namespace UserData
         }
     }
 
-    void UserCredentialsFile::WriteCredentials(const User& user) noexcept
+    void UserCredentialsFile::WriteCredentials(const User& user)
     {
         if (_credentialsFile.is_open())
         {
-            const std::string userName = user.GetUserName();
-            _credentialsFile.write(userName.c_str(), userName.size());
+            const std::string& userName = user.GetUserName();
+            _credentialsFile.write(userName.c_str(), static_cast<std::streamsize>(userName.size()));
             _credentialsFile.write(" ", sizeof(char));
 
-            const std::string userLogin = user.GetUserLogin();
-            _credentialsFile.write(userLogin.c_str(), userLogin.size());
+            const std::string& userLogin = user.GetUserLogin();
+            _credentialsFile.write(userLogin.c_str(), static_cast<std::streamsize>(userLogin.size()));
             _credentialsFile.write(" ", sizeof(char));
 
             const size_t userPassword = user.GetUserPassword();
@@ -68,7 +70,7 @@ namespace UserData
         }
     }
 
-    User UserCredentialsFile::ReadCredentials() noexcept
+    User UserCredentialsFile::ReadCredentials()
     {
         User user;
 
@@ -92,5 +94,4 @@ namespace UserData
 
         return user;
     }
-
 } // !namespace UserData

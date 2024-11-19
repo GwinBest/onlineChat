@@ -1,7 +1,6 @@
 #pragma once
 
 #include <fstream>
-#include <string>
 
 #include "userData/user.h"
 
@@ -10,19 +9,18 @@ namespace UserData
     class UserCredentialsFile final
     {
     public:
-        [[nodiscard]] static bool IsFileExists() noexcept;
+        [[nodiscard]] static bool IsFileExists();
 
-        [[nodiscard]] static bool CreateNewFile() noexcept;
-        static void CloseFile() noexcept;
+        [[nodiscard]] static bool CreateNewFile();
+        static void CloseFile();
 
-        static void WriteCredentials(const User& user) noexcept;
-        static User ReadCredentials() noexcept;
+        static void WriteCredentials(const User& user);
+        static User ReadCredentials();
 
     private:
-        static constexpr const char* _fileName = ".loginFile.dat";
+        static constexpr const char* const _fileName = ".loginFile.dat";
         static inline std::fstream _credentialsFile;
 
         static inline bool _isFileExists = false;
     };
-
 } // !namespace UserData

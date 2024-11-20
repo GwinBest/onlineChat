@@ -8,12 +8,16 @@ file(COPY
     DESTINATION ${CMAKE_BINARY_DIR}/serverApp
 )
 
+include_directories(
+    ${CMAKE_SOURCE_DIR}/src
+)
+
 add_executable(Server
     main.cpp
-    ../src/server/server.h
-    ../src/server/server.cpp
-    ../src/database/database.h
-    ../src/database/database.cpp
+    ${CMAKE_SOURCE_DIR}/src/server/server.h
+    ${CMAKE_SOURCE_DIR}/src/server/server.cpp
+    ${CMAKE_SOURCE_DIR}/src/database/database.h
+    ${CMAKE_SOURCE_DIR}/src/database/database.cpp
 )
 
 add_compile_definitions(STATIC_CONCPP)

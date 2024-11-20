@@ -7,31 +7,34 @@
 #pragma comment(lib, "ws2_32.lib")
 #pragma warning(disable: 4996)
 
+#ifdef GetCurrentTime
+#undef GetCurrentTime
+#endif
+
 namespace ServerNetworking
 {
-	class Server final
-	{
-	public:
-		void Start() noexcept;
-		[[noreturn]] void Run() noexcept;
+    class Server final
+    {
+    public:
+        void Start() noexcept;
+        [[noreturn]] void Run() noexcept;
 
-	private:
-		void ClientHandler(int index);
-		
-		//void ReceiveUserMessage(UserData::User& sender, const UserData::User& receiver, const char* data) const noexcept;
-		NetworkCore::UserPacket ReceiveUserCredentialsPacket(size_t index) const noexcept;
-		//void ReceiveChatInfoPacket(const ChatPacket& chatInfo) const noexcept;
+    private:
+        void ClientHandler(int index);
 
-		void SendServerErrorMessage(const size_t index, const std::string& errorMessage) const noexcept;
+        //void ReceiveUserMessage(UserData::User& sender, const UserData::User& receiver, const char* data) const noexcept;
+        NetworkCore::UserPacket ReceiveUserCredentialsPacket(size_t index) const noexcept;
+        //void ReceiveChatInfoPacket(const ChatPacket& chatInfo) const noexcept;
 
-	private:
-		WSADATA _wsaData;
-		SOCKET _serverSocket;
-		SOCKADDR_IN _socketAddress;
+        void SendServerErrorMessage(const size_t index, const std::string& errorMessage) const noexcept;
 
-		SOCKET _connections[100];
-		uint8_t _connectionsCurrentCount = 0;
-	};
+    private:
+        WSADATA _wsaData = {};
+        SOCKET _serverSocket = 0;
+        SOCKADDR_IN _socketAddress = {};
 
+        SOCKET _connections[100] = {};
+        uint8_t _connectionsCurrentCount = 0;
+    };
 } // !namespace ServerNetworking
 

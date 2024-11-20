@@ -4,99 +4,103 @@
 
 namespace Database
 {
-	DatabaseHelper& DatabaseHelper::GetInstance() noexcept
-	{
-		static DatabaseHelper instance;
+    DatabaseHelper& DatabaseHelper::GetInstance() noexcept
+    {
+        static DatabaseHelper instance;
 
-		return instance;
-	}
+        return instance;
+    }
 
-	sql::ResultSet* DatabaseHelper::ExecuteQuery(const std::string query, ...)
-	{
-		char request[255];
+    sql::ResultSet* DatabaseHelper::ExecuteQuery(const std::string query, ...)
+    {
+        va_list args = nullptr;
+        va_start(args, query);
+        const int size = vsnprintf(nullptr, 0, query.c_str(), args);
 
-		va_list args;
-		va_start(args, query);
-		vsnprintf(request, 255, query.c_str(), args);
-		va_end(args);
+        std::vector<char> request(size + 1);;
 
-		try
-		{
-			_statement = _connection->createStatement();
-			return _statement->executeQuery(request);
-		}
-		catch (const sql::SQLException& e)
-		{
-			std::cout << e.what() << std::endl;
-			throw;
-		}
-	}
+        vsnprintf(request.data(), request.size(), query.c_str(), args);
+        va_end(args);
 
-	bool DatabaseHelper::ExecuteUpdate(const std::string query, ...)
-	{
-		char request[255];
+        try
+        {
+            _statement = _connection->createStatement();
+            return _statement->executeQuery(request.data());
+        }
+        catch (const sql::SQLException& e)
+        {
+            std::cout << e.what() << std::endl;
+            throw;
+        }
+    }
 
-		va_list args;
-		va_start(args, query);
-		vsnprintf(request, 255, query.c_str(), args);
-		va_end(args);
+    bool DatabaseHelper::ExecuteUpdate(const std::string query, ...)
+    {
+        va_list args = nullptr;
+        va_start(args, query);
+        const int size = vsnprintf(nullptr, 0, query.c_str(), args);
 
-		try
-		{
-			_statement = _connection->createStatement();
-			_statement->executeUpdate(request);
+        std::vector<char> request(size + 1);;
 
-			return true;
-		}
-		catch (const sql::SQLException& e)
-		{
-			std::cout << e.what() << std::endl;
-			throw;
-		}
-	}
+        vsnprintf(request.data(), request.size(), query.c_str(), args);
+        va_end(args);
 
-	DatabaseHelper::~DatabaseHelper()
-	{
-		if (_currentState != DatabaseState::kDatabaseDisconnected)
-		{
-			DatabaseHelper::Disconnect();
-		}
-	}
+        try
+        {
+            _statement = _connection->createStatement();
+            _statement->executeUpdate(request.data());
 
-	DatabaseHelper::DatabaseHelper()
-	{
-		if (_currentState != DatabaseState::kDatabaseConnected)
-		{
-			DatabaseHelper::Connect();
-		}
-	}
+            return true;
+        }
+        catch (const sql::SQLException& e)
+        {
+            std::cout << e.what() << std::endl;
+            throw;
+        }
+    }
 
-	bool DatabaseHelper::Connect() noexcept
-	{
-		try
-		{
-			_driver = get_driver_instance();
-			_connection = _driver->connect(_hostName, _userName, _password);
-			_connection->setSchema(_schemaName);
+    DatabaseHelper::~DatabaseHelper()
+    {
+        if (_currentState != DatabaseState::kDatabaseDisconnected)
+        {
+            DatabaseHelper::Disconnect();
+        }
+    }
 
-			_currentState = DatabaseState::kDatabaseConnected;
+    DatabaseHelper::DatabaseHelper()
+    {
+        if (_currentState != DatabaseState::kDatabaseConnected)
+        {
+            DatabaseHelper::Connect();
+        }
+    }
 
-			return true;
-		}
-		catch (const sql::SQLException& e)
-		{
-			std::cout << e.what() << std::endl;
-		}
+    bool DatabaseHelper::Connect() noexcept
+    {
+        try
+        {
+            _driver = get_driver_instance();
+            _connection = _driver->connect(_hostName, _userName, _password);
+            _connection->setSchema(_schemaName);
 
-		return false;
-	}
+            _currentState = DatabaseState::kDatabaseConnected;
 
-	void DatabaseHelper::Disconnect() noexcept
-	{
-		delete _statement;
-		delete _connection;
+            return true;
+        }
+        catch (const sql::SQLException& e)
+        {
+            std::cout << e.what() << std::endl;
+        }
 
-		_currentState = DatabaseState::kDatabaseDisconnected;
-	}
+        return false;
+    }
+
+    void DatabaseHelper::Disconnect() noexcept
+    {
+        delete _statement;
+        delete _connection;
+
+        _currentState = DatabaseState::kDatabaseDisconnected;
+    }
 
 } // !namespase Database

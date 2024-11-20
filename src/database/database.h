@@ -18,7 +18,7 @@ namespace Database
         static DatabaseHelper& GetInstance() noexcept;
 
         [[nodiscard]] sql::ResultSet* ExecuteQuery(const std::string query, ...);
-        bool ExecuteUpdate(const std::string  query, ...);
+        bool ExecuteUpdate(const std::string query, ...);
 
         ~DatabaseHelper();
 
@@ -36,7 +36,7 @@ namespace Database
         const sql::SQLString _hostName = "127.0.0.1:3306";
         const sql::SQLString _userName = "root";
         const sql::SQLString _password = "admin";
-        const sql::SQLString _schemaName = "online_chat";
+        const sql::SQLString _schemaName = "test";
 
         enum class DatabaseState : uint8_t
         {

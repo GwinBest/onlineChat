@@ -1,16 +1,8 @@
-﻿#include <functional>
-
-
-#include "../src/userData/user.h"
-#include "../src/userData/userCredentialsFile.h"
-#include "../src/userData/userRepository.h"
-
-
-#include "../src/gui/login/loginPage.h"
-
-#include <QApplication>
+﻿#include <QApplication>
 
 #include "gui/mainWindow.h"
+
+#include "userData/user.h"
 
 UserData::User currentUser;
 

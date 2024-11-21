@@ -10,6 +10,7 @@
 #include "common/common.h"
 #include "userData/user.h"
 #include "messageBuffer/messageBuffer.h"
+#include "chatSystem/chatInfo.h"
 
 extern std::list<MessageBuffer::MessageNode> MessageBuffer::messageBuffer;
 
@@ -33,9 +34,9 @@ namespace ClientNetworking
                 }
 
                 ++currentAttempt;
-            };
+            }
 
-            std::thread receiveThread(&Client::ReceiveThread, Client::GetInstance().value());
+            std::thread receiveThread(&Client::ReceiveThread, GetInstance().value());
             receiveThread.detach();
         }
 
@@ -89,7 +90,7 @@ namespace ClientNetworking
 
         send(_clientSocket, reinterpret_cast<const char*>(&chatInfo.chatUserId), sizeof(chatInfo.chatUserId), NULL);
 
-        send(_clientSocket, reinterpret_cast<const char*>(&chatInfo.chatId), sizeof(chatInfo.chatId), NULL);
+        send(_clientSocket, reinterpret_cast<const char*>(&chatInfo.id), sizeof(chatInfo.id), NULL);
     }
 
     void Client::ReceiveThread() const noexcept
@@ -105,8 +106,7 @@ namespace ClientNetworking
             {
             case NetworkCore::ActionType::kSendChatMessage:
             {
-                size_t userId;
-
+                size_t userId = 0;
                 recv(_clientSocket, reinterpret_cast<char*>(&userId), sizeof(userId), NULL);
 
                 size_t receiveMessageSize;
@@ -130,7 +130,7 @@ namespace ClientNetworking
                 bool response = false;
                 recv(_clientSocket, reinterpret_cast<char*>(&response), sizeof(response), NULL);
 
-                NetworkCore::serverResponse = response;
+                _serverResponse = response;
 
                 _conditionalVariable.notify_one();
 
@@ -143,7 +143,7 @@ namespace ClientNetworking
                 recv(_clientSocket, serverResponse, responseSize, NULL);
                 serverResponse[responseSize] = '\0';
 
-                NetworkCore::serverResponse = serverResponse;
+                _serverResponse = serverResponse;
                 _conditionalVariable.notify_one();
 
                 break;
@@ -153,64 +153,59 @@ namespace ClientNetworking
                 size_t response;
                 recv(_clientSocket, reinterpret_cast<char*>(&response), sizeof(response), NULL);
 
-                NetworkCore::serverResponse = response;
+                _serverResponse = response;
                 _conditionalVariable.notify_one();
 
                 break;
             }
-            case NetworkCore::ActionType::kFindUsersByLogin:
-            {
-                size_t foundUsersCount = 0;
-                recv(_clientSocket, reinterpret_cast<char*>(&foundUsersCount), sizeof(foundUsersCount), NULL);
-
-                std::vector<UserData::User> foundUsersVector;
-
-                for (size_t i = 0; foundUsersCount > 0; ++i, --foundUsersCount)
-                {
-                    char userLogin[Common::userLoginSize];
-                    size_t userLoginLength;
-                    UserData::User foundUser;
-
-                    recv(_clientSocket, reinterpret_cast<char*>(&userLoginLength), sizeof(userLoginLength), NULL);
-                    recv(_clientSocket, userLogin, userLoginLength, NULL);
-                    userLogin[userLoginLength] = '\0';
-
-                    foundUser.SetUserLogin(userLogin);
-                    foundUsersVector.push_back(foundUser);
-                }
-
-                NetworkCore::serverResponse = foundUsersVector;
-                _conditionalVariable.notify_one();
-
-                break;
-            }
+            case NetworkCore::ActionType::kFindMatchingChats:
             case NetworkCore::ActionType::kGetAvailableChatsForUser:
             {
                 size_t availableChatsCount = 0;
                 recv(_clientSocket, reinterpret_cast<char*>(&availableChatsCount), sizeof(availableChatsCount), NULL);
 
-                std::vector<ChatSystem::Chat> availableChatsVector;
+                std::vector<ChatSystem::ChatInfo> availableChatsVector;
 
                 for (size_t i = 0; availableChatsCount > 0; ++i, --availableChatsCount)
                 {
-                    char chatName[50];
+                    ChatSystem::ChatInfo foundChat;
+
+                    size_t id;
+                    recv(_clientSocket, reinterpret_cast<char*>(&id), sizeof(id), NULL);
+
+                    char name[50];
                     size_t chatNameLength;
-                    ChatSystem::Chat foundChat;
-
-                    size_t chatId;
-                    recv(_clientSocket, reinterpret_cast<char*>(&chatId), sizeof(chatId), NULL);
-
                     recv(_clientSocket, reinterpret_cast<char*>(&chatNameLength), sizeof(chatNameLength), NULL);
-                    recv(_clientSocket, chatName, chatNameLength, NULL);
-                    chatName[chatNameLength] = '\0';
+                    recv(_clientSocket, name, chatNameLength, NULL);
+                    name[chatNameLength] = '\0';
 
-                    foundChat.SetChatName(chatName);
-                    foundChat.SetChatId(chatId);
+                    size_t lastMessageSize;
+                    char lastMessage[Common::maxInputBufferSize];
+                    recv(_clientSocket, reinterpret_cast<char*>(&lastMessageSize), sizeof(lastMessageSize), NULL);
+                    recv(_clientSocket, lastMessage, lastMessageSize, NULL);
+                    lastMessage[lastMessageSize] = '\0';
+
+                    size_t lastMessageSendTimeSize;
+                    char lastMessageSendTime[Common::maxInputBufferSize];
+                    recv(_clientSocket, reinterpret_cast<char*>(&lastMessageSendTimeSize), sizeof(lastMessageSendTimeSize), NULL);
+                    recv(_clientSocket, lastMessageSendTime, lastMessageSendTimeSize, NULL);
+                    lastMessageSendTime[lastMessageSendTimeSize] = '\0';
+
+                    size_t photoSize;
+                    char photo[Common::maxLastMessageSendTimeSize] = "";
+                    recv(_clientSocket, reinterpret_cast<char*>(&photoSize), sizeof(photoSize), NULL);
+                    if (photoSize != 0) recv(_clientSocket, lastMessageSendTime, photoSize, NULL);
+                    photo[photoSize] = '\0';
+
+                    foundChat.id = id;
+                    foundChat.name = name;
+                    foundChat.lastMessage = lastMessage;
+                    foundChat.lastMessageSendTime = lastMessageSendTime;
 
                     availableChatsVector.push_back(foundChat);
                 }
 
-                NetworkCore::serverResponse = availableChatsVector;
+                _serverResponse = availableChatsVector;
                 _conditionalVariable.notify_one();
 
                 break;
@@ -222,7 +217,7 @@ namespace ClientNetworking
 
                 MessageBuffer::messageBuffer.clear();
 
-                NetworkCore::serverResponse = false;
+                _serverResponse = false;
                 while (messageCount > 0)
                 {
                     size_t receiveMessageSize;
@@ -246,9 +241,9 @@ namespace ClientNetworking
 
                     messageCount--;
 
-                    if (!std::get<bool>(NetworkCore::serverResponse) && ((MessageBuffer::messageBuffer.size() + 1) % 15 == 0 || messageCount == 0))
+                    if (!std::get<bool>(_serverResponse) && ((MessageBuffer::messageBuffer.size() + 1) % 15 == 0 || messageCount == 0))
                     {
-                        NetworkCore::serverResponse = true;
+                        _serverResponse = true;
                         _conditionalVariable.notify_one();
                     }
                 }

@@ -1,9 +1,6 @@
 ﻿#include <functional>
 
-#include "../src/gui/chatWindow.h"
-#include "../src/gui/glfwWindow.h"
-#include "../src/gui/loginWindow.h"
-#include "../src/gui/signUpWindow.h"
+
 #include "../src/userData/user.h"
 #include "../src/userData/userCredentialsFile.h"
 #include "../src/userData/userRepository.h"
@@ -11,23 +8,22 @@
 
 #include "../src/gui/login/loginPage.h"
 
-#include "gui/mainWindow.h"
 #include <QApplication>
 
-UserData::User currentUser;
+#include "gui/mainWindow.h"
 
-enum class WindowState : uint8_t
-{
-    kLogin,
-    kSignUp,
-    kChat
-};
+UserData::User currentUser;
 
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
+    app.setStyle("fusion");
     MainWindow window;
     window.show();
+
+    return app.exec();
+
+
     /*Gui::LoginPage page;
     page.show();*/
     /*Gui::GlfwWindow window;
@@ -172,5 +168,4 @@ int main(int argc, char** argv)
         }
     }*/
 
-    return app.exec();
 }

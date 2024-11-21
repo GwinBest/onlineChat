@@ -3,6 +3,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <optional>
+#include <variant>
 
 #include "networkCore/networkCore.h"
 
@@ -15,6 +16,9 @@ namespace ClientNetworking
 {
     class Client final
     {
+    public:
+        using ServerResponse = std::variant<bool, size_t, std::string, std::vector<UserData::User>, std::vector<ChatSystem::ChatInfo>>;
+
     public:
         Client(const Client&) = delete;
         void operator= (const Client&) = delete;
@@ -34,7 +38,7 @@ namespace ClientNetworking
             std::unique_lock<std::mutex> lock(_mutex);
             _conditionalVariable.wait(lock);
 
-            return std::get<T>(NetworkCore::serverResponse);
+            return std::get<T>(_serverResponse);
         }
 
         ~Client();
@@ -60,6 +64,7 @@ namespace ClientNetworking
 
         mutable std::mutex _mutex;
         mutable std::condition_variable _conditionalVariable;
-    };
 
+        mutable ServerResponse _serverResponse;
+    };
 } // !namespace ClientNetworking

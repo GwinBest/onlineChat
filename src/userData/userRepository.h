@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "chatSystem/chat.h"
+#include "chatSystem/chatInfo.h"
 
 #include "userData/user.h"
 
@@ -18,7 +18,7 @@ namespace UserData
         [[nodiscard]] static std::optional<size_t> GetUserIdFromDatabase(const std::string& userLogin);
         [[nodiscard]] static std::optional<bool> IsUserDataFromFileValid(const User& user);
         [[nodiscard]] static std::optional<bool> IsUserExist(const User& user);
-        [[nodiscard]] static std::optional<std::vector<User>> FindUsersByLogin(const std::string& userLogin);
-        [[nodiscard]] static std::optional<std::vector<ChatSystem::Chat>> GetAvailableChatsForUser(const size_t userId);
+        [[nodiscard]] static std::optional<std::vector<ChatSystem::ChatInfo>> FindMatchingChats(const size_t currentUserId, const std::string& pattern);
+        [[nodiscard]] static std::optional<std::vector<ChatSystem::ChatInfo>> GetAvailableChatsForUser(const size_t userId);
     };
 } // !namespace UserData

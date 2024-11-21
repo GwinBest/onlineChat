@@ -3,7 +3,8 @@
 #include <QWidget>
 
 // forward declaration
-namespace Ui { class ChatPage; };
+namespace Ui { class ChatPage; }
+namespace Gui::Model { class AvailableChatsModel; }
 
 namespace Gui
 {
@@ -15,7 +16,14 @@ namespace Gui
         explicit ChatPage(QWidget* parent = nullptr);
         ~ChatPage() override;
 
+        void PreparePage() noexcept;
+
+    private slots:
+        void OnSearchInputTextChanged() const noexcept;
+
     private:
-        Ui::ChatPage* ui = nullptr;
+        Ui::ChatPage* _ui = nullptr;
+
+        Model::AvailableChatsModel* _model = nullptr;
     };
 } // !namespace Gui

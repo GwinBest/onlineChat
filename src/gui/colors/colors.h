@@ -4,8 +4,11 @@
 
 namespace Gui
 {
-    static constexpr const char* colorRed = "rgb(255, 0, 0)";
-    static constexpr const char* colorLightGreen = "rgb(0, 255, 132)";
-    static constexpr const char* colorBlue = "rgb(105, 118, 132)";
-    static constexpr const char* colorTransparent = "rgba(0, 0, 0, 0)";
+    constexpr const char* colorRed = "#FF0000";
+    constexpr const char* colorLightGreen = "#00FF84";
+    constexpr const char* colorBlue = "#697684";
+    constexpr const char* colorGray = "#282e33";
+    constexpr const char* colorOnHover = "#505050";
+    constexpr const char* colorSelectedChat = "#009687";
+    constexpr const char* colorTransparent = "#00000000";
 } // !namespace Gui

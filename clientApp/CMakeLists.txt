@@ -48,6 +48,10 @@ set(SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/gui/chat/chatPage.cpp
     ${CMAKE_SOURCE_DIR}/src/gui/chat/chatPage.h
     ${CMAKE_SOURCE_DIR}/src/gui/chat/chatPage.ui
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/model/availableChatsModel.h
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/model/availableChatsModel.cpp
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/delegate/availableChatsDelegate.h
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/delegate/availableChatsDelegate.cpp
     ${CMAKE_SOURCE_DIR}/src/gui/signIn/signInPage.cpp
     ${CMAKE_SOURCE_DIR}/src/gui/signIn/signInPage.h
     ${CMAKE_SOURCE_DIR}/src/gui/signIn/signInPage.ui
@@ -62,8 +66,7 @@ set(SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/userData/userCredentialsFile.h
     ${CMAKE_SOURCE_DIR}/src/userData/userCredentialsFile.cpp
     ${CMAKE_SOURCE_DIR}/src/userData/user.h
-    ${CMAKE_SOURCE_DIR}/src/chatSystem/chat.h
-    ${CMAKE_SOURCE_DIR}/src/chatSystem/chat.cpp
+    ${CMAKE_SOURCE_DIR}/src/chatSystem/chatInfo.h
     ${CMAKE_SOURCE_DIR}/src/networkCore/networkCore.h
     ${CMAKE_SOURCE_DIR}/src/common/common.h
     ${CMAKE_SOURCE_DIR}/src/userData/userRepository.h
@@ -71,7 +74,7 @@ set(SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/utils/loadImage.cpp
 )
 
-add_executable(OnlineChat ${SOURCE_FILES})
+add_executable(OnlineChat WIN32 ${SOURCE_FILES})
 
 find_package(OpenGL REQUIRED)
 

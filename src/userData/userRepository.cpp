@@ -96,12 +96,13 @@ namespace UserData
         return instance.value().get().GetServerResponse<bool>();
     }
 
-    std::optional<std::vector<User>> UserRepository::FindUsersByLogin(const std::string& userLogin)
+    std::optional<std::vector<ChatSystem::ChatInfo>> UserRepository::FindMatchingChats(const size_t currentUserId, const std::string& pattern)
     {
         const NetworkCore::UserPacket request =
         {
-            .actionType = NetworkCore::ActionType::kFindUsersByLogin,
-            .login = userLogin,
+            .actionType = NetworkCore::ActionType::kFindMatchingChats,
+            .login = pattern,
+            .id = currentUserId,
         };
 
         const std::optional<std::reference_wrapper<ClientNetworking::Client>> instance = ClientNetworking::Client::GetInstance();
@@ -109,10 +110,10 @@ namespace UserData
 
         instance.value().get().SendUserCredentialsPacket(request);
 
-        return instance.value().get().GetServerResponse<std::vector<User>>();
+        return instance.value().get().GetServerResponse<std::vector<ChatSystem::ChatInfo>>();
     }
 
-    std::optional<std::vector<ChatSystem::Chat>> UserRepository::GetAvailableChatsForUser(const size_t userId)
+    std::optional<std::vector<ChatSystem::ChatInfo>> UserRepository::GetAvailableChatsForUser(const size_t userId)
     {
         const NetworkCore::UserPacket request =
         {
@@ -125,7 +126,7 @@ namespace UserData
 
         instance.value().get().SendUserCredentialsPacket(request);
 
-        return instance.value().get().GetServerResponse<std::vector<ChatSystem::Chat>>();
+        return instance.value().get().GetServerResponse<std::vector<ChatSystem::ChatInfo>>();
     }
 } // !namespace UserData
 

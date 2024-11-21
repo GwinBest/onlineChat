@@ -359,25 +359,84 @@ namespace ServerNetworking
 
                 break;
             }
-            case NetworkCore::ActionType::kFindUsersByLogin:
+            case NetworkCore::ActionType::kFindMatchingChats:
             {
                 NetworkCore::UserPacket userPacket = ReceiveUserCredentialsPacket(index);
 
-                std::string* foundUsersLogin = nullptr;
+                size_t* chatIdResult = nullptr;
+                std::string* chatNameResult = nullptr;
+                std::string* chatPhotoResult = nullptr;
+                std::string* lastMessageResult = nullptr;
+                std::string* lastMessageTimeResult = nullptr;
 
                 try
                 {
                     resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
-                        "SELECT login FROM users "
-                        "WHERE login like '%s%%';",
-                        userPacket.login.c_str());
+                        "(SELECT DISTINCT "
+                        "c.id AS chat_id, "
+                        "COALESCE(c.name, u2.name) AS chat_name, "
+                        "COALESCE(c.photo, u2.photo) AS chat_photo, "
+                        "m.content AS last_message, "
+                        "m.sent_at AS last_message_time "
+                        "FROM chats c "
+                        "JOIN "
+                        "users_chats uc ON c.id = uc.chat_id "
+                        "JOIN "
+                        "users u ON uc.user_id = u.id "
+                        "LEFT JOIN "
+                        "users_chats uc2 ON c.id = uc2.chat_id AND uc2.user_id != u.id "
+                        "LEFT JOIN "
+                        "users u2 ON uc2.user_id = u2.id "
+                        "LEFT JOIN "
+                        "messages m ON c.id = m.chat_id "
+                        "WHERE "
+                        "u.id = %zu "
+                        "AND (c.name LIKE '%s%%' OR u2.name LIKE '%s%%') "
+                        "AND m.sent_at = ( "
+                        "SELECT MAX(sent_at) "
+                        "FROM messages "
+                        "WHERE chat_id = c.id)) "
+                        "UNION ( SELECT "
+                        "NULL AS chat_id, "
+                        "u.name AS chat_name, "
+                        "u.photo AS chat_photo, "
+                        "NULL AS last_message, "
+                        "NULL AS last_message_time "
+                        "FROM users u "
+                        "WHERE u.name LIKE '%s%%' "
+                        "AND u.id != %zu "
+                        "AND NOT EXISTS ( "
+                        "SELECT 1 "
+                        "FROM users_chats uc "
+                        "JOIN chats c ON uc.chat_id = c.id "
+                        "WHERE uc.user_id = %zu "
+                        "AND c.id IN ( "
+                        "SELECT chat_id "
+                        "FROM users_chats "
+                        "WHERE user_id = u.id)));",
+                        userPacket.id,
+                        userPacket.login.c_str(),
+                        userPacket.login.c_str(),
+                        userPacket.login.c_str(),
+                        userPacket.id,
+                        userPacket.id);
 
                     size_t counter = 0;
-                    foundUsersLogin = new std::string[resultSet->rowsCount()];
+                    chatIdResult = new size_t[resultSet->rowsCount()];
+                    chatNameResult = new std::string[resultSet->rowsCount()];
+                    chatPhotoResult = new std::string[resultSet->rowsCount()];
+                    lastMessageResult = new std::string[resultSet->rowsCount()];
+                    lastMessageTimeResult = new std::string[resultSet->rowsCount()];
 
                     while (resultSet->next())
                     {
-                        foundUsersLogin[counter++] = resultSet->getString("login");
+                        chatIdResult[counter] = resultSet->getInt("chat_id");
+                        chatNameResult[counter] = resultSet->getString("chat_name");
+                        chatPhotoResult[counter] = resultSet->getString("chat_photo");
+                        lastMessageResult[counter] = resultSet->getString("last_message");
+                        lastMessageTimeResult[counter] = resultSet->getString("last_message_time");
+
+                        ++counter;
                     }
 
                     send(_connections[index], reinterpret_cast<char*>(&actionType), sizeof(actionType), NULL);
@@ -386,12 +445,26 @@ namespace ServerNetworking
                     int i = 0;
                     while (counter > 0)
                     {
-                        size_t resultLength = foundUsersLogin[i].size();
+                        send(_connections[index], reinterpret_cast<char*>(&chatIdResult[i]), sizeof(chatIdResult[0]), NULL);
 
+                        size_t resultLength = chatNameResult[i].size();
                         send(_connections[index], reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
-                        send(_connections[index], foundUsersLogin[i++].c_str(), resultLength, NULL);
+                        send(_connections[index], chatNameResult[i].c_str(), resultLength, NULL);
+
+                        resultLength = lastMessageResult[i].size();
+                        send(_connections[index], reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
+                        send(_connections[index], lastMessageResult[i].c_str(), resultLength, NULL);
+
+                        resultLength = lastMessageTimeResult[i].size();
+                        send(_connections[index], reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
+                        send(_connections[index], lastMessageTimeResult[i].c_str(), resultLength, NULL);
+
+                        resultLength = chatPhotoResult[i].size();
+                        send(_connections[index], reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
+                        send(_connections[index], chatPhotoResult[i].c_str(), resultLength, NULL);
 
                         counter--;
+                        i++;
                     }
                 }
                 catch (const sql::SQLException& e)
@@ -399,7 +472,11 @@ namespace ServerNetworking
                     SendServerErrorMessage(index, "Server error: server cant push message to database");
                 }
 
-                delete[] foundUsersLogin;
+                delete[] chatNameResult;
+                delete[] chatIdResult;
+                delete[] chatPhotoResult;
+                delete[] lastMessageResult;
+                delete[] lastMessageTimeResult;
 
                 break;
             }
@@ -472,6 +549,18 @@ namespace ServerNetworking
                         send(_connections[index], reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
                         send(_connections[index], chatNameResult[i].c_str(), resultLength, NULL);
 
+                        resultLength = lastMessageResult[i].size();
+                        send(_connections[index], reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
+                        send(_connections[index], lastMessageResult[i].c_str(), resultLength, NULL);
+
+                        resultLength = lastMessageTimeResult[i].size();
+                        send(_connections[index], reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
+                        send(_connections[index], lastMessageTimeResult[i].c_str(), resultLength, NULL);
+
+                        resultLength = chatPhotoResult[i].size();
+                        send(_connections[index], reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
+                        send(_connections[index], chatPhotoResult[i].c_str(), resultLength, NULL);
+
                         counter--;
                         i++;
                     }
@@ -494,10 +583,10 @@ namespace ServerNetworking
                 size_t userId = 0;
                 recv(_connections[index], reinterpret_cast<char*>(&userId), sizeof(userId), NULL);
 
-                size_t chatId = 0;
-                recv(_connections[index], reinterpret_cast<char*>(&chatId), sizeof(chatId), NULL);
+                size_t id = 0;
+                recv(_connections[index], reinterpret_cast<char*>(&id), sizeof(id), NULL);
 
-                if (chatId == 0)
+                if (id == 0)
                 {
                     SendServerErrorMessage(index, "Server error: chat id is empty");
 
@@ -513,7 +602,7 @@ namespace ServerNetworking
                         "SELECT * "
                         "FROM messages "
                         "WHERE chat_id = %zu;",
-                        chatId);
+                        id);
 
                     messagesResult = new std::string[resultSet->rowsCount()];
                     messageTypeResult = new MessageBuffer::MessageStatus[resultSet->rowsCount()];

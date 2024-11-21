@@ -8,23 +8,26 @@
 
 namespace Ui { class MainWindowClass; };
 
-class MainWindow : public QMainWindow
+namespace Gui
 {
-    Q_OBJECT
+    class MainWindow : public QMainWindow
+    {
+        Q_OBJECT
 
-public:
-    MainWindow(QWidget* parent = nullptr);
-    ~MainWindow();
+    public:
+        MainWindow(QWidget* parent = nullptr);
+        ~MainWindow();
 
-private slots:
-    void DisplaySignInPage() const noexcept;
-    void DisplayLoginPage() const noexcept;
-    void DisplayChatPage() const noexcept;
+    private slots:
+        void DisplaySignInPage() const noexcept;
+        void DisplayLoginPage() const noexcept;
+        void DisplayChatPage() const noexcept;
 
-private:
-    Ui::MainWindowClass* _ui = nullptr;
+    private:
+        Ui::MainWindowClass* _ui = nullptr;
 
-    Gui::LoginPage* _loginPage = nullptr;
-    Gui::SignInPage* _signInPage = nullptr;
-    Gui::ChatPage* _chatPage = nullptr;
-};
+        Gui::LoginPage* _loginPage = nullptr;
+        Gui::SignInPage* _signInPage = nullptr;
+        Gui::ChatPage* _chatPage = nullptr;
+    };
+} // !namespace Gui

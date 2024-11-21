@@ -18,37 +18,11 @@ MainWindow::MainWindow(QWidget* parent)
     _ui->stackedWidget->addWidget(_signInPage);
     _ui->stackedWidget->addWidget(_chatPage);
 
-    connect(_loginPage, &Gui::LoginPage::DisplaySignInPage, this, [this]()
-        {
-            _loginPage->ResetUiStyle();
-            _signInPage->ResetUiStyle();
-            _ui->stackedWidget->setCurrentWidget(_signInPage);
-        }
-    );
-    connect(_loginPage, &Gui::LoginPage::LoginSuccessful, this, [this]()
-        {
-            _loginPage->ResetUiStyle();
-            _signInPage->ResetUiStyle();
-            _chatPage->PreparePage();
-            _ui->stackedWidget->setCurrentWidget(_chatPage);
-        }
-    );
+    connect(_loginPage, &Gui::LoginPage::DisplaySignInPage, this, &MainWindow::DisplaySignInPage);
+    connect(_loginPage, &Gui::LoginPage::LoginSuccessful, this, &MainWindow::DisplayChatPage);
 
-    connect(_signInPage, &Gui::SignInPage::DisplayLoginPage, this, [this]()
-        {
-            _loginPage->ResetUiStyle();
-            _signInPage->ResetUiStyle();
-            _ui->stackedWidget->setCurrentWidget(_loginPage);
-        }
-    );
-    connect(_signInPage, &Gui::SignInPage::SignInSuccessful, this, [this]()
-        {
-            _loginPage->ResetUiStyle();
-            _signInPage->ResetUiStyle();
-            _chatPage->PreparePage();
-            _ui->stackedWidget->setCurrentWidget(_chatPage);
-        }
-    );
+    connect(_signInPage, &Gui::SignInPage::DisplayLoginPage, this, &MainWindow::DisplayLoginPage);
+    connect(_signInPage, &Gui::SignInPage::SignInSuccessful, this, &MainWindow::DisplayChatPage);
 }
 
 MainWindow::~MainWindow()
@@ -58,4 +32,22 @@ MainWindow::~MainWindow()
     delete _loginPage;
     delete _signInPage;
     delete _chatPage;
+}
+
+void MainWindow::DisplaySignInPage() const noexcept
+{
+    _signInPage->PreparePage();
+    _ui->stackedWidget->setCurrentWidget(_signInPage);
+}
+
+void MainWindow::DisplayLoginPage() const noexcept
+{
+    _loginPage->PreparePage();
+    _ui->stackedWidget->setCurrentWidget(_loginPage);
+}
+
+void MainWindow::DisplayChatPage() const noexcept
+{
+    _chatPage->PreparePage();
+    _ui->stackedWidget->setCurrentWidget(_chatPage);
 }

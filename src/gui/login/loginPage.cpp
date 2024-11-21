@@ -19,7 +19,7 @@ namespace Gui
     {
         _ui->setupUi(this);
 
-        ResetUiStyle();
+        PreparePage();
 
         connect(_ui->loginButton, &QPushButton::clicked, this, &LoginPage::OnLoginButtonClicked);
         connect(_ui->signInButton, &QPushButton::clicked, this, &LoginPage::OnSignInButtonClicked);
@@ -30,7 +30,7 @@ namespace Gui
         delete _ui;
     }
 
-    void LoginPage::ResetUiStyle() const noexcept
+    void LoginPage::PreparePage() const noexcept
     {
         _ui->loginInput->setStyleSheet(SetInputStyleSheet(colorBlue));
         _ui->loginInput->clear();

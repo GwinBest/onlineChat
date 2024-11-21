@@ -16,6 +16,11 @@ public:
     MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void DisplaySignInPage() const noexcept;
+    void DisplayLoginPage() const noexcept;
+    void DisplayChatPage() const noexcept;
+
 private:
     Ui::MainWindowClass* _ui = nullptr;
 

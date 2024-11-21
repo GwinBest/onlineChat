@@ -17,7 +17,7 @@ namespace Gui
         explicit SignInPage(QWidget* parent = nullptr);
         ~SignInPage() override;
 
-        void ResetUiStyle() const noexcept;
+        void PreparePage() const noexcept;
 
     signals:
         void SignInSuccessful() const;

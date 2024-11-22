@@ -45,6 +45,7 @@ file(COPY ${CMAKE_SOURCE_DIR}/resources DESTINATION ${CMAKE_BINARY_DIR}/clientAp
 
 set(SOURCE_FILES
     main.cpp
+    ${CMAKE_SOURCE_DIR}/resources/qrc/images.qrc
     ${CMAKE_SOURCE_DIR}/src/gui/chat/chatPage.cpp
     ${CMAKE_SOURCE_DIR}/src/gui/chat/chatPage.h
     ${CMAKE_SOURCE_DIR}/src/gui/chat/chatPage.ui

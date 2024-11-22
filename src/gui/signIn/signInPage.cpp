@@ -106,12 +106,6 @@ namespace Gui
             _ui->userExistLabel->setVisible(false);
         }
 
-        if (UserData::UserCredentialsFile::CreateNewFile())
-        {
-            UserData::UserCredentialsFile::WriteCredentials(currentUser);
-            UserData::UserCredentialsFile::CloseFile();
-        }
-
         std::optional<bool> isPushSuccessful = UserData::UserRepository::PushUserCredentialsToDatabase(currentUser);
 
         if (!isPushSuccessful.has_value())
@@ -135,6 +129,12 @@ namespace Gui
         }
 
         currentUser.SetUserId(userId.value());
+
+        if (UserData::UserCredentialsFile::CreateNewFile())
+        {
+            UserData::UserCredentialsFile::WriteCredentials(currentUser);
+            UserData::UserCredentialsFile::CloseFile();
+        }
 
         emit SignInSuccessful();
     }

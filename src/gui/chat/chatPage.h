@@ -5,6 +5,7 @@
 // forward declaration
 namespace Ui { class ChatPage; }
 namespace Gui::Model { class AvailableChatsModel; }
+namespace Gui::Delegate { class AvailableChatsDelegate; }
 
 namespace Gui
 {
@@ -19,11 +20,13 @@ namespace Gui
         void PreparePage() noexcept;
 
     private slots:
+        void OnMenuButtonPressed() const noexcept;
         void OnSearchInputTextChanged() const noexcept;
 
     private:
         Ui::ChatPage* _ui = nullptr;
 
         Model::AvailableChatsModel* _model = nullptr;
+        Delegate::AvailableChatsDelegate* _delegate = nullptr;
     };
 } // !namespace Gui

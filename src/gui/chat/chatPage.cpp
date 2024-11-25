@@ -11,12 +11,15 @@ namespace Gui
         : QWidget(parent)
         , _ui(new Ui::ChatPage())
         , _model(new Model::AvailableChatsModel())
+        , _delegate(new Delegate::AvailableChatsDelegate(_ui->availableChatsList))
     {
         _ui->setupUi(this);
 
         _ui->availableChatsList->setMouseTracking(true);
         _ui->availableChatsList->setUniformItemSizes(true);
         _ui->availableChatsList->setResizeMode(QListView::Adjust);
+
+        connect(_ui->menuButton, &QPushButton::clicked, this, &ChatPage::OnMenuButtonPressed);
 
         connect(_ui->searchInput, &QLineEdit::textChanged, this, &ChatPage::OnSearchInputTextChanged);
     }
@@ -25,6 +28,7 @@ namespace Gui
     {
         delete _ui;
         delete _model;
+        delete _delegate;
     }
 
     void ChatPage::PreparePage() noexcept
@@ -33,8 +37,12 @@ namespace Gui
 
         _ui->availableChatsList->setModel(_model);
 
-        Delegate::AvailableChatsDelegate* delegate = new Delegate::AvailableChatsDelegate(_ui->availableChatsList);
-        _ui->availableChatsList->setItemDelegate(delegate);
+        _ui->availableChatsList->setItemDelegate(_delegate);
+    }
+
+    void ChatPage::OnMenuButtonPressed() const noexcept
+    {
+
     }
 
     void ChatPage::OnSearchInputTextChanged() const noexcept

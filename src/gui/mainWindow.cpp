@@ -19,11 +19,13 @@ namespace Gui
         _ui->stackedWidget->addWidget(_signInPage);
         _ui->stackedWidget->addWidget(_chatPage);
 
-        connect(_loginPage, &Gui::LoginPage::DisplaySignInPage, this, &MainWindow::DisplaySignInPage);
-        connect(_loginPage, &Gui::LoginPage::LoginSuccessful, this, &MainWindow::DisplayChatPage);
+        connect(_loginPage, &LoginPage::DisplaySignInPage, this, &MainWindow::DisplaySignInPage);
+        connect(_loginPage, &LoginPage::LoginSuccessful, this, &MainWindow::DisplayChatPage);
 
-        connect(_signInPage, &Gui::SignInPage::DisplayLoginPage, this, &MainWindow::DisplayLoginPage);
-        connect(_signInPage, &Gui::SignInPage::SignInSuccessful, this, &MainWindow::DisplayChatPage);
+        connect(_signInPage, &SignInPage::DisplayLoginPage, this, &MainWindow::DisplayLoginPage);
+        connect(_signInPage, &SignInPage::SignInSuccessful, this, &MainWindow::DisplayChatPage);
+
+        connect(_chatPage, &ChatPage::LogOutButtonPressed, this, &MainWindow::DisplayLoginPage);
     }
 
     MainWindow::~MainWindow()

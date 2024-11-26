@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/images">
-		<file alias="imagePlacholder.png">../images/imagePlacholder.png</file>
 		<file alias="settings.png">../images/settings.png</file>
+		<file alias="logOut.png">../images/logOut.png</file>
     </qresource>
 </RCC>

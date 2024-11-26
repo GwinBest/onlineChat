@@ -53,6 +53,9 @@ set(SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/gui/chat/model/availableChatsModel.cpp
     ${CMAKE_SOURCE_DIR}/src/gui/chat/delegate/availableChatsDelegate.h
     ${CMAKE_SOURCE_DIR}/src/gui/chat/delegate/availableChatsDelegate.cpp
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/widget/sideBarWidget.h
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/widget/sideBarWidget.cpp
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/widget/sideBarWidget.ui
     ${CMAKE_SOURCE_DIR}/src/gui/signIn/signInPage.cpp
     ${CMAKE_SOURCE_DIR}/src/gui/signIn/signInPage.h
     ${CMAKE_SOURCE_DIR}/src/gui/signIn/signInPage.ui
@@ -75,7 +78,7 @@ set(SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/utils/loadImage.cpp
 )
 
-add_executable(OnlineChat WIN32 ${SOURCE_FILES})
+add_executable(OnlineChat ${SOURCE_FILES})
 
 find_package(OpenGL REQUIRED)
 

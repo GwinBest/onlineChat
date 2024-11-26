@@ -16,7 +16,7 @@ namespace Gui
 
     public:
         MainWindow(QWidget* parent = nullptr);
-        ~MainWindow();
+        ~MainWindow() override;
 
     private slots:
         void DisplaySignInPage() const noexcept;
@@ -26,8 +26,8 @@ namespace Gui
     private:
         Ui::MainWindowClass* _ui = nullptr;
 
-        Gui::LoginPage* _loginPage = nullptr;
-        Gui::SignInPage* _signInPage = nullptr;
-        Gui::ChatPage* _chatPage = nullptr;
+        LoginPage* _loginPage = nullptr;
+        SignInPage* _signInPage = nullptr;
+        ChatPage* _chatPage = nullptr;
     };
 } // !namespace Gui

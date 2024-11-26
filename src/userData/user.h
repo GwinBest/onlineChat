@@ -13,8 +13,8 @@ namespace UserData
         [[nodiscard]] size_t GetUserPassword() const noexcept { return _userPassword; }
 
         void SetUserId(const size_t userId) noexcept { _userId = userId; }
-        void SetUserName(std::string_view userName) { _userName = userName; }
-        void SetUserLogin(std::string_view userLogin) { _userLogin = userLogin; }
+        void SetUserName(const std::string_view userName) { _userName = userName; }
+        void SetUserLogin(const std::string_view userLogin) { _userLogin = userLogin; }
         void SetUserPassword(const size_t userPassword) noexcept { _userPassword = userPassword; }
 
     private:

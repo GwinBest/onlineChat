@@ -78,7 +78,7 @@ set(SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/utils/loadImage.cpp
 )
 
-add_executable(OnlineChat ${SOURCE_FILES})
+add_executable(OnlineChat WIN32 ${SOURCE_FILES})
 
 find_package(OpenGL REQUIRED)
 

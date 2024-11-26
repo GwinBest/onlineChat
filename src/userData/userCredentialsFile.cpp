@@ -25,7 +25,7 @@ namespace UserData
         if (_credentialsFile.is_open())
         {
 #ifdef WIN32
-            SetFileAttributesA(_fileName, FILE_ATTRIBUTE_HIDDEN);
+            SetFileAttributesA(_fileName.generic_string().c_str(), FILE_ATTRIBUTE_HIDDEN);
 #endif
             return true;
         }
@@ -34,12 +34,20 @@ namespace UserData
         if (_credentialsFile.is_open())
         {
 #ifdef WIN32
-            SetFileAttributesA(_fileName, FILE_ATTRIBUTE_HIDDEN);
+            SetFileAttributesA(_fileName.generic_string().c_str(), FILE_ATTRIBUTE_HIDDEN);
 #endif
             return true;
         }
 
         return false;
+    }
+
+    void UserCredentialsFile::RemoveFile()
+    {
+        if (!IsFileExists()) return;
+
+        _credentialsFile.close();
+        std::filesystem::remove(_fileName);
     }
 
     void UserCredentialsFile::CloseFile()

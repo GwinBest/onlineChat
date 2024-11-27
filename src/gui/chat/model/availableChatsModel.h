@@ -32,8 +32,8 @@ namespace Gui::Model
 
         [[nodiscard]] inline bool IsEmpty() const noexcept { return _availableChats.empty(); }
 
-        void SetAllAvailableChats() noexcept;
-        void SetMatchingChats(const std::string& pattern) noexcept;
+        void SetAllAvailableChats();
+        void SetMatchingChats(const std::string& pattern);
 
     private:
         QList<ChatSystem::ChatInfo> _availableChats;

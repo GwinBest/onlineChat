@@ -9,7 +9,7 @@ namespace Gui::Model
     int AvailableChatsModel::rowCount(const QModelIndex& parent) const
     {
         if (parent.isValid()) return 0;
-        return _availableChats.size();
+        return static_cast<int>(_availableChats.size());
     }
 
     QVariant AvailableChatsModel::data(const QModelIndex& index, const int role) const
@@ -29,13 +29,13 @@ namespace Gui::Model
         }
     }
 
-    void AvailableChatsModel::SetAllAvailableChats() noexcept
+    void AvailableChatsModel::SetAllAvailableChats()
     {
         beginResetModel();
 
         _availableChats.clear();
 
-        std::optional<std::vector<ChatSystem::ChatInfo>> chats =
+        const std::optional<std::vector<ChatSystem::ChatInfo>> chats =
             UserData::UserRepository::GetAvailableChatsForUser(currentUser.GetUserId());
 
         if (!chats.has_value()) return;
@@ -48,13 +48,13 @@ namespace Gui::Model
         endResetModel();
     }
 
-    void AvailableChatsModel::SetMatchingChats(const std::string& pattern) noexcept
+    void AvailableChatsModel::SetMatchingChats(const std::string& pattern)
     {
         beginResetModel();
 
         _availableChats.clear();
 
-        std::optional<std::vector<ChatSystem::ChatInfo>> chats =
+        const std::optional<std::vector<ChatSystem::ChatInfo>> chats =
             UserData::UserRepository::FindMatchingChats(currentUser.GetUserId(), pattern);
 
         if (!chats.has_value()) return;

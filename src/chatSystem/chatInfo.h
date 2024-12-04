@@ -18,14 +18,15 @@ namespace ChatSystem
         ChatInfo() noexcept = default;
 
         ChatInfo(const size_t id,
-                 const QString& name,
-                 const QString& lastMessage = "",
-                 const QString& lastMessageSendTime = "") noexcept
+                 QString name,
+                 QString lastMessage = "",
+                 QString lastMessageSendTime = "") noexcept
             : id(id)
-            , name(name)
-            , lastMessage(lastMessage)
-            , lastMessageSendTime(lastMessageSendTime)
-        {}
+            , name(std::move(name))
+            , lastMessage(std::move(lastMessage))
+            , lastMessageSendTime(std::move(lastMessageSendTime))
+        {
+        }
 
         ChatInfo(const size_t id,
                  const std::string& name,
@@ -35,6 +36,7 @@ namespace ChatSystem
             , name(name.data())
             , lastMessage(lastMessage.data())
             , lastMessageSendTime(lastMessageSendTime.data())
-        {}
+        {
+        }
     };
 } // !namespace ChatSystem

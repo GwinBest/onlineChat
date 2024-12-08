@@ -2,9 +2,9 @@
 
 int main()
 {
-	ServerNetworking::Server server;
-	server.Start();
-	server.Run();
+    ServerNetworking::Server server;
+    server.Start();
+    server.Run();
 
-	return 0;
+    return 0;
 }

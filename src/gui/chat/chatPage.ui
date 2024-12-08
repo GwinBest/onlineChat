@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>947</width>
-    <height>590</height>
+    <height>626</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -241,10 +241,25 @@ QPushButton:pressed {
                             </string>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="emptyPage">
        <layout class="QVBoxLayout" name="verticalLayout_5">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
          <widget class="QLabel" name="selectChatLabel">
           <property name="font">
@@ -295,19 +310,18 @@ QPushButton:pressed {
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>45</height>
+            <height>50</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>45</height>
+            <height>50</height>
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">
-                                                background-color: rgb(40, 46, 51);
-                                            </string>
+           <string notr="true">background-color: rgb(40, 46, 51);
+border: none;</string>
           </property>
           <property name="frameShape">
            <enum>QFrame::Shape::StyledPanel</enum>
@@ -316,10 +330,19 @@ QPushButton:pressed {
            <enum>QFrame::Shadow::Raised</enum>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <item>
-            <widget class="QLabel" name="receiverName">
+            <widget class="QLabel" name="userName">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
-              <string>Name</string>
+              <string>UserName</string>
              </property>
             </widget>
            </item>
@@ -327,26 +350,20 @@ QPushButton:pressed {
          </widget>
         </item>
         <item>
-         <widget class="QScrollArea" name="chatScrollArea">
-          <property name="minimumSize">
-           <size>
-            <width>270</width>
-            <height>0</height>
-           </size>
-          </property>
+         <widget class="QScrollArea" name="scrollArea">
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">border: none;</string>
           </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
-          <widget class="QWidget" name="chatScrollAreaContent">
+          <widget class="QWidget" name="scrollAreaWidgetContents">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>485</width>
-             <height>498</height>
+             <width>487</width>
+             <height>536</height>
             </rect>
            </property>
           </widget>
@@ -357,19 +374,18 @@ QPushButton:pressed {
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>45</height>
+            <height>40</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>45</height>
+            <height>40</height>
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">
-                                                background-color: rgb(40, 46, 51);
-                                            </string>
+           <string notr="true">background-color: rgb(40, 46, 51);
+border: none;</string>
           </property>
           <property name="frameShape">
            <enum>QFrame::Shape::StyledPanel</enum>
@@ -385,57 +401,39 @@ QPushButton:pressed {
             <number>0</number>
            </property>
            <property name="topMargin">
-            <number>0</number>
+            <number>6</number>
            </property>
            <property name="rightMargin">
-            <number>0</number>
+            <number>2</number>
            </property>
            <property name="bottomMargin">
-            <number>0</number>
+            <number>6</number>
            </property>
-           <item>
+           <item alignment="Qt::AlignmentFlag::AlignVCenter">
             <widget class="QTextEdit" name="messageInput">
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
              <property name="placeholderText">
               <string>Write a message...</string>
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QPushButton" name="sendButton">
-             <property name="minimumSize">
-              <size>
-               <width>30</width>
-               <height>30</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>30</width>
-               <height>30</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">
-                                                            QPushButton {
-                                                            border-radius: 15px;
-                                                            }
-
-                                                            QPushButton:pressed {
-                                                            background-color: #666;
-                                                            }
-                                                        </string>
-             </property>
+           <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
+            <widget class="QPushButton" name="sendMessageButton">
              <property name="text">
               <string/>
              </property>
              <property name="icon">
               <iconset resource="../../../resources/qrc/images.qrc">
-               <normaloff>:/images/settings.png</normaloff>:/images/settings.png</iconset>
+               <normaloff>:/images/sendMessage.png</normaloff>:/images/sendMessage.png</iconset>
              </property>
              <property name="iconSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>28</width>
+               <height>28</height>
               </size>
              </property>
             </widget>
@@ -455,9 +453,6 @@ QPushButton:pressed {
   <tabstop>searchInput</tabstop>
   <tabstop>menuButton</tabstop>
   <tabstop>availableChatsList</tabstop>
-  <tabstop>chatScrollArea</tabstop>
-  <tabstop>messageInput</tabstop>
-  <tabstop>sendButton</tabstop>
  </tabstops>
  <resources>
   <include location="../../../resources/qrc/images.qrc"/>

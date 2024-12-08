@@ -2,5 +2,6 @@
     <qresource prefix="/images">
 		<file alias="settings.png">../images/settings.png</file>
 		<file alias="logOut.png">../images/logOut.png</file>
+		<file alias="sendMessage.png">../images/sendMessage.png</file>
     </qresource>
 </RCC>

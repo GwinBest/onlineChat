@@ -3,7 +3,6 @@
 #include <filesystem>
 #include <fstream>
 
-
 #include "userData/user.h"
 
 namespace UserData
@@ -17,7 +16,7 @@ namespace UserData
         static void CloseFile();
 
         static void WriteCredentials(const User& user);
-        static User ReadCredentials();
+        [[nodiscard]] static User ReadCredentials();
 
     private:
         static inline std::filesystem::path _fileName = ".loginFile.dat";

@@ -25,8 +25,7 @@ namespace ChatSystem
             , name(std::move(name))
             , lastMessage(std::move(lastMessage))
             , lastMessageSendTime(std::move(lastMessageSendTime))
-        {
-        }
+        {}
 
         ChatInfo(const size_t id,
                  const std::string& name,
@@ -36,7 +35,6 @@ namespace ChatSystem
             , name(name.data())
             , lastMessage(lastMessage.data())
             , lastMessageSendTime(lastMessageSendTime.data())
-        {
-        }
+        {}
     };
 } // !namespace ChatSystem

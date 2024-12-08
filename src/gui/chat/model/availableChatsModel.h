@@ -25,7 +25,8 @@ namespace Gui::Model
     public:
         explicit AvailableChatsModel(QObject* parent = nullptr) noexcept
             : QAbstractListModel(parent)
-        {}
+        {
+        }
 
         int rowCount(const QModelIndex& parent = QModelIndex()) const override;
         QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
@@ -39,4 +40,3 @@ namespace Gui::Model
         QList<ChatSystem::ChatInfo> _availableChats;
     };
 } // !namespace Gui::Model
-

@@ -13,7 +13,7 @@ namespace UserData
 }
 namespace ChatSystem
 {
-    class ChatInfo;
+    struct ChatInfo;
 }
 
 namespace NetworkCore
@@ -36,8 +36,8 @@ namespace NetworkCore
     struct UserPacket
     {
         ActionType actionType = ActionType::kActionUndefined;
-        std::string name = "";
-        std::string login = "";
+        std::string name;
+        std::string login;
         size_t password = 0;
         size_t id = 0;
     };

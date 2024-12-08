@@ -75,7 +75,6 @@ set(SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/common/common.h
     ${CMAKE_SOURCE_DIR}/src/userData/userRepository.h
     ${CMAKE_SOURCE_DIR}/src/userData/userRepository.cpp
-    ${CMAKE_SOURCE_DIR}/src/utils/loadImage.cpp
 )
 
 add_executable(OnlineChat WIN32 ${SOURCE_FILES})

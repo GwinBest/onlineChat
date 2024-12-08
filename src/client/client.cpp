@@ -12,8 +12,6 @@
 #include "messageBuffer/messageBuffer.h"
 #include "chatSystem/chatInfo.h"
 
-extern std::list<MessageBuffer::MessageNode> MessageBuffer::messageBuffer;
-
 extern UserData::User currentUser;
 
 namespace ClientNetworking
@@ -118,7 +116,7 @@ namespace ClientNetworking
 
                 if (userId == currentUser.GetUserId())
                 {
-                    MessageBuffer::messageBuffer.emplace_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kReceived, receiveMessage));
+                    //MessageBuffer::messageBuffer.emplace_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kReceived, receiveMessage));
                 }
 
                 break;
@@ -215,7 +213,7 @@ namespace ClientNetworking
                 size_t messageCount;
                 recv(_clientSocket, reinterpret_cast<char*>(&messageCount), sizeof(messageCount), NULL);
 
-                MessageBuffer::messageBuffer.clear();
+                std::vector<MessageBuffer::MessageNode> messageBuffer;
 
                 _serverResponse = false;
                 while (messageCount > 0)
@@ -232,18 +230,18 @@ namespace ClientNetworking
 
                     if (messageType == MessageBuffer::MessageStatus::kReceived)
                     {
-                        MessageBuffer::messageBuffer.emplace_back(MessageBuffer::MessageNode(messageType, std::string(receiveMessage)));
+                        messageBuffer.emplace_back(messageType, std::string(receiveMessage));
                     }
                     else if (messageType == MessageBuffer::MessageStatus::kSend)
                     {
-                        MessageBuffer::messageBuffer.emplace_back(MessageBuffer::MessageNode(messageType, std::string(receiveMessage)));
+                        messageBuffer.emplace_back(messageType, std::string(receiveMessage));
                     }
 
                     messageCount--;
 
-                    if (!std::get<bool>(_serverResponse) && ((MessageBuffer::messageBuffer.size() + 1) % 15 == 0 || messageCount == 0))
+                    if (!std::get<bool>(_serverResponse) && ((messageBuffer.size() + 1) % 15 == 0 || messageCount == 0))
                     {
-                        _serverResponse = true;
+                        _serverResponse = messageBuffer;
                         _conditionalVariable.notify_one();
                     }
                 }

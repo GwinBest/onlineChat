@@ -5,6 +5,7 @@
 #include <optional>
 #include <variant>
 
+#include "messageBuffer/messageBuffer.h"
 #include "networkCore/networkCore.h"
 
 #ifdef WIN32
@@ -17,7 +18,10 @@ namespace ClientNetworking
     class Client final
     {
     public:
-        using ServerResponse = std::variant<bool, size_t, std::string, std::vector<UserData::User>, std::vector<ChatSystem::ChatInfo>>;
+        using ServerResponse = std::variant<bool, size_t,
+            std::string, std::vector<UserData::User>,
+            std::vector<ChatSystem::ChatInfo>,
+            std::vector<MessageBuffer::MessageNode>>;
 
     public:
         Client(const Client&) = delete;

@@ -31,14 +31,16 @@ namespace Gui
 
         connect(_sideBarWidget, &Widget::SideBarWidget::HideSideBar, this, [this] { ToggleSideMenu(); });
         connect(_sideBarWidget, &Widget::SideBarWidget::LogOutButtonPressed, this, [this]
-        {
-            emit LogOutButtonPressed();
-            ToggleSideMenu();
-        });
+                {
+                    emit LogOutButtonPressed();
+                    ToggleSideMenu();
+                });
 
         connect(_ui->menuButton, &QPushButton::clicked, this, &ChatPage::ToggleSideMenu);
 
         connect(_ui->searchInput, &QLineEdit::textChanged, this, &ChatPage::OnSearchInputTextChanged);
+
+        connect(_ui->availableChatsList, &QListView::clicked, this, &ChatPage::OnChatSelected);
     }
 
     ChatPage::~ChatPage()
@@ -97,6 +99,17 @@ namespace Gui
         _model->SetMatchingChats(userSearch.toStdString());
     }
 
+    void ChatPage::OnChatSelected() const noexcept
+    {
+        const QModelIndex index = _ui->availableChatsList->currentIndex();
+
+        _ui->userName->setText(index.data(Model::AvailableChatsModel::AvailableChatsRole::kChatNameRole).toString());
+        _ui->messageInput->clear();
+
+        _ui->rightStack->setCurrentWidget(_ui->chatPage);
+        _isChatPageVisible = true;
+    }
+
     void ChatPage::resizeEvent(QResizeEvent* event)
     {
         QWidget::resizeEvent(event);
@@ -106,21 +119,21 @@ namespace Gui
 
     void ChatPage::keyPressEvent(QKeyEvent* event)
     {
-        if (event->key() == Qt::Key_Escape)
-        {
-            if (_isSideBarVisible) ToggleSideMenu();
-        }
+        if (event->key() == Qt::Key_Escape) ToggleUiElements();
 
         QWidget::keyPressEvent(event);
     }
 
     void ChatPage::mousePressEvent(QMouseEvent* event)
     {
-        if (event->buttons() == Qt::BackButton)
-        {
-            if (_isSideBarVisible) ToggleSideMenu();
-        }
+        if (event->buttons() == Qt::BackButton) ToggleUiElements();
 
         QWidget::mousePressEvent(event);
+    }
+
+    inline void ChatPage::ToggleUiElements() const
+    {
+        if (_isSideBarVisible) ToggleSideMenu();
+        if (_isChatPageVisible) _ui->rightStack->setCurrentWidget(_ui->emptyPage);
     }
 } // !namespace Gui

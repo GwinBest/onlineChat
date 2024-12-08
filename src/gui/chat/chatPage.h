@@ -29,17 +29,22 @@ namespace Gui
     private slots:
         void ToggleSideMenu() const noexcept;
         void OnSearchInputTextChanged() const noexcept;
+        void OnChatSelected() const noexcept;
 
     private:
         void resizeEvent(QResizeEvent* event) override;
 
         void keyPressEvent(QKeyEvent* event) override;
         void mousePressEvent(QMouseEvent* event) override;
+
+        void ToggleUiElements() const;
+
     private:
         Ui::ChatPage* _ui = nullptr;
 
         Model::AvailableChatsModel* _model = nullptr;
         Delegate::AvailableChatsDelegate* _delegate = nullptr;
+        static inline bool _isChatPageVisible = false;
 
         Widget::SideBarWidget* _sideBarWidget = nullptr;
         static inline bool _isSideBarVisible = false;

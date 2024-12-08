@@ -2,6 +2,8 @@
 
 #include "client/client.h"
 
+#include "messageBuffer/messageBuffer.h"
+
 #include "networkCore/networkCore.h"
 
 #ifdef GetUserName
@@ -127,6 +129,23 @@ namespace UserData
         instance.value().get().SendUserCredentialsPacket(request);
 
         return instance.value().get().GetServerResponse<std::vector<ChatSystem::ChatInfo>>();
+    }
+
+    std::optional<std::vector<MessageBuffer::MessageNode>> UserRepository::GetAvailableChatMessages(const size_t userId, const size_t chatId)
+    {
+        const NetworkCore::ChatPacket request =
+        {
+            .actionType = NetworkCore::ActionType::kReceiveAllMessagesForSelectedChat,
+            .chatUserId = userId,
+            .id = chatId
+        };
+
+        const std::optional<std::reference_wrapper<ClientNetworking::Client>> instance = ClientNetworking::Client::GetInstance();
+        if (!instance.has_value()) return std::nullopt;
+
+        instance.value().get().SendChatInfoPacket(request);
+
+        return instance.value().get().GetServerResponse<std::vector<MessageBuffer::MessageNode>>();
     }
 } // !namespace UserData
 

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "chatSystem/chatInfo.h"
+#include "messageBuffer/messageBuffer.h"
 
 #include "userData/user.h"
 
@@ -20,5 +21,6 @@ namespace UserData
         [[nodiscard]] static std::optional<bool> IsUserExist(const User& user);
         [[nodiscard]] static std::optional<std::vector<ChatSystem::ChatInfo>> FindMatchingChats(const size_t currentUserId, const std::string& pattern);
         [[nodiscard]] static std::optional<std::vector<ChatSystem::ChatInfo>> GetAvailableChatsForUser(const size_t userId);
+        [[nodiscard]] static std::optional<std::vector<MessageBuffer::MessageNode>> GetAvailableChatMessages(size_t userId, size_t chatId);
     };
 } // !namespace UserData

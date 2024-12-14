@@ -15,7 +15,7 @@ namespace Gui::Model
     QVariant AvailableChatsModel::data(const QModelIndex& index, const int role) const
     {
         if (!index.isValid() || index.row() < 0 || index.row() >= _availableChats.size())
-            return QVariant();
+            return {};
 
         const ChatSystem::ChatInfo& chatInfo = _availableChats.at(index.row());
 
@@ -25,7 +25,7 @@ namespace Gui::Model
         case kChatNameRole:             return chatInfo.name;
         case kLastMessageRole:          return chatInfo.lastMessage;
         case kLastMessageSendTimeRole:  return chatInfo.lastMessageSendTime;
-        default:                        return QVariant();
+        default:                        return {};
         }
     }
 

@@ -30,7 +30,8 @@ namespace Gui
         _ui->availableChatsList->setResizeMode(QListView::Adjust);
 
         connect(_sideBarWidget, &Widget::SideBarWidget::HideSideBar, this, [this] { ToggleSideMenu(); });
-        connect(_sideBarWidget, &Widget::SideBarWidget::LogOutButtonPressed, this, [this]
+        connect(_sideBarWidget, &Widget::SideBarWidget::LogOutButtonPressed, this,
+                [this]
                 {
                     emit LogOutButtonPressed();
                     ToggleSideMenu();
@@ -60,11 +61,12 @@ namespace Gui
         _ui->availableChatsList->setItemDelegate(_delegate);
 
         _sideBarWidget->UpdateUserName(currentUser.GetUserName());
+
     }
 
     void ChatPage::ToggleSideMenu() const noexcept
     {
-        const auto animation = new(std::nothrow) QPropertyAnimation(_sideBarWidget, "geometry");
+        auto* const animation = new(std::nothrow) QPropertyAnimation(_sideBarWidget, "geometry");
         animation->setDuration(1);
 
         if (_isSideBarVisible)

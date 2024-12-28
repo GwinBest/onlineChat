@@ -42,4 +42,38 @@ namespace Gui::ScrollArea
         layout->setContentsMargins(0, 0, 0, 0);
         return messageWidget;
     }
+
+    QWidget* CreateDateDivider(const QString& dateText)
+    {
+        QWidget* dividerWidget = new QWidget();
+        QHBoxLayout* layout = new QHBoxLayout(dividerWidget);
+
+        QFrame* leftLine = new QFrame();
+        leftLine->setFrameShape(QFrame::HLine);
+        leftLine->setFrameShadow(QFrame::Sunken);
+        leftLine->setStyleSheet("color: gray;");
+
+        QLabel* dateLabel = new QLabel(dateText);
+        dateLabel->setAlignment(Qt::AlignCenter);
+        dateLabel->setStyleSheet(
+            "color: white;"
+            "background-color: #2f343b;"
+            "border-radius: 12px;"
+            "padding: 4px 12px;"
+            "font-size: 12px;"
+            "font-weight: bold;"
+        );
+
+        QFrame* rightLine = new QFrame();
+        rightLine->setFrameShape(QFrame::HLine);
+        rightLine->setFrameShadow(QFrame::Sunken);
+        rightLine->setStyleSheet("color: gray;");
+
+        layout->addWidget(leftLine);
+        layout->addWidget(dateLabel);
+        layout->addWidget(rightLine);
+        layout->setContentsMargins(0, 0, 0, 0);
+
+        return dividerWidget;
+    }
 } // !namespace ScrollArea

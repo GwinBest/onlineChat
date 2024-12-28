@@ -2,6 +2,7 @@
 
 #include "ui_chatPage.h"
 
+#include <QDateTime>
 #include <QKeyEvent>
 #include <QPropertyAnimation>
 
@@ -171,9 +172,22 @@ namespace Gui
 
         if (!chatMessage.has_value()) return;
 
+        QDateTime previousDateTime = {};
+        const QLocale locale = QLocale::English;
+
         for (const auto& message : chatMessage.value())
         {
+            const QDateTime currentDateTime = QDateTime::fromString(message.sendTime.c_str(),
+                                                                    "yyyy-MM-dd HH:mm:ss");
+            if (currentDateTime.date() != previousDateTime.date())
+            {
+                const QString currentSendTime = locale.toString(currentDateTime, "MMMM dd, yyyy");
+                _messagesContainerLayout->addWidget(ScrollArea::CreateDateDivider(currentSendTime));
+            }
+
             _messagesContainerLayout->addWidget(ScrollArea::CreateMessage(message));
+
+            previousDateTime = currentDateTime;
         }
 
         _messagesContainerLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));

@@ -168,7 +168,8 @@ namespace Gui
 
     void ChatPage::FillMessageContainerLayout(const size_t chatId) const
     {
-        const auto chatMessage = UserData::UserRepository::GetAvailableChatMessages(currentUser.GetUserId(), chatId);
+        const auto chatMessage = UserData::UserRepository::GetAvailableChatMessages(
+            currentUser.GetUserId(), chatId);
 
         if (!chatMessage.has_value()) return;
 
@@ -190,6 +191,7 @@ namespace Gui
             previousDateTime = currentDateTime;
         }
 
-        _messagesContainerLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+        _messagesContainerLayout->addSpacerItem(
+            new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
     }
 } // !namespace Gui

@@ -594,6 +594,7 @@ namespace ServerNetworking
                 }
 
                 std::string* messagesResult = nullptr;
+                std::string* messagesSendTime = nullptr;
                 MessageBuffer::MessageStatus* messageTypeResult = nullptr;
 
                 try
@@ -606,6 +607,7 @@ namespace ServerNetworking
 
                     messagesResult = new std::string[resultSet->rowsCount()];
                     messageTypeResult = new MessageBuffer::MessageStatus[resultSet->rowsCount()];
+                    messagesSendTime = new std::string[resultSet->rowsCount()];
                     size_t count = 0;
 
                     while (resultSet->next())
@@ -613,6 +615,7 @@ namespace ServerNetworking
                         size_t messageAuthorId = resultSet->getInt("user_id");
 
                         messagesResult[count] = resultSet->getString("content");
+                        messagesSendTime[count] = resultSet->getString("sent_at");
 
                         if (messageAuthorId == userId)
                         {
@@ -629,14 +632,18 @@ namespace ServerNetworking
                     send(_connections[index], reinterpret_cast<char*>(&actionType), sizeof(actionType), NULL);
                     send(_connections[index], reinterpret_cast<char*>(&count), sizeof(count), NULL);
 
-
                     int i = 0;
                     while (count > 0)
                     {
                         size_t msgSize = messagesResult[i].size();
                         send(_connections[index], reinterpret_cast<char*>(&msgSize), sizeof(msgSize), NULL);
                         send(_connections[index], messagesResult[i].c_str(), msgSize, NULL);
-                        send(_connections[index], reinterpret_cast<char*>(&messageTypeResult[i++]), sizeof(messageTypeResult[i]), NULL);
+                        send(_connections[index], reinterpret_cast<char*>(&messageTypeResult[i]), sizeof(messageTypeResult[i]), NULL);
+
+                        size_t sendTimeSize = messagesSendTime[i].size();
+                        send(_connections[index], reinterpret_cast<char*>(&sendTimeSize), sizeof(sendTimeSize), NULL);
+                        send(_connections[index], messagesSendTime[i].c_str(), sendTimeSize, NULL);
+                        i++;
                         count--;
                     }
                 }
@@ -647,6 +654,7 @@ namespace ServerNetworking
 
                 delete[] messagesResult;
                 delete[] messageTypeResult;
+                delete[] messagesSendTime;
 
                 break;
             }

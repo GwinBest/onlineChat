@@ -24,12 +24,12 @@ namespace Gui::Delegate
         const QString avatarPath = index.data(Qt::DecorationRole).toString();
         QString sendTime = index.data(Model::AvailableChatsModel::kLastMessageSendTimeRole).toString();
 
-        QDateTime dateTime = QDateTime::fromString(sendTime, "yyyy-MM-dd HH:mm:ss");
+        const QDateTime dateTime = QDateTime::fromString(sendTime, "yyyy-MM-dd HH:mm:ss");
         sendTime = dateTime.time().toString("HH:mm");
 
         constexpr int avatarSize = 40;
         constexpr int margin = 10;
-        int centerY = rect.top() + (rect.height() - avatarSize) / 2;
+        const int centerY = rect.top() + (rect.height() - avatarSize) / 2;
         const QRect avatarRect(rect.left() + margin, centerY, avatarSize, avatarSize);
         const QPixmap avatarPixmap(avatarPath);
         if (!avatarPixmap.isNull())
@@ -81,6 +81,6 @@ namespace Gui::Delegate
     {
         Q_UNUSED(option);
         Q_UNUSED(index);
-        return QSize(0, 60);
+        return { 0, 60 };
     }
 } // !namespace Gui::Delegate

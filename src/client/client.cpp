@@ -228,13 +228,19 @@ namespace ClientNetworking
                     MessageBuffer::MessageStatus messageType;
                     recv(_clientSocket, reinterpret_cast<char*>(&messageType), sizeof(messageType), NULL);
 
+                    size_t lastMessageSendTimeSize;
+                    char lastMessageSendTime[Common::maxInputBufferSize];
+                    recv(_clientSocket, reinterpret_cast<char*>(&lastMessageSendTimeSize), sizeof(lastMessageSendTimeSize), NULL);
+                    recv(_clientSocket, lastMessageSendTime, lastMessageSendTimeSize, NULL);
+                    lastMessageSendTime[lastMessageSendTimeSize] = '\0';
+
                     if (messageType == MessageBuffer::MessageStatus::kReceived)
                     {
-                        messageBuffer.emplace_back(messageType, std::string(receiveMessage));
+                        messageBuffer.emplace_back(messageType, std::string(receiveMessage), std::string(lastMessageSendTime));
                     }
                     else if (messageType == MessageBuffer::MessageStatus::kSend)
                     {
-                        messageBuffer.emplace_back(messageType, std::string(receiveMessage));
+                        messageBuffer.emplace_back(messageType, std::string(receiveMessage), std::string(lastMessageSendTime));
                     }
 
                     messageCount--;

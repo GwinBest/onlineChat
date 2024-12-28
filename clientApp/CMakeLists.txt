@@ -56,6 +56,8 @@ set(SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/gui/chat/widget/sideBarWidget.h
     ${CMAKE_SOURCE_DIR}/src/gui/chat/widget/sideBarWidget.cpp
     ${CMAKE_SOURCE_DIR}/src/gui/chat/widget/sideBarWidget.ui
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/scrollArea/chatScrollArea.h
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/scrollArea/chatScrollArea.cpp
     ${CMAKE_SOURCE_DIR}/src/gui/signIn/signInPage.cpp
     ${CMAKE_SOURCE_DIR}/src/gui/signIn/signInPage.h
     ${CMAKE_SOURCE_DIR}/src/gui/signIn/signInPage.ui

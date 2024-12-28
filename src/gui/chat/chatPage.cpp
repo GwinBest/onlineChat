@@ -7,8 +7,10 @@
 
 #include "gui/chat/delegate/availableChatsDelegate.h"
 #include "gui/chat/model/availableChatsModel.h"
+#include "gui/chat/scrollArea/chatScrollArea.h"
 #include "gui/chat/widget/sideBarWidget.h"
 #include "userData/user.h"
+#include "userData/userRepository.h"
 
 extern UserData::User currentUser;
 
@@ -19,11 +21,16 @@ namespace Gui
         , _ui(new Ui::ChatPage())
         , _model(new Model::AvailableChatsModel())
         , _delegate(new Delegate::AvailableChatsDelegate(_ui->availableChatsList))
+        , _messagesContainer(new QWidget())
     {
         _ui->setupUi(this);
 
         _sideBarWidget = new Widget::SideBarWidget(this);
         _sideBarWidget->setVisible(false);
+
+        _messagesContainerLayout = new QVBoxLayout(_messagesContainer);
+        _messagesContainer->setLayout(_messagesContainerLayout);
+        _ui->scrollArea->setWidget(_messagesContainer);
 
         _ui->availableChatsList->setMouseTracking(true);
         _ui->availableChatsList->setUniformItemSizes(true);
@@ -50,6 +57,15 @@ namespace Gui
         delete _model;
         delete _delegate;
         delete _sideBarWidget;
+        delete _messagesContainerLayout;
+        delete _messagesContainer;
+
+        _ui = nullptr;
+        _model = nullptr;
+        _delegate = nullptr;
+        _sideBarWidget = nullptr;
+        _messagesContainer = nullptr;
+        _messagesContainerLayout = nullptr;
     }
 
     void ChatPage::PreparePage() const noexcept
@@ -61,7 +77,6 @@ namespace Gui
         _ui->availableChatsList->setItemDelegate(_delegate);
 
         _sideBarWidget->UpdateUserName(currentUser.GetUserName());
-
     }
 
     void ChatPage::ToggleSideMenu() const noexcept
@@ -101,14 +116,25 @@ namespace Gui
         _model->SetMatchingChats(userSearch.toStdString());
     }
 
-    void ChatPage::OnChatSelected() const noexcept
+    void ChatPage::OnChatSelected() const
     {
+        static int lastSelectedRow = -1;
         const QModelIndex index = _ui->availableChatsList->currentIndex();
 
-        _ui->userName->setText(index.data(Model::AvailableChatsModel::AvailableChatsRole::kChatNameRole).toString());
+        if (lastSelectedRow == index.row()) return;
+
+        _ui->userName->setText(index.data(
+            Model::AvailableChatsModel::AvailableChatsRole::kChatNameRole).toString());
+
         _ui->messageInput->clear();
 
         _ui->rightStack->setCurrentWidget(_ui->chatPage);
+
+        FillMessageContainerLayout(index.data(
+            Model::AvailableChatsModel::AvailableChatsRole::kChatIdRole).toInt());
+
+        lastSelectedRow = index.row();
+
         _isChatPageVisible = true;
     }
 
@@ -137,5 +163,19 @@ namespace Gui
     {
         if (_isSideBarVisible) ToggleSideMenu();
         if (_isChatPageVisible) _ui->rightStack->setCurrentWidget(_ui->emptyPage);
+    }
+
+    void ChatPage::FillMessageContainerLayout(const size_t chatId) const
+    {
+        const auto chatMessage = UserData::UserRepository::GetAvailableChatMessages(currentUser.GetUserId(), chatId);
+
+        if (!chatMessage.has_value()) return;
+
+        for (const auto& message : chatMessage.value())
+        {
+            _messagesContainerLayout->addWidget(ScrollArea::CreateMessage(message));
+        }
+
+        _messagesContainerLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
     }
 } // !namespace Gui

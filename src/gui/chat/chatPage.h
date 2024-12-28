@@ -2,6 +2,8 @@
 
 #include <QWidget>
 
+class QVBoxLayout;
+
 // forward declaration
 namespace Ui { class ChatPage; }
 
@@ -29,7 +31,7 @@ namespace Gui
     private slots:
         void ToggleSideMenu() const noexcept;
         void OnSearchInputTextChanged() const noexcept;
-        void OnChatSelected() const noexcept;
+        void OnChatSelected() const;
 
     private:
         void resizeEvent(QResizeEvent* event) override;
@@ -38,6 +40,8 @@ namespace Gui
         void mousePressEvent(QMouseEvent* event) override;
 
         void ToggleUiElements() const;
+
+        void FillMessageContainerLayout(const size_t chatId) const;
 
     private:
         Ui::ChatPage* _ui = nullptr;
@@ -48,5 +52,8 @@ namespace Gui
 
         Widget::SideBarWidget* _sideBarWidget = nullptr;
         static inline bool _isSideBarVisible = false;
+
+        QWidget* _messagesContainer = nullptr;
+        QVBoxLayout* _messagesContainerLayout = nullptr;
     };
 } // !namespace Gui

@@ -8,7 +8,9 @@
 
 namespace Gui::Delegate
 {
-    void AvailableChatsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+    void AvailableChatsDelegate::paint(QPainter* painter,
+                                       const QStyleOptionViewItem& option,
+                                       const QModelIndex& index) const
     {
         painter->save();
 
@@ -77,7 +79,8 @@ namespace Gui::Delegate
         painter->restore();
     }
 
-    QSize AvailableChatsDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
+    QSize AvailableChatsDelegate::sizeHint(const QStyleOptionViewItem& option,
+                                           const QModelIndex& index) const
     {
         Q_UNUSED(option);
         Q_UNUSED(index);

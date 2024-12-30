@@ -17,7 +17,7 @@ namespace MessageBuffer
         MessageNode(const MessageStatus messageType, std::string data, std::string sendTime)
             : data(std::move(data))
             , sendTime(std::move(sendTime))
-            , messageType(std::move(messageType))
+            , messageType(messageType)
         {}
 
         std::string data;

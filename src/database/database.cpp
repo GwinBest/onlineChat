@@ -39,9 +39,10 @@ namespace Database
         va_list args = nullptr;
         va_start(args, query);
         const int size = vsnprintf(nullptr, 0, query.c_str(), args);
+        va_end(args);
 
-        std::vector<char> request(size + 1);;
-
+        va_start(args, query);
+        std::vector<char> request(size + 1);
         vsnprintf(request.data(), request.size(), query.c_str(), args);
         va_end(args);
 
@@ -55,6 +56,7 @@ namespace Database
         catch (const sql::SQLException& e)
         {
             std::cout << e.what() << std::endl;
+            std::cout << request.data() << std::endl;
             throw;
         }
     }

@@ -29,8 +29,7 @@ namespace ClientNetworking
 
         static std::optional<std::reference_wrapper<Client>> GetInstance() noexcept;
 
-        //The sender objects must have login and id fields filled in
-        void SendUserMessage(const UserData::User& sender, const std::string& receiverUserLogin, const char* data) const noexcept;
+        void SendUserMessage(const size_t chatId, const size_t senderUserId, const char* const data) const noexcept;
         void SendUserCredentialsPacket(const NetworkCore::UserPacket& userCredentials) const noexcept;
         void SendChatInfoPacket(const NetworkCore::ChatPacket& chatInfo) const noexcept;
 

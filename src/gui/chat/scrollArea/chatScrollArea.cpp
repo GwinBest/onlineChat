@@ -17,14 +17,17 @@ namespace Gui::ScrollArea
 
         const QDateTime dateTime = QDateTime::fromString(message.sendTime.c_str(),
                                                          "yyyy-MM-dd HH:mm:ss");
+        const QString sendDate = dateTime.date().toString("yyyy-MM-dd");
         const QString sendTime = dateTime.time().toString("HH:mm");
 
         const auto content = QString(
-            "<div style='font-size: 14px;'>%1</div>"
+            "<div style='font-size: 14px;' data-date='%3'>%1</div>"
             "<div style='color: " + QString(colorMessageTimeSend) +
             ";font-size: 10px; text-align: right;'>%2</div>")
             .arg(message.data.c_str())
-            .arg(sendTime);
+            .arg(sendTime)
+            .arg(sendDate);
+
 
         auto* messageLabel = new QLabel(content);
         messageLabel->setWordWrap(true);

@@ -84,20 +84,11 @@ namespace ServerNetworking
             {
             case NetworkCore::ActionType::kSendChatMessage:
             {
-                size_t senderUserLoginSize = 0;
-                char senderUserLogin[Common::userLoginSize] = "";
-                recv(_connections[index], reinterpret_cast<char*>(&senderUserLoginSize), sizeof(senderUserLoginSize), NULL);
-                recv(_connections[index], senderUserLogin, senderUserLoginSize, NULL);
-                senderUserLogin[senderUserLoginSize] = '\0';
+                size_t chatId = 0;
+                recv(_connections[index], reinterpret_cast<char*>(&chatId), sizeof(chatId), NULL);
 
                 size_t senderUserId = 0;
                 recv(_connections[index], reinterpret_cast<char*>(&senderUserId), sizeof(senderUserId), NULL);
-
-                size_t receiverUserLoginSize = 0;
-                char receiverUserLogin[Common::userLoginSize] = "";
-                recv(_connections[index], reinterpret_cast<char*>(&receiverUserLoginSize), sizeof(receiverUserLoginSize), NULL);
-                recv(_connections[index], receiverUserLogin, receiverUserLoginSize, NULL);
-                receiverUserLogin[receiverUserLoginSize] = '\0';
 
                 size_t messageSize = 0;
                 char message[Common::maxInputBufferSize] = "";
@@ -107,48 +98,45 @@ namespace ServerNetworking
 
                 try
                 {
-                    resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
-                        "SELECT id FROM users "
-                        "WHERE login = '%s';",
-                        receiverUserLogin);
-
-                    size_t receiverUserId = 0;
-
-                    if (resultSet->next())
-                    {
-                        receiverUserId = resultSet->getInt("id");
-                    }
+                    Database::DatabaseHelper::GetInstance().GetConnection()->setAutoCommit(false);
 
                     Database::DatabaseHelper::GetInstance().ExecuteUpdate(
-                        "SELECT id INTO @chat_id "
-                        "FROM chats c "
-                        "JOIN users_chats uc1 ON c.id = uc1.chat_id "
-                        "JOIN users u1 ON uc1.user_id = u1.id "
-                        "JOIN users_chats uc2 ON c.id = uc2.chat_id"
-                        "JOIN users u2 ON uc2.user_id = u2.id"
-                        "WHERE u1.login = '%s' AND u2.login = '%s' AND c.login IS NULL "
-                        "LIMIT 1; "
-                        "IF @chat_id IS NULL THEN "
                         "INSERT INTO chats (name, photo, created_at) "
-                        "VALUES (NULL, NULL, NOW()); "
-                        "SELECT LAST_INSERT_ID() INTO @chat_id; "
+                        "SELECT NULL, NULL, NOW() "
+                        "WHERE NOT EXISTS ("
+                        "    SELECT 1 FROM chats WHERE id = %zu"
+                        ");",
+                        chatId
+                    );
+
+                    Database::DatabaseHelper::GetInstance().ExecuteUpdate(
                         "INSERT INTO users_chats (user_id, chat_id, joined_at) "
-                        "VALUES "
-                        "((SELECT id FROM users WHERE login = '%s'), @chat_id, NOW()), "
-                        "((SELECT id FROM users WHERE login = '%s'), @chat_id, NOW()); "
-                        "END IF; "
+                        "SELECT %zu, "
+                        "       (SELECT id FROM chats WHERE id = %zu LIMIT 1), "
+                        "       NOW() "
+                        "WHERE NOT EXISTS ("
+                        "    SELECT 1 FROM users_chats WHERE user_id = %zu AND chat_id = %zu"
+                        ");",
+                        senderUserId, chatId,
+                        senderUserId, chatId
+                    );
+
+                    Database::DatabaseHelper::GetInstance().ExecuteUpdate(
                         "INSERT INTO messages (chat_id, user_id, content, sent_at) "
-                        "VALUES "
-                        "(@chat_id, (SELECT id FROM users WHERE login = '%s'), '%s', NOW());",
-                        senderUserLogin, receiverUserLogin,
-                        senderUserLogin, receiverUserLogin,
-                        senderUserLogin, message);
+                        "VALUES ("
+                        "    (SELECT id FROM chats WHERE id = %zu LIMIT 1), "
+                        "    %zu, '%s', NOW()"
+                        ");",
+                        chatId, senderUserId, message
+                    );
+
+                    Database::DatabaseHelper::GetInstance().GetConnection()->commit();
 
                     for (size_t i = 0; i < _connectionsCurrentCount; ++i)
                     {
                         send(_connections[i], reinterpret_cast<char*>(&actionType), sizeof(actionType), NULL);
 
-                        send(_connections[i], reinterpret_cast<char*>(&receiverUserId), sizeof(receiverUserId), NULL);
+                        //send(_connections[i], reinterpret_cast<char*>(&receiverUserId), sizeof(receiverUserId), NULL);
 
                         size_t messageSize = strlen(message);
                         send(_connections[i], reinterpret_cast<char*>(&messageSize), sizeof(messageSize), NULL);
@@ -158,6 +146,8 @@ namespace ServerNetworking
                 catch (const sql::SQLException& e)
                 {
                     SendServerErrorMessage(index, "Server error: server cant push message to database");
+
+                    Database::DatabaseHelper::GetInstance().GetConnection()->rollback();
 
                     break;
                 }

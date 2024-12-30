@@ -5,13 +5,23 @@
 #include <QDateTime>
 #include <QKeyEvent>
 #include <QPropertyAnimation>
+#include <QRegularExpression>
 
+#include "client/client.h"
 #include "gui/chat/delegate/availableChatsDelegate.h"
 #include "gui/chat/model/availableChatsModel.h"
 #include "gui/chat/scrollArea/chatScrollArea.h"
 #include "gui/chat/widget/sideBarWidget.h"
 #include "userData/user.h"
 #include "userData/userRepository.h"
+
+#ifdef SendMessage
+#undef SendMessage
+#endif // SendMessage
+
+#ifdef GetUserName
+#undef GetUserName
+#endif // GetUserName
 
 extern UserData::User currentUser;
 
@@ -50,6 +60,26 @@ namespace Gui
         connect(_ui->searchInput, &QLineEdit::textChanged, this, &ChatPage::OnSearchInputTextChanged);
 
         connect(_ui->availableChatsList, &QListView::clicked, this, &ChatPage::OnChatSelected);
+
+        connect(_ui->sendMessageButton, &QPushButton::clicked, this, [this]
+                {
+                    const auto lastMessageText = _ui->messageInput->toPlainText();
+
+                    if (lastMessageText.trimmed().isEmpty()) return;
+
+                    MessageBuffer::MessageNode lastMessage(MessageBuffer::MessageStatus::kSend,
+                                                           lastMessageText.toStdString(),
+                                                           QDateTime::currentDateTime().toString(
+                                                               "yyyy-MM-dd HH:mm:ss").toStdString());
+
+                    const QModelIndex index = _ui->availableChatsList->currentIndex();
+
+                    SendMessage(index.data(Model::AvailableChatsModel::AvailableChatsRole::kChatIdRole).toUInt(),
+                                currentUser.GetUserId(), lastMessage.data.c_str());
+                    ChatPage::RenderLastMessage(lastMessage);
+
+                    _ui->messageInput->clear();
+                });
     }
 
     ChatPage::~ChatPage()
@@ -193,5 +223,80 @@ namespace Gui
 
         _messagesContainerLayout->addSpacerItem(
             new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+    }
+
+    void ChatPage::RemoveLastSpacerItem(QVBoxLayout* layout)
+    {
+        int count = layout->count();
+        if (count > 0)
+        {
+            QLayoutItem* item = layout->takeAt(count - 1);
+            delete item;
+        }
+    }
+
+    QString ChatPage::ExtractDateTimeFromMessageWidget(QWidget* messageWidget)
+    {
+        auto* label = messageWidget->findChild<QLabel*>();
+        if (!label) return {};
+
+        QString htmlContent = label->text();
+        QRegularExpression regexTime("<div style='color: #[0-9A-Fa-f]{6};font-size: 10px; text-align: right;'>(\\d{2}:\\d{2})</div>");
+        QRegularExpression regexDate("<div style='font-size: 14px;' data-date='(\\d{4}-\\d{2}-\\d{2})'>");
+
+        QRegularExpressionMatch matchTime = regexTime.match(htmlContent);
+        QRegularExpressionMatch matchDate = regexDate.match(htmlContent);
+
+        QString extractedTime;
+        QString extractedDate;
+
+        if (matchTime.hasMatch()) extractedTime = matchTime.captured(1);
+        if (matchDate.hasMatch()) extractedDate = matchDate.captured(1);
+
+        return QString("%1 %2").arg(extractedDate).arg(extractedTime);
+    }
+
+    void ChatPage::SendMessage(const size_t chatId, const size_t senderUserId, const char* const data) const
+    {
+        if (!ClientNetworking::Client::GetInstance().has_value()) return;
+
+        const auto clientInstance = ClientNetworking::Client::GetInstance().value();
+
+        clientInstance.get().SendUserMessage(chatId, senderUserId, data);
+    }
+
+    void ChatPage::RenderLastMessage(const MessageBuffer::MessageNode& message)
+    {
+        RemoveLastSpacerItem(_messagesContainerLayout);
+
+        const auto lastRenderedMessage = _messagesContainerLayout->itemAt(
+            _messagesContainerLayout->count() - 1)->widget();
+
+        const auto lastRenderedMessageSendDate = ExtractDateTimeFromMessageWidget(lastRenderedMessage);
+        const auto lastDateTime = QDateTime::fromString(lastRenderedMessageSendDate,
+                                                        "yyyy-MM-dd HH:mm");
+        const auto currentDateTime = QDateTime::fromString(message.sendTime.c_str(),
+                                                           "yyyy-MM-dd HH:mm:ss");
+
+        if (lastDateTime.date() != currentDateTime.date())
+        {
+            const QLocale locale = QLocale::English;
+            const QString currentSendTime = locale.toString(currentDateTime, "MMMM dd, yyyy");
+            _messagesContainerLayout->addWidget(ScrollArea::CreateDateDivider(currentSendTime));
+        }
+
+        _messagesContainerLayout->addWidget(ScrollArea::CreateMessage(message));
+        _messagesContainerLayout->addSpacerItem(
+            new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+        const QModelIndex index = _ui->availableChatsList->currentIndex();
+        if (index.isValid()) {
+            _model->setData(index, message.data.c_str(),
+                            Model::AvailableChatsModel::AvailableChatsRole::kLastMessageRole);
+            _model->setData(index, message.sendTime.c_str(),
+                            Model::AvailableChatsModel::AvailableChatsRole::kLastMessageSendTimeRole);
+            emit _model->dataChanged(index, index);
+        }
+
     }
 } // !namespace Gui

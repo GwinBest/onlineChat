@@ -25,11 +25,11 @@ namespace Gui::Model
     public:
         explicit AvailableChatsModel(QObject* parent = nullptr) noexcept
             : QAbstractListModel(parent)
-        {
-        }
+        {}
 
         int rowCount(const QModelIndex& parent = QModelIndex()) const override;
         QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+        bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
         [[nodiscard]] inline bool IsEmpty() const noexcept { return _availableChats.empty(); }
 

@@ -41,24 +41,17 @@ namespace ClientNetworking
         return instance;
     }
 
-    void Client::SendUserMessage(const UserData::User& sender, const std::string& receiverUserLogin, const char* data) const noexcept
+    void Client::SendUserMessage(const size_t chatId, const size_t senderUserId, const char* const data) const noexcept
     {
         NetworkCore::ActionType type = NetworkCore::ActionType::kSendChatMessage;
         send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 
-        size_t senderUserLoginSize = sender.GetUserLogin().size();
-        send(_clientSocket, reinterpret_cast<char*>(&senderUserLoginSize), sizeof(senderUserLoginSize), NULL);
-        send(_clientSocket, sender.GetUserLogin().c_str(), senderUserLoginSize, NULL);
+        send(_clientSocket, reinterpret_cast<const char*>(&chatId), sizeof(chatId), NULL);
 
-        size_t senderUserId = sender.GetUserId();
         send(_clientSocket, reinterpret_cast<const char*>(&senderUserId), sizeof(senderUserId), NULL);
 
-        size_t receiverUserLoginSize = receiverUserLogin.size();
-        send(_clientSocket, reinterpret_cast<char*>(&receiverUserLoginSize), sizeof(receiverUserLoginSize), NULL);
-        send(_clientSocket, receiverUserLogin.c_str(), receiverUserLoginSize, NULL);
-
-        size_t dataSize = strlen(data);
-        send(_clientSocket, reinterpret_cast<char*>(&dataSize), sizeof(dataSize), NULL);
+        const size_t dataSize = strlen(data);
+        send(_clientSocket, reinterpret_cast<const char*>(&dataSize), sizeof(dataSize), NULL);
         send(_clientSocket, data, dataSize, NULL);
     }
 
@@ -105,7 +98,7 @@ namespace ClientNetworking
             case NetworkCore::ActionType::kSendChatMessage:
             {
                 size_t userId = 0;
-                recv(_clientSocket, reinterpret_cast<char*>(&userId), sizeof(userId), NULL);
+                //recv(_clientSocket, reinterpret_cast<char*>(&userId), sizeof(userId), NULL);
 
                 size_t receiveMessageSize;
                 char receiveMessage[Common::maxInputBufferSize];

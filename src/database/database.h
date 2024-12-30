@@ -20,6 +20,8 @@ namespace Database
         [[nodiscard]] sql::ResultSet* ExecuteQuery(const std::string query, ...);
         bool ExecuteUpdate(const std::string query, ...);
 
+        [[nodiscard]] sql::Connection* GetConnection() { return _connection; }
+
         ~DatabaseHelper();
 
     private:

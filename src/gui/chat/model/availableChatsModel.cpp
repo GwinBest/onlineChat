@@ -29,6 +29,23 @@ namespace Gui::Model
         }
     }
 
+    bool AvailableChatsModel::setData(const QModelIndex& index, const QVariant& value, int role)
+    {
+        if (!index.isValid() || index.row() < 0 || index.row() >= _availableChats.size())
+            return false;
+
+        ChatSystem::ChatInfo& chatInfo = _availableChats[index.row()];
+
+        switch (role)
+        {
+        case kChatIdRole:               chatInfo.id = value.toInt();                     return true;
+        case kChatNameRole:             chatInfo.name = value.toString();                return true;
+        case kLastMessageRole:          chatInfo.lastMessage = value.toString();         return true;
+        case kLastMessageSendTimeRole:  chatInfo.lastMessageSendTime = value.toString(); return true;
+        default: return false;
+        }
+    }
+
     void AvailableChatsModel::SetAllAvailableChats()
     {
         beginResetModel();

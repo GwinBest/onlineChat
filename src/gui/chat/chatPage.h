@@ -2,6 +2,9 @@
 
 #include <QWidget>
 
+#include "messageBuffer/messageBuffer.h"
+#include "userData/user.h"
+
 class QVBoxLayout;
 
 // forward declaration
@@ -42,6 +45,12 @@ namespace Gui
         void ToggleUiElements() const;
 
         void FillMessageContainerLayout(const size_t chatId) const;
+
+        void RemoveLastSpacerItem(QVBoxLayout* layout);
+        QString ExtractDateTimeFromMessageWidget(QWidget* messageWidget);
+
+        void SendMessage(const size_t chatId, const size_t senderUserId, const char* const data) const;
+        void RenderLastMessage(const MessageBuffer::MessageNode& message);
 
     private:
         Ui::ChatPage* _ui = nullptr;

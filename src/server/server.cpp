@@ -245,11 +245,11 @@ namespace ServerNetworking
 
                     size_t sendMessageSize = strlen(message.data());
                     send(receiverSocket, reinterpret_cast<char*>(&sendMessageSize), sizeof(sendMessageSize), NULL);
-                    send(receiverSocket, message.data(), sendMessageSize, NULL);
+                    send(receiverSocket, message.data(), static_cast<int>(sendMessageSize), NULL);
 
                     size_t sendTimeSize = sentAt.size();
                     send(receiverSocket, reinterpret_cast<char*>(&sendTimeSize), sizeof(sendTimeSize), NULL);
-                    send(receiverSocket, sentAt.data(), sendTimeSize, NULL);
+                    send(receiverSocket, sentAt.data(), static_cast<int>(sendTimeSize), NULL);
                 }
             }
         }

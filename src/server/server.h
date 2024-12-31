@@ -43,6 +43,6 @@ namespace ServerNetworking
         uint8_t _connectionsCurrentCount = 0;
 
         using UserId = size_t;
-        std::map<SOCKET, UserId> _connectionsToUserId = {};
+        std::map<UserId, SOCKET> _connectionsToUserId = {};
     };
 } // !namespace ServerNetworking

@@ -80,6 +80,23 @@ namespace Gui
 
                     _ui->messageInput->clear();
                 });
+
+        if (const auto clientInstance = ClientNetworking::Client::GetInstance();
+            clientInstance.has_value())
+        {
+            clientInstance
+                .value()
+                .get()
+                .RegisterReceiveMessageCallback([this](const MessageBuffer::MessageNode& message)
+                                                {
+                                                    QMetaObject::invokeMethod(this,
+                                                                              [this, message]
+                                                                              {
+                                                                                  RenderLastMessage(message);
+                                                                              },
+                                                                              Qt::QueuedConnection);
+                                                });
+        }
     }
 
     ChatPage::~ChatPage()

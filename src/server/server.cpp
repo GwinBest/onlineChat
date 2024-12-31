@@ -222,27 +222,34 @@ namespace ServerNetworking
             connection->commit();
 
             auto* resultSet = dbHelper.ExecuteQuery(
-                "SELECT user_id "
+                "SELECT users_chats.user_id, messages.sent_at "
                 "FROM users_chats "
-                "WHERE chat_id = %zu AND user_id != %zu;",
+                "JOIN messages ON users_chats.chat_id = messages.chat_id "
+                "WHERE users_chats.chat_id = %zu AND users_chats.user_id != %zu "
+                "ORDER BY messages.sent_at DESC LIMIT 1;",
                 chatId,
                 senderUserId);
 
             static constexpr auto actionType = NetworkCore::ActionType::kSendChatMessage;
             while (resultSet->next())
             {
-                const int32_t receiverUserId = resultSet->getInt("user_id");
+                const UserId receiverUserId = resultSet->getInt("user_id");
+                const std::string sentAt = resultSet->getString("sent_at");
 
                 if (auto it = _connectionsToUserId.find(receiverUserId);
                     it != _connectionsToUserId.end())
                 {
-                    const SOCKET receiverSocket = it->first;
+                    const SOCKET receiverSocket = it->second;
 
                     send(receiverSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
 
-                    size_t sendMessageSize = message.size();
+                    size_t sendMessageSize = strlen(message.data());
                     send(receiverSocket, reinterpret_cast<char*>(&sendMessageSize), sizeof(sendMessageSize), NULL);
                     send(receiverSocket, message.data(), sendMessageSize, NULL);
+
+                    size_t sendTimeSize = sentAt.size();
+                    send(receiverSocket, reinterpret_cast<char*>(&sendTimeSize), sizeof(sendTimeSize), NULL);
+                    send(receiverSocket, sentAt.data(), sendTimeSize, NULL);
                 }
             }
         }
@@ -434,7 +441,7 @@ namespace ServerNetworking
             send(clientSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
             send(clientSocket, reinterpret_cast<char*>(&userId), sizeof(userId), NULL);
 
-            _connectionsToUserId[clientSocket] = userId;
+            _connectionsToUserId[userId] = clientSocket;
         }
         catch (const sql::SQLException& e)
         {

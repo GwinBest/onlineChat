@@ -1,6 +1,7 @@
 #pragma once
 
 #include <condition_variable>
+#include <functional>
 #include <mutex>
 #include <optional>
 #include <variant>
@@ -37,9 +38,11 @@ namespace ClientNetworking
         void SendUserCredentialsPacket(const NetworkCore::UserPacket& userCredentials) const noexcept;
         void SendChatInfoPacket(const NetworkCore::ChatPacket& chatInfo) const noexcept;
 
-        void ReceiveThread() const noexcept;
+        void ReceiveThread() const;
 
-        template<typename T>
+        void RegisterReceiveMessageCallback(std::function<void(const MessageBuffer::MessageNode&)> callback);
+
+        template <typename T>
         const T& GetServerResponse() const noexcept
         {
             std::unique_lock<std::mutex> lock(_mutex);
@@ -73,5 +76,7 @@ namespace ClientNetworking
         mutable std::condition_variable _conditionalVariable;
 
         mutable ServerResponse _serverResponse;
+
+        std::function<void(const MessageBuffer::MessageNode&)> _receiveMessageCallback = nullptr;
     };
 } // !namespace ClientNetworking

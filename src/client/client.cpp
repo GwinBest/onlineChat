@@ -4,6 +4,7 @@
 #include <iostream>
 #endif // !NDEBUG
 
+#include <array>
 #include <thread>
 #include <vector>
 
@@ -11,6 +12,7 @@
 #include "userData/user.h"
 #include "messageBuffer/messageBuffer.h"
 #include "chatSystem/chatInfo.h"
+#include "gui/chat/chatPage.h"
 
 extern UserData::User currentUser;
 
@@ -84,32 +86,38 @@ namespace ClientNetworking
         send(_clientSocket, reinterpret_cast<const char*>(&chatInfo.id), sizeof(chatInfo.id), NULL);
     }
 
-    void Client::ReceiveThread() const noexcept
+    void Client::ReceiveThread() const
     {
         char serverResponse[NetworkCore::serverResponseSize];
 
         while (_currentClientState != ClientState::kClientDisconnected)
         {
-            NetworkCore::ActionType type = NetworkCore::ActionType::kActionUndefined;
+            auto type = NetworkCore::ActionType::kActionUndefined;
             recv(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
 
             switch (type)
             {
             case NetworkCore::ActionType::kSendChatMessage:
             {
-                size_t userId = 0;
-                //recv(_clientSocket, reinterpret_cast<char*>(&userId), sizeof(userId), NULL);
-
-                size_t receiveMessageSize;
-                char receiveMessage[Common::maxInputBufferSize];
-
+                size_t receiveMessageSize = 0;
+                std::array<char, Common::maxInputBufferSize> receiveMessage = {};
                 recv(_clientSocket, reinterpret_cast<char*>(&receiveMessageSize), sizeof(receiveMessageSize), NULL);
-                recv(_clientSocket, receiveMessage, receiveMessageSize, NULL);
+                recv(_clientSocket, receiveMessage.data(), static_cast<int>(receiveMessageSize), NULL);
                 receiveMessage[receiveMessageSize] = '\0';
 
-                if (userId == currentUser.GetUserId())
+                size_t sendTimeSize = 0;
+                std::array<char, Common::maxLastMessageSendTimeSize> sentAt = {};
+                recv(_clientSocket, reinterpret_cast<char*>(&sendTimeSize), sizeof(sendTimeSize), NULL);
+                recv(_clientSocket, sentAt.data(), static_cast<int>(sendTimeSize), NULL);
+                sentAt[sendTimeSize] = '\0';
+
+                const MessageBuffer::MessageNode messageNode(MessageBuffer::MessageStatus::kReceived,
+                                                             std::string(receiveMessage.data()),
+                                                             sentAt.data());
+
+                if (_receiveMessageCallback)
                 {
-                    //MessageBuffer::messageBuffer.emplace_back(MessageBuffer::MessageNode(MessageBuffer::MessageStatus::kReceived, receiveMessage));
+                    _receiveMessageCallback(messageNode);
                 }
 
                 break;
@@ -263,6 +271,11 @@ namespace ClientNetworking
                 break;
             }
         }
+    }
+
+    void Client::RegisterReceiveMessageCallback(std::function<void(const MessageBuffer::MessageNode&)> callback)
+    {
+        _receiveMessageCallback = std::move(callback);
     }
 
     Client::~Client()

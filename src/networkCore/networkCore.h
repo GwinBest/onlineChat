@@ -6,16 +6,6 @@
 #include <string>
 #include <vector>
 
-// forward declaration
-namespace UserData
-{
-    class User;
-}
-namespace ChatSystem
-{
-    struct ChatInfo;
-}
-
 namespace NetworkCore
 {
     enum class ActionType : uint8_t
@@ -33,7 +23,7 @@ namespace NetworkCore
         kServerError,
     };
 
-    struct UserPacket
+    struct UserPacket final
     {
         ActionType actionType = ActionType::kActionUndefined;
         std::string name;
@@ -42,7 +32,7 @@ namespace NetworkCore
         size_t id = 0;
     };
 
-    struct ChatPacket
+    struct ChatPacket final
     {
         ActionType actionType = ActionType::kActionUndefined;
         size_t chatUserId = 0;

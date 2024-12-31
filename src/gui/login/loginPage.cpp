@@ -41,7 +41,7 @@ namespace Gui
         _ui->userNotFound->setVisible(false);
     }
 
-    void LoginPage::OnLoginButtonClicked() const noexcept
+    void LoginPage::OnLoginButtonClicked() const
     {
         bool isFieldEmpty = false;
 
@@ -73,7 +73,7 @@ namespace Gui
         currentUser.SetUserLogin(login);
         currentUser.SetUserPassword(std::hash<std::string>{}(password));
 
-        std::optional<bool> isUserExist = UserData::UserRepository::IsUserExist(currentUser);
+        const std::optional<bool> isUserExist = UserData::UserRepository::IsUserExist(currentUser);
 
         if (!isUserExist.has_value())
         {
@@ -86,13 +86,11 @@ namespace Gui
             _ui->userNotFound->setVisible(true);
             return;
         }
-        else
-        {
-            _ui->userNotFound->setVisible(false);
-        }
 
-        std::optional<size_t> userId = UserData::UserRepository::GetUserIdFromDatabase(login);
-        std::optional<std::string> userName = UserData::UserRepository::GetUserNameFromDatabase(login);
+        _ui->userNotFound->setVisible(false);
+
+        const std::optional<size_t> userId = UserData::UserRepository::GetUserIdFromDatabase(login);
+        const std::optional<std::string> userName = UserData::UserRepository::GetUserNameFromDatabase(login);
 
         if (!userId.has_value() || !userName.has_value())
         {

@@ -98,7 +98,8 @@ namespace UserData
         return instance.value().get().GetServerResponse<bool>();
     }
 
-    std::optional<std::vector<ChatSystem::ChatInfo>> UserRepository::FindMatchingChats(const size_t currentUserId, const std::string& pattern)
+    std::optional<std::vector<ChatSystem::ChatInfo>> UserRepository::FindMatchingChats(const size_t currentUserId,
+                                                                                       const std::string& pattern)
     {
         const NetworkCore::UserPacket request =
         {
@@ -131,7 +132,8 @@ namespace UserData
         return instance.value().get().GetServerResponse<std::vector<ChatSystem::ChatInfo>>();
     }
 
-    std::optional<std::vector<MessageBuffer::MessageNode>> UserRepository::GetAvailableChatMessages(const size_t userId, const size_t chatId)
+    std::optional<std::vector<MessageBuffer::MessageNode>> UserRepository::GetAvailableChatMessages(const size_t userId,
+                                                                                                    const size_t chatId)
     {
         const NetworkCore::ChatPacket request =
         {

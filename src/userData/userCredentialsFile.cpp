@@ -30,7 +30,8 @@ namespace UserData
             return true;
         }
 
-        _credentialsFile.open(_fileName, std::ios::in | std::ios::out | std::ios::trunc | std::ios::binary); // if file already exist - clear it
+        _credentialsFile.open(_fileName, std::ios::in | std::ios::out |
+                              std::ios::trunc | std::ios::binary); // if file already exist - clear it
         if (_credentialsFile.is_open())
         {
 #ifdef WIN32

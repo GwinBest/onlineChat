@@ -13,6 +13,10 @@
 #pragma warning (disable:4996)
 #endif
 
+// forward declarations
+namespace UserData { class User; }
+namespace ChatSystem { struct ChatInfo; }
+
 namespace ClientNetworking
 {
     class Client final

@@ -24,7 +24,7 @@ namespace Gui
         void DisplaySignInPage() const;
 
     private slots:
-        void OnLoginButtonClicked() const noexcept;
+        void OnLoginButtonClicked() const;
         void OnSignInButtonClicked() const noexcept;
 
     private:

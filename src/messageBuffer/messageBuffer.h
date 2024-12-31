@@ -8,8 +8,8 @@ namespace MessageBuffer
     enum class MessageStatus : uint8_t
     {
         kUndefined = 0,
-        kSend = 1,
-        kReceived = 2
+        kSend,
+        kReceived,
     };
 
     struct MessageNode final

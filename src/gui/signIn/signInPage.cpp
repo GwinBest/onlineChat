@@ -88,7 +88,7 @@ namespace Gui
         currentUser.SetUserLogin(login);
         currentUser.SetUserPassword(std::hash<std::string>{}(password));
 
-        std::optional<bool> isUserExist = UserData::UserRepository::IsUserExist(currentUser);
+        const std::optional<bool> isUserExist = UserData::UserRepository::IsUserExist(currentUser);
 
         if (!isUserExist.has_value())
         {
@@ -106,7 +106,7 @@ namespace Gui
             _ui->userExistLabel->setVisible(false);
         }
 
-        std::optional<bool> isPushSuccessful = UserData::UserRepository::PushUserCredentialsToDatabase(currentUser);
+        const std::optional<bool> isPushSuccessful = UserData::UserRepository::PushUserCredentialsToDatabase(currentUser);
 
         if (!isPushSuccessful.has_value())
         {
@@ -120,7 +120,7 @@ namespace Gui
             return;
         };
 
-        std::optional<size_t> userId = UserData::UserRepository::GetUserIdFromDatabase(login);
+        const std::optional<size_t> userId = UserData::UserRepository::GetUserIdFromDatabase(login);
 
         if (!userId.has_value())
         {

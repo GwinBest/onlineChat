@@ -46,11 +46,11 @@ namespace Gui
 
         void FillMessageContainerLayout(const size_t chatId) const;
 
-        void RemoveLastSpacerItem(QVBoxLayout* layout);
-        QString ExtractDateTimeFromMessageWidget(QWidget* messageWidget);
+        static void RemoveLastSpacerItem(QVBoxLayout* layout);
+        static QString ExtractDateTimeFromMessageWidget(const QWidget* messageWidget);
 
-        void SendMessage(const size_t chatId, const size_t senderUserId, const char* const data) const;
-        void RenderLastMessage(const MessageBuffer::MessageNode& message);
+        static void SendMessage(const size_t chatId, const size_t senderUserId, const char* const data);
+        void RenderLastMessage(const MessageBuffer::MessageNode& message) const;
 
     private:
         Ui::ChatPage* _ui = nullptr;

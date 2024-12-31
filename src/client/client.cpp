@@ -237,13 +237,10 @@ namespace ClientNetworking
                     }
 
                     messageCount--;
-
-                    if (!std::get<bool>(_serverResponse) && ((messageBuffer.size() + 1) % 15 == 0 || messageCount == 0))
-                    {
-                        _serverResponse = messageBuffer;
-                        _conditionalVariable.notify_one();
-                    }
                 }
+
+                _serverResponse = messageBuffer;
+                _conditionalVariable.notify_one();
 
                 break;
             }

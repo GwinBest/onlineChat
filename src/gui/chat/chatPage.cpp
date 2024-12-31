@@ -269,10 +269,11 @@ namespace Gui
     {
         RemoveLastSpacerItem(_messagesContainerLayout);
 
-        if (const auto messageContainerSize = _messagesContainerLayout->count() - 1 > 0)
+        if (const int messageContainerSize = _messagesContainerLayout->count() - 1;
+            messageContainerSize > 0)
         {
-            const auto* lastRenderedMessage = _messagesContainerLayout->itemAt(messageContainerSize
-            )->widget();
+            const auto* lastRenderedMessage = _messagesContainerLayout->
+                itemAt(messageContainerSize)->widget();
 
             const auto lastRenderedMessageSendDate = ExtractDateTimeFromMessageWidget(lastRenderedMessage);
             const auto lastDateTime = QDateTime::fromString(lastRenderedMessageSendDate,

@@ -9,7 +9,7 @@
 
 namespace Database
 {
-    class DatabaseHelper
+    class DatabaseHelper final
     {
     public:
         DatabaseHelper(const DatabaseHelper&) = delete;
@@ -18,7 +18,7 @@ namespace Database
         static DatabaseHelper& GetInstance() noexcept;
 
         [[nodiscard]] sql::ResultSet* ExecuteQuery(const std::string query, ...);
-        bool ExecuteUpdate(const std::string query, ...);
+        [[nodiscard]] bool ExecuteUpdate(const std::string query, ...);
 
         [[nodiscard]] sql::Connection* GetConnection() { return _connection; }
 

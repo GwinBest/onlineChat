@@ -29,7 +29,7 @@ namespace Database
         }
         catch (const sql::SQLException& e)
         {
-            std::cout << e.what() << std::endl;
+            std::cout << e.what() << '\n';
             throw;
         }
     }
@@ -55,8 +55,8 @@ namespace Database
         }
         catch (const sql::SQLException& e)
         {
-            std::cout << e.what() << std::endl;
-            std::cout << request.data() << std::endl;
+            std::cout << e.what() << '\n';
+            std::cout << request.data() << '\n';
             throw;
         }
     }
@@ -91,7 +91,7 @@ namespace Database
         }
         catch (const sql::SQLException& e)
         {
-            std::cout << e.what() << std::endl;
+            std::cout << e.what() << '\n';
         }
 
         return false;

@@ -1,40 +1,48 @@
 #pragma once
 
-#include <cstdint>
+#include <WinSock2.h>
 
-#include "../networkCore/networkCore.h"
+#include <array>
+#include <map>
+#include <string>
 
-#pragma comment(lib, "ws2_32.lib")
-#pragma warning(disable: 4996)
-
-#ifdef GetCurrentTime
-#undef GetCurrentTime
-#endif
+#include "database/database.h"
+#include "networkCore/networkCore.h"
 
 namespace ServerNetworking
 {
     class Server final
     {
     public:
-        void Start() noexcept;
-        [[noreturn]] void Run() noexcept;
+        Server();
+        bool Start();
+        [[noreturn]] void Run();
+        void ClientHandler(const SOCKET clientSocket);
 
     private:
-        void ClientHandler(int index);
+        void HandleAction(const SOCKET clientSocket, const NetworkCore::ActionType actionType);
+        void HandleSendChatMessage(const SOCKET clientSocket);
+        static void HandleAddUserCredentialsToDatabase(const SOCKET clientSocket);
+        static void HandleCheckUserExistence(const SOCKET clientSocket);
+        static void HandleCheckIsUserDataFromFileValid(const SOCKET clientSocket);
+        static void HandleGetUserNameFromDatabase(const SOCKET clientSocket);
+        void HandleGetUserIdFromDatabase(const SOCKET clientSocket);
+        static void HandleFindMatchingChats(const SOCKET clientSocket);
+        static void HandleGetAvailableChatsForUser(const SOCKET clientSocket);
+        static void HandleReceiveAllMessagesForSelectedChat(const SOCKET clientSocket);
 
-        //void ReceiveUserMessage(UserData::User& sender, const UserData::User& receiver, const char* data) const noexcept;
-        NetworkCore::UserPacket ReceiveUserCredentialsPacket(size_t index) const noexcept;
-        //void ReceiveChatInfoPacket(const ChatPacket& chatInfo) const noexcept;
+        static NetworkCore::UserPacket ReceiveUserCredentialsPacket(const SOCKET clientSocket);
+        static void SendServerErrorMessage(const SOCKET clientSocket, const std::string& errorMessage) noexcept;
 
-        void SendServerErrorMessage(const size_t index, const std::string& errorMessage) const noexcept;
-
-    private:
         WSADATA _wsaData = {};
         SOCKET _serverSocket = 0;
         SOCKADDR_IN _socketAddress = {};
 
-        SOCKET _connections[100] = {};
+        static constexpr size_t _maxConnectionsCount = 100;
+        std::array<SOCKET, _maxConnectionsCount> _connections = {};
         uint8_t _connectionsCurrentCount = 0;
+
+        using UserId = size_t;
+        std::map<SOCKET, UserId> _connectionsToUserId = {};
     };
 } // !namespace ServerNetworking
-

@@ -8,6 +8,7 @@
 #include <QRegularExpression>
 
 #include "client/client.h"
+#include "common/common.h"
 #include "gui/chat/delegate/availableChatsDelegate.h"
 #include "gui/chat/model/availableChatsModel.h"
 #include "gui/chat/scrollArea/chatScrollArea.h"
@@ -67,16 +68,24 @@ namespace Gui
 
                     if (lastMessageText.trimmed().isEmpty()) return;
 
-                    const MessageBuffer::MessageNode lastMessage(MessageBuffer::MessageStatus::kSend,
-                                                                 lastMessageText.toStdString(),
-                                                                 QDateTime::currentDateTime().toString(
-                                                                     "yyyy-MM-dd HH:mm:ss").toStdString());
+                    auto remainingText = lastMessageText;
 
-                    const QModelIndex index = _ui->availableChatsList->currentIndex();
+                    while (!remainingText.isEmpty())
+                    {
+                        const auto chunk = remainingText.left(Common::maxInputBufferSize - 1);
+                        remainingText = remainingText.mid(Common::maxInputBufferSize - 1);
 
-                    SendMessage(index.data(Model::AvailableChatsModel::AvailableChatsRole::kChatIdRole).toUInt(),
-                                currentUser.GetUserId(), lastMessage.data.c_str());
-                    RenderLastMessage(lastMessage);
+                        const MessageBuffer::MessageNode messageChunk(
+                            MessageBuffer::MessageStatus::kSend,
+                            chunk.toStdString(),
+                            QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString());
+
+                        const QModelIndex index = _ui->availableChatsList->currentIndex();
+
+                        SendMessage(index.data(Model::AvailableChatsModel::AvailableChatsRole::kChatIdRole).toUInt(),
+                                    currentUser.GetUserId(), messageChunk.data.c_str());
+                        RenderLastMessage(messageChunk);
+                    }
 
                     _ui->messageInput->clear();
                 });

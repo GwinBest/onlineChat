@@ -20,11 +20,15 @@ namespace Gui::ScrollArea
         const QString sendDate = dateTime.date().toString("yyyy-MM-dd");
         const QString sendTime = dateTime.time().toString("HH:mm");
 
+        static constexpr auto zeroWidthSpace = "\u200b";
+        const QString contentText = QString::fromStdString(message.data);
+        const QString contentWithBreaks = contentText.split("").join(zeroWidthSpace);
+
         const auto content = QString(
             "<div style='font-size: 14px;' data-date='%3'>%1</div>"
             "<div style='color: " + QString(colorMessageTimeSend) +
             ";font-size: 10px; text-align: right;'>%2</div>")
-            .arg(message.data.c_str())
+            .arg(contentWithBreaks)
             .arg(sendTime)
             .arg(sendDate);
 

@@ -4,6 +4,7 @@
 #include <string>
 
 #include <QAbstractListModel>
+#include <QKeyEvent>
 #include <QList>
 #include <QString>
 
@@ -35,6 +36,8 @@ namespace Gui::Model
 
         void SetAllAvailableChats();
         void SetMatchingChats(const std::string& pattern);
+
+    private:
 
     private:
         QList<ChatSystem::ChatInfo> _availableChats;

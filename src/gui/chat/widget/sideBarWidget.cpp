@@ -41,7 +41,14 @@ namespace Gui::Widget
     {
         if (obj == _ui->transparentFrame)
         {
-            if (event->type() == QEvent::MouseButtonPress) emit HideSideBar();
+            if (event->type() == QEvent::MouseButtonPress)
+            {
+                if (const auto* mouseEvent = dynamic_cast<QMouseEvent*>(event);
+                    mouseEvent->button() == Qt::LeftButton)
+                {
+                    emit HideSideBar();
+                }
+            }
         }
 
         return QWidget::eventFilter(obj, event);

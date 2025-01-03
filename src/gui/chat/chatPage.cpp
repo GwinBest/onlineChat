@@ -203,14 +203,22 @@ namespace Gui
 
     void ChatPage::keyPressEvent(QKeyEvent* event)
     {
-        if (event->key() == Qt::Key_Escape) ToggleUiElements();
+        if (event->key() == Qt::Key_Escape)
+        {
+            ToggleUiElements();
+            return;
+        }
 
         QWidget::keyPressEvent(event);
     }
 
     void ChatPage::mousePressEvent(QMouseEvent* event)
     {
-        if (event->buttons() == Qt::BackButton) ToggleUiElements();
+        if (event->buttons() == Qt::BackButton)
+        {
+            ToggleUiElements();
+            return;
+        }
 
         QWidget::mousePressEvent(event);
     }

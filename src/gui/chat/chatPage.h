@@ -64,5 +64,7 @@ namespace Gui
 
         QWidget* _messagesContainer = nullptr;
         QVBoxLayout* _messagesContainerLayout = nullptr;
+
+        static inline int lastSelectedRow = -1;
     };
 } // !namespace Gui

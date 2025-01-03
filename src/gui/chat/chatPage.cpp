@@ -175,7 +175,6 @@ namespace Gui
 
     void ChatPage::OnChatSelected() const
     {
-        static int lastSelectedRow = -1;
         const QModelIndex index = _ui->availableChatsList->currentIndex();
 
         if (lastSelectedRow == index.row()) return;
@@ -216,10 +215,20 @@ namespace Gui
         QWidget::mousePressEvent(event);
     }
 
-    inline void ChatPage::ToggleUiElements() const
+    void ChatPage::ToggleUiElements() const
     {
-        if (_isSideBarVisible) ToggleSideMenu();
-        if (_isChatPageVisible) _ui->rightStack->setCurrentWidget(_ui->emptyPage);
+        if (_isSideBarVisible)
+        {
+            ToggleSideMenu();
+            return;
+        }
+
+        if (_isChatPageVisible)
+        {
+            _ui->rightStack->setCurrentWidget(_ui->emptyPage);
+            _ui->availableChatsList->selectionModel()->clearSelection();
+            lastSelectedRow = -1;
+        }
     }
 
     void ChatPage::FillMessageContainerLayout(const size_t chatId) const
@@ -253,8 +262,8 @@ namespace Gui
 
     void ChatPage::RemoveLastSpacerItem(QVBoxLayout* layout)
     {
-        const int count = layout->count();
-        if (count > 0)
+        if (const int count = layout->count();
+            count > 0)
         {
             QLayoutItem* item = layout->takeAt(count - 1);
             delete item;

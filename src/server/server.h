@@ -21,6 +21,7 @@ namespace ServerNetworking
 
     private:
         void HandleAction(const SOCKET clientSocket, const NetworkCore::ActionType actionType);
+        static void HandleCreateNewPersonalChat(SOCKET clientSocket);
         void HandleSendChatMessage(const SOCKET clientSocket);
         static void HandleAddUserCredentialsToDatabase(const SOCKET clientSocket);
         static void HandleCheckUserExistence(const SOCKET clientSocket);

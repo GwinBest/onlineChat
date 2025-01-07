@@ -57,6 +57,18 @@ namespace ClientNetworking
         send(_clientSocket, data, dataSize, NULL);
     }
 
+    void Client::CreateNewPersonalChat(const size_t senderUserId, const char* receiverUserName) const
+    {
+        NetworkCore::ActionType type = NetworkCore::ActionType::kCreateNewPersonalChat;
+        send(_clientSocket, reinterpret_cast<char*>(&type), sizeof(type), NULL);
+
+        send(_clientSocket, reinterpret_cast<const char*>(&senderUserId), sizeof(senderUserId), NULL);
+
+        size_t receiverUserNameSize = strlen(receiverUserName);
+        send(_clientSocket, reinterpret_cast<char*>(&receiverUserNameSize), sizeof(receiverUserNameSize), NULL);
+        send(_clientSocket, receiverUserName, static_cast<int>(receiverUserNameSize), NULL);
+    }
+
     void Client::SendUserCredentialsPacket(const NetworkCore::UserPacket& userCredentials) const noexcept
     {
         NetworkCore::ActionType type = userCredentials.actionType;
@@ -97,6 +109,17 @@ namespace ClientNetworking
 
             switch (type)
             {
+            case NetworkCore::ActionType::kCreateNewPersonalChat:
+            {
+                size_t result = 0;
+                recv(_clientSocket, reinterpret_cast<char*>(&result), sizeof(result), NULL);
+
+                _serverResponse = result;
+
+                _conditionalVariable.notify_one();
+
+                break;
+            }
             case NetworkCore::ActionType::kSendChatMessage:
             {
                 size_t receiveMessageSize = 0;

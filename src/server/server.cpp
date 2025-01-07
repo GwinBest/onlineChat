@@ -136,6 +136,9 @@ namespace ServerNetworking
     {
         switch (actionType)
         {
+        case NetworkCore::ActionType::kCreateNewPersonalChat:
+            HandleCreateNewPersonalChat(clientSocket);
+            break;
         case NetworkCore::ActionType::kSendChatMessage:
             HandleSendChatMessage(clientSocket);
             break;
@@ -166,6 +169,73 @@ namespace ServerNetworking
         default:
             std::cerr << "Undefined action type\n";
             break;
+        }
+    }
+
+    void Server::HandleCreateNewPersonalChat(const SOCKET clientSocket)
+    {
+        size_t senderUserId = 0;
+        recv(clientSocket, reinterpret_cast<char*>(&senderUserId), sizeof(senderUserId), NULL);
+
+        size_t receiverUserNameSize = 0;
+        std::array<char, Common::maxInputBufferSize> receiverUserName = {};
+        recv(clientSocket, reinterpret_cast<char*>(&receiverUserNameSize), sizeof(receiverUserNameSize), NULL);
+        recv(clientSocket, receiverUserName.data(), static_cast<int>(receiverUserNameSize), NULL);
+        receiverUserName[receiverUserNameSize] = '\0';
+
+        try
+        {
+            auto& dbHelper = Database::DatabaseHelper::GetInstance();
+            auto* connection = dbHelper.GetConnection();
+            connection->setAutoCommit(false);
+            bool result = false;
+
+            result = dbHelper.ExecuteUpdate(
+                "INSERT INTO chats (name, photo, created_at) "
+                "SELECT NULL, NULL, NOW() "
+                "WHERE NOT EXISTS ("
+                "    SELECT 1 FROM chats WHERE name = '%s'"
+                ");",
+                receiverUserName.data()
+            );
+
+            size_t chatId = 0;
+            if (auto* resultSet = dbHelper.ExecuteQuery("SELECT LAST_INSERT_ID() AS id;");
+                resultSet->next())
+            {
+                chatId = resultSet->getInt("id");
+                result = dbHelper.ExecuteUpdate(
+                    "INSERT INTO users_chats (user_id, chat_id, joined_at) "
+                    "SELECT %zu, %zu, NOW() "
+                    "WHERE NOT EXISTS ("
+                    "    SELECT 1 FROM users_chats WHERE user_id = %zu AND chat_id = %zu"
+                    ");",
+                    senderUserId, chatId,
+                    senderUserId, chatId
+                );
+
+                result = dbHelper.ExecuteUpdate(
+                    "INSERT INTO users_chats (user_id, chat_id, joined_at) "
+                    "SELECT (SELECT id FROM users WHERE name = '%s' LIMIT 1), %zu, NOW() "
+                    "WHERE NOT EXISTS ("
+                    "    SELECT 1 FROM users_chats WHERE user_id = (SELECT id FROM users WHERE name = '%s' LIMIT 1) AND chat_id = %zu"
+                    ");",
+                    receiverUserName.data(), chatId,
+                    receiverUserName.data(), chatId
+                );
+            }
+            connection->commit();
+
+            static constexpr auto actionType = NetworkCore::ActionType::kCreateNewPersonalChat;
+
+            send(clientSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
+            send(clientSocket, reinterpret_cast<const char*>(&chatId), sizeof(chatId), NULL);
+        }
+        catch (const sql::SQLException& e)
+        {
+            std::cerr << "kCreateNewPersonalChat error: " << e.what() << '\n';
+            SendServerErrorMessage(clientSocket, "Server error: server cant create new personal chat");
+            Database::DatabaseHelper::GetInstance().GetConnection()->rollback();
         }
     }
 
@@ -572,7 +642,7 @@ namespace ServerNetworking
             auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
                 "SELECT DISTINCT "
                 "c.id AS chat_id, "
-                "COALESCE(c.name, u2.name) AS chat_name, "
+                "COALESCE(c.name, u2.login) AS chat_name, "
                 "COALESCE(c.photo, u2.photo) AS chat_photo, "
                 "m.content AS last_message, "
                 "m.sent_at AS last_message_time "

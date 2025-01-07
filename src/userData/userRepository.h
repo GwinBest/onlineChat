@@ -22,5 +22,6 @@ namespace UserData
         [[nodiscard]] static std::optional<std::vector<ChatSystem::ChatInfo>> FindMatchingChats(const size_t currentUserId, const std::string& pattern);
         [[nodiscard]] static std::optional<std::vector<ChatSystem::ChatInfo>> GetAvailableChatsForUser(const size_t userId);
         [[nodiscard]] static std::optional<std::vector<MessageBuffer::MessageNode>> GetAvailableChatMessages(size_t userId, size_t chatId);
+        [[nodiscard]] static std::optional<size_t> CreateNewPersonalChat(size_t senderUserId, const std::string& receiverUserName);
     };
 } // !namespace UserData

@@ -35,6 +35,7 @@ namespace ClientNetworking
         static std::optional<std::reference_wrapper<Client>> GetInstance() noexcept;
 
         void SendUserMessage(const size_t chatId, const size_t senderUserId, const char* const data) const noexcept;
+        void CreateNewPersonalChat(size_t senderUserId, const char* receiverUserName) const;
         void SendUserCredentialsPacket(const NetworkCore::UserPacket& userCredentials) const noexcept;
         void SendChatInfoPacket(const NetworkCore::ChatPacket& chatInfo) const noexcept;
 

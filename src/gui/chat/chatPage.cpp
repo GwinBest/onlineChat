@@ -48,9 +48,8 @@ namespace Gui
         _ui->availableChatsList->setUniformItemSizes(true);
         _ui->availableChatsList->setResizeMode(QListView::Adjust);
 
-        connect(_sideBarWidget, &Widget::SideBarWidget::HideSideBar, this, [this] { ToggleSideMenu(); });
-        connect(_sideBarWidget, &Widget::SideBarWidget::LogOutButtonPressed, this,
-                [this]
+        connect(_sideBarWidget, &Widget::SideBarWidget::HideSideBar, this, &ChatPage::ToggleSideMenu);
+        connect(_sideBarWidget, &Widget::SideBarWidget::LogOutButtonPressed, this, [this]
                 {
                     emit LogOutButtonPressed();
                     ToggleSideMenu();
@@ -62,33 +61,7 @@ namespace Gui
 
         connect(_ui->availableChatsList, &QListView::clicked, this, &ChatPage::OnChatSelected);
 
-        connect(_ui->sendMessageButton, &QPushButton::clicked, this, [this]
-                {
-                    const auto lastMessageText = _ui->messageInput->toPlainText();
-
-                    if (lastMessageText.trimmed().isEmpty()) return;
-
-                    auto remainingText = lastMessageText;
-
-                    while (!remainingText.isEmpty())
-                    {
-                        const auto chunk = remainingText.left(Common::maxInputBufferSize - 1);
-                        remainingText = remainingText.mid(Common::maxInputBufferSize - 1);
-
-                        const MessageBuffer::MessageNode messageChunk(
-                            MessageBuffer::MessageStatus::kSend,
-                            chunk.toStdString(),
-                            QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString());
-
-                        const QModelIndex index = _ui->availableChatsList->currentIndex();
-
-                        SendMessage(index.data(Model::AvailableChatsModel::AvailableChatsRole::kChatIdRole).toUInt(),
-                                    currentUser.GetUserId(), messageChunk.data.c_str());
-                        RenderLastMessage(messageChunk);
-                    }
-
-                    _ui->messageInput->clear();
-                });
+        connect(_ui->sendMessageButton, &QPushButton::clicked, this, &ChatPage::OnSendButtonPressed);
 
         if (const auto clientInstance = ClientNetworking::Client::GetInstance();
             clientInstance.has_value())
@@ -98,8 +71,7 @@ namespace Gui
                 .get()
                 .RegisterReceiveMessageCallback([this](const MessageBuffer::MessageNode& message)
                                                 {
-                                                    QMetaObject::invokeMethod(this,
-                                                                              [this, message]
+                                                    QMetaObject::invokeMethod(this, [this, message]
                                                                               {
                                                                                   RenderLastMessage(message);
                                                                               },
@@ -194,6 +166,48 @@ namespace Gui
         _isChatPageVisible = true;
     }
 
+    void ChatPage::OnSendButtonPressed() const
+    {
+        const auto lastMessageText = _ui->messageInput->toPlainText();
+
+        if (lastMessageText.trimmed().isEmpty()) return;
+
+        auto remainingText = lastMessageText;
+
+        while (!remainingText.isEmpty())
+        {
+            const auto chunk = remainingText.left(Common::maxInputBufferSize - 1);
+            remainingText = remainingText.mid(Common::maxInputBufferSize - 1);
+
+            const MessageBuffer::MessageNode messageChunk(
+                MessageBuffer::MessageStatus::kSend,
+                chunk.toStdString(),
+                QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString());
+
+            const QModelIndex index = _ui->availableChatsList->currentIndex();
+
+            size_t chatId = index.data(Model::AvailableChatsModel::AvailableChatsRole::kChatIdRole).toUInt();
+
+            if (chatId == ChatSystem::ChatInfo::chatUndefined)
+            {
+                chatId = UserData::UserRepository::CreateNewPersonalChat(
+                    currentUser.GetUserId(),
+                    index.data(Model::AvailableChatsModel::AvailableChatsRole::kChatNameRole).toString().toStdString())
+                    .value_or(ChatSystem::ChatInfo::chatUndefined);
+
+                _model->setData(index, chatId, Model::AvailableChatsModel::AvailableChatsRole::kChatIdRole);
+            }
+
+            if (chatId == ChatSystem::ChatInfo::chatUndefined) return;
+
+            SendMessage(chatId,
+                        currentUser.GetUserId(), messageChunk.data.c_str());
+            RenderLastMessage(messageChunk);
+        }
+
+        _ui->messageInput->clear();
+    }
+
     void ChatPage::resizeEvent(QResizeEvent* event)
     {
         QWidget::resizeEvent(event);
@@ -241,6 +255,10 @@ namespace Gui
 
     void ChatPage::FillMessageContainerLayout(const size_t chatId) const
     {
+        ClearMessageLayout();
+
+        if (chatId == 0) return;
+
         const auto chatMessage = UserData::UserRepository::GetAvailableChatMessages(
             currentUser.GetUserId(), chatId);
 
@@ -268,12 +286,22 @@ namespace Gui
             new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
     }
 
+    void ChatPage::ClearMessageLayout() const
+    {
+        while (_messagesContainerLayout->count() > 0)
+        {
+            const QLayoutItem* item = _messagesContainerLayout->takeAt(0);
+            delete item->widget();
+            delete item;
+        }
+    }
+
     void ChatPage::RemoveLastSpacerItem(QVBoxLayout* layout)
     {
         if (const int count = layout->count();
             count > 0)
         {
-            QLayoutItem* item = layout->takeAt(count - 1);
+            const QLayoutItem* item = layout->takeAt(count - 1);
             delete item;
         }
     }
@@ -334,16 +362,6 @@ namespace Gui
             _messagesContainerLayout->addWidget(ScrollArea::CreateMessage(message));
             _messagesContainerLayout->addSpacerItem(
                 new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
-
-            if (const QModelIndex index = _ui->availableChatsList->currentIndex();
-                index.isValid())
-            {
-                _model->setData(index, message.data.c_str(),
-                                Model::AvailableChatsModel::AvailableChatsRole::kLastMessageRole);
-                _model->setData(index, message.sendTime.c_str(),
-                                Model::AvailableChatsModel::AvailableChatsRole::kLastMessageSendTimeRole);
-                emit _model->dataChanged(index, index);
-            }
         }
         else
         {
@@ -356,6 +374,16 @@ namespace Gui
             _messagesContainerLayout->addWidget(ScrollArea::CreateMessage(message));
             _messagesContainerLayout->addSpacerItem(
                 new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+        }
+
+        if (const QModelIndex index = _ui->availableChatsList->currentIndex();
+            index.isValid())
+        {
+            _model->setData(index, message.data.c_str(),
+                            Model::AvailableChatsModel::AvailableChatsRole::kLastMessageRole);
+            _model->setData(index, message.sendTime.c_str(),
+                            Model::AvailableChatsModel::AvailableChatsRole::kLastMessageSendTimeRole);
+            emit _model->dataChanged(index, index);
         }
     }
 } // !namespace Gui

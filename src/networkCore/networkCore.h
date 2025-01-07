@@ -21,6 +21,7 @@ namespace NetworkCore
         kReceiveAllMessagesForSelectedChat,
         kCheckIsUserDataFromFileValid,
         kServerError,
+        kCreateNewPersonalChat,
     };
 
     struct UserPacket final

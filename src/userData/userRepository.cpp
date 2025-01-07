@@ -149,5 +149,15 @@ namespace UserData
 
         return instance.value().get().GetServerResponse<std::vector<MessageBuffer::MessageNode>>();
     }
+
+    std::optional<size_t> UserRepository::CreateNewPersonalChat(const size_t senderUserId, const std::string& receiverUserName)
+    {
+        const std::optional<std::reference_wrapper<ClientNetworking::Client>> instance = ClientNetworking::Client::GetInstance();
+        if (!instance.has_value()) return std::nullopt;
+
+        instance.value().get().CreateNewPersonalChat(senderUserId, receiverUserName.c_str());
+
+        return instance.value().get().GetServerResponse<size_t>();
+    }
 } // !namespace UserData
 

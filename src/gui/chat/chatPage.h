@@ -35,6 +35,7 @@ namespace Gui
         void ToggleSideMenu() const noexcept;
         void OnSearchInputTextChanged() const noexcept;
         void OnChatSelected() const;
+        void OnSendButtonPressed() const;
 
     private:
         void resizeEvent(QResizeEvent* event) override;
@@ -45,6 +46,7 @@ namespace Gui
         void ToggleUiElements() const;
 
         void FillMessageContainerLayout(const size_t chatId) const;
+        void ClearMessageLayout() const;
 
         static void RemoveLastSpacerItem(QVBoxLayout* layout);
         static QString ExtractDateTimeFromMessageWidget(const QWidget* messageWidget);

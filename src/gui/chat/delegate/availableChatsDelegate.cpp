@@ -33,8 +33,9 @@ namespace Gui::Delegate
         constexpr int margin = 10;
         const int centerY = rect.top() + (rect.height() - avatarSize) / 2;
         const QRect avatarRect(rect.left() + margin, centerY, avatarSize, avatarSize);
-        const QPixmap avatarPixmap(avatarPath);
-        if (!avatarPixmap.isNull())
+
+        if (const QPixmap avatarPixmap(avatarPath); 
+            !avatarPixmap.isNull())
         {
             painter->drawPixmap(avatarRect, avatarPixmap.scaled(avatarSize,
                                                                 avatarSize,
@@ -82,8 +83,8 @@ namespace Gui::Delegate
     QSize AvailableChatsDelegate::sizeHint(const QStyleOptionViewItem& option,
                                            const QModelIndex& index) const
     {
-        Q_UNUSED(option);
-        Q_UNUSED(index);
+        Q_UNUSED(option)
+        Q_UNUSED(index)
         return { 0, 60 };
     }
 } // !namespace Gui::Delegate

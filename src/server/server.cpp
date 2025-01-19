@@ -1,4 +1,4 @@
-#include "Server.h"
+#include "server.h"
 
 #ifdef WIN32
 #include <WS2tcpip.h>
@@ -38,7 +38,7 @@ namespace ServerNetworking
 
         _serverSocket = socket(AF_INET, SOCK_STREAM, NULL);
         if (bind(_serverSocket,
-                 reinterpret_cast<SOCKADDR*>(&_socketAddress),
+                 std::bit_cast<SOCKADDR*>(&_socketAddress),
                  sizeof(_socketAddress)) != 0)
         {
             std::cerr << "bind error: " << WSAGetLastError() << '\n';
@@ -62,7 +62,7 @@ namespace ServerNetworking
         while (true)
         {
             const SOCKET newConnection = accept(_serverSocket,
-                                                reinterpret_cast<SOCKADDR*>(&_socketAddress),
+                                                std::bit_cast<SOCKADDR*>(&_socketAddress),
                                                 &sizeOfServerAddress);
 
             if (newConnection == INVALID_SOCKET)
@@ -71,8 +71,8 @@ namespace ServerNetworking
                 continue;
             }
 
-            std::array<char, INET_ADDRSTRLEN> clientIp = {};
-            if (inet_ntop(AF_INET, &_socketAddress.sin_addr, clientIp.data(), INET_ADDRSTRLEN) == nullptr)
+            if (std::array<char, INET_ADDRSTRLEN> clientIp = {}; 
+                inet_ntop(AF_INET, &_socketAddress.sin_addr, clientIp.data(), INET_ADDRSTRLEN) == nullptr)
             {
                 std::cerr << "inet_ntop error: " << WSAGetLastError() << '\n';
             }
@@ -103,12 +103,12 @@ namespace ServerNetworking
 
         while (true)
         {
-            const int32_t recvReturnValue = recv(clientSocket,
-                                                 reinterpret_cast<char*>(&actionType),
-                                                 sizeof(actionType),
-                                                 0);
-
-            if (recvReturnValue <= 0)
+            if (const int32_t recvReturnValue = recv(
+                clientSocket,
+                reinterpret_cast<char*>(&actionType),
+                sizeof(actionType),
+                0); 
+                recvReturnValue <= 0)
             {
                 if (const auto it = std::ranges::find(_connections.begin(), _connections.end(), clientSocket);
                     it != _connections.end())
@@ -136,34 +136,36 @@ namespace ServerNetworking
     {
         switch (actionType)
         {
-        case NetworkCore::ActionType::kCreateNewPersonalChat:
+            using enum NetworkCore::ActionType;
+
+        case kCreateNewPersonalChat:
             HandleCreateNewPersonalChat(clientSocket);
             break;
-        case NetworkCore::ActionType::kSendChatMessage:
+        case kSendChatMessage:
             HandleSendChatMessage(clientSocket);
             break;
-        case NetworkCore::ActionType::kAddUserCredentialsToDatabase:
+        case kAddUserCredentialsToDatabase:
             HandleAddUserCredentialsToDatabase(clientSocket);
             break;
-        case NetworkCore::ActionType::kCheckUserExistence:
+        case kCheckUserExistence:
             HandleCheckUserExistence(clientSocket);
             break;
-        case NetworkCore::ActionType::kCheckIsUserDataFromFileValid:
+        case kCheckIsUserDataFromFileValid:
             HandleCheckIsUserDataFromFileValid(clientSocket);
             break;
-        case NetworkCore::ActionType::kGetUserNameFromDatabase:
+        case kGetUserNameFromDatabase:
             HandleGetUserNameFromDatabase(clientSocket);
             break;
-        case NetworkCore::ActionType::kGetUserIdFromDatabase:
+        case kGetUserIdFromDatabase:
             HandleGetUserIdFromDatabase(clientSocket);
             break;
-        case NetworkCore::ActionType::kFindMatchingChats:
+        case kFindMatchingChats:
             HandleFindMatchingChats(clientSocket);
             break;
-        case NetworkCore::ActionType::kGetAvailableChatsForUser:
+        case kGetAvailableChatsForUser:
             HandleGetAvailableChatsForUser(clientSocket);
             break;
-        case NetworkCore::ActionType::kReceiveAllMessagesForSelectedChat:
+        case kReceiveAllMessagesForSelectedChat:
             HandleReceiveAllMessagesForSelectedChat(clientSocket);
             break;
         default:

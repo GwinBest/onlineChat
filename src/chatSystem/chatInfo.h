@@ -28,9 +28,9 @@ namespace ChatSystem
         {}
 
         ChatInfo(const size_t id,
-                 const std::string& name,
-                 const std::string& lastMessage = "",
-                 const std::string& lastMessageSendTime = "") noexcept
+                 const std::string_view name,
+                 const std::string_view lastMessage = "",
+                 const std::string_view lastMessageSendTime = "") noexcept
             : id(id)
             , name(name.data())
             , lastMessage(lastMessage.data())

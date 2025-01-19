@@ -24,9 +24,7 @@ namespace Gui::Model
         };
 
     public:
-        explicit AvailableChatsModel(QObject* parent = nullptr) noexcept
-            : QAbstractListModel(parent)
-        {}
+        using QAbstractListModel::QAbstractListModel;
 
         int rowCount(const QModelIndex& parent = QModelIndex()) const override;
         QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
@@ -36,8 +34,6 @@ namespace Gui::Model
 
         void SetAllAvailableChats();
         void SetMatchingChats(const std::string& pattern);
-
-    private:
 
     private:
         QList<ChatSystem::ChatInfo> _availableChats;

@@ -15,7 +15,7 @@ namespace Gui
         Q_OBJECT
 
     public:
-        MainWindow(QWidget* parent = nullptr);
+        explicit MainWindow(QWidget* parent = nullptr);
         ~MainWindow() override;
 
     private slots:

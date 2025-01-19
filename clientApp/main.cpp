@@ -9,9 +9,10 @@ UserData::User currentUser;
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
-    app.setStyle("fusion");
+    QApplication::setStyle("fusion");
+
     Gui::MainWindow window;
     window.show();
 
-    return app.exec();
+    return QApplication::exec();
 }

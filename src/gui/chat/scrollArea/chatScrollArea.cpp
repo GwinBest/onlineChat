@@ -56,15 +56,15 @@ namespace Gui::ScrollArea
 
     QWidget* CreateDateDivider(const QString& dateText)
     {
-        QWidget* dividerWidget = new QWidget();
-        QHBoxLayout* layout = new QHBoxLayout(dividerWidget);
+        auto* dividerWidget = new QWidget();
+        auto* layout = new QHBoxLayout(dividerWidget);
 
-        QFrame* leftLine = new QFrame();
+        auto* leftLine = new QFrame();
         leftLine->setFrameShape(QFrame::HLine);
         leftLine->setFrameShadow(QFrame::Sunken);
         leftLine->setStyleSheet("color: " + QString(colorDateDivider) + ';');
 
-        QLabel* dateLabel = new QLabel(dateText);
+        auto* dateLabel = new QLabel(dateText);
         dateLabel->setAlignment(Qt::AlignCenter);
         dateLabel->setStyleSheet(
             "color: " + QString(colorWhite) +
@@ -75,7 +75,7 @@ namespace Gui::ScrollArea
             "font-weight: bold;"
         );
 
-        QFrame* rightLine = new QFrame();
+        auto* rightLine = new QFrame();
         rightLine->setFrameShape(QFrame::HLine);
         rightLine->setFrameShadow(QFrame::Sunken);
         rightLine->setStyleSheet("color: " + QString(colorDateDivider) + ';');

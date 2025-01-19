@@ -30,14 +30,14 @@ namespace Gui
     private:
         inline QString SetInputStyleSheet(const QString& primaryColor) const noexcept
         {
-            return "QLineEdit { \
-                    background-color: " + QString(colorTransparent) + ";" +
-                "border: none; \
-                    border-bottom: 1px solid " + primaryColor + ";}" +
-                "QLineEdit:focus {\
-                    background-color: " + QString(colorTransparent) + "; " +
-                "border: none; \
-                    border-bottom: 1px solid " + QString(colorLightGreen) + ";}";
+            return "QLineEdit { "
+                    "background-color: " + QString(colorTransparent) + ";" +
+                    "border: none; "
+                    "border-bottom: 1px solid " + primaryColor + ";}" +
+                    "QLineEdit:focus { "
+                    "background-color: " + QString(colorTransparent) + "; " +
+                    "border: none; "
+                    "border-bottom: 1px solid " + QString(colorLightGreen) + ";}";
         }
 
     private:

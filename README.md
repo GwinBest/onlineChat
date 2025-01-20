@@ -7,7 +7,7 @@ git clone --recursive https://github.com/GwinBest/OnlineChat.git
 ## Build Tools
 ### [CMake](https://cmake.org/download/)
 ## Database
-If you need to run the server, then download the [MySql](https://dev.mysql.com/downloads/workbench/)
+If you need to run the server, then download the [MySql](https://dev.mysql.com/downloads/installer/)
 ## Getting Started
 First, clone a repository
 ```

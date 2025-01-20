@@ -32,7 +32,7 @@ Or, if you want to specify
 cmake --build . --target (serverApp | clientApp)
 ```
 # MySQL setup
-First, set up the server, after that add your server credential to environment variables
+First, set up the server, after that add your server credentials to environment variables
 ```
 setx CHAT_DB_HOST "your_db_ip:your_db_port"
 setx CHAT_DB_USER "your_db_user"

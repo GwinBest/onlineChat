@@ -32,12 +32,12 @@ Or, if you want to specify
 cmake --build . --target (serverApp | clientApp)
 ```
 # MySQL setup
-First create a new connection with the following parametrs
+First, set up the server, after that add your server credential to environment variables
 ```
-Hostname: 127.0.0.1
-Port: 3306
-Username: root
-Password: root
+setx CHAT_DB_HOST "your_db_ip:your_db_port"
+setx CHAT_DB_USER "your_db_user"
+setx CHAT_DB_PASSWORD "your_db_password"
+setx CHAT_DB_SCHEMA "your_db_schema"
 ```
 After connection, run the following code to create all necessary tables
 ``` SQL

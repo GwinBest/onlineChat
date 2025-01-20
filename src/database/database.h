@@ -13,7 +13,10 @@ namespace Database
     {
     public:
         DatabaseHelper(const DatabaseHelper&) = delete;
-        void operator= (const DatabaseHelper&) = delete;
+        DatabaseHelper& operator= (const DatabaseHelper&) = delete;
+
+        DatabaseHelper(DatabaseHelper&&) = default;
+        DatabaseHelper& operator=(DatabaseHelper&&) = default;
 
         static DatabaseHelper& GetInstance() noexcept;
 

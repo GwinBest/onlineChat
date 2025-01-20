@@ -39,4 +39,4 @@ setx CHAT_DB_USER "your_db_user"
 setx CHAT_DB_PASSWORD "your_db_password"
 setx CHAT_DB_SCHEMA "your_db_schema"
 ```
-After connection, run the [following code](https://github.com/GwinBest/onlineChat/blob/5d7b133a00e55d44e87736bf6c8b9af14148c8a9/sqlScripts/create.sql) to create all necessary tables 
+After that, run the [following code](https://github.com/GwinBest/onlineChat/blob/5d7b133a00e55d44e87736bf6c8b9af14148c8a9/sqlScripts/create.sql) to create all necessary tables 

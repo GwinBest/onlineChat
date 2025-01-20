@@ -38,8 +38,8 @@ namespace ServerNetworking
 
         _serverSocket = socket(AF_INET, SOCK_STREAM, NULL);
         if (bind(_serverSocket,
-                 std::bit_cast<SOCKADDR*>(&_socketAddress),
-                 sizeof(_socketAddress)) != 0)
+            std::bit_cast<SOCKADDR*>(&_socketAddress),
+            sizeof(_socketAddress)) != 0)
         {
             std::cerr << "bind error: " << WSAGetLastError() << '\n';
             return false;
@@ -62,8 +62,8 @@ namespace ServerNetworking
         while (true)
         {
             const SOCKET newConnection = accept(_serverSocket,
-                                                std::bit_cast<SOCKADDR*>(&_socketAddress),
-                                                &sizeOfServerAddress);
+                std::bit_cast<SOCKADDR*>(&_socketAddress),
+                &sizeOfServerAddress);
 
             if (newConnection == INVALID_SOCKET)
             {
@@ -71,7 +71,7 @@ namespace ServerNetworking
                 continue;
             }
 
-            if (std::array<char, INET_ADDRSTRLEN> clientIp = {}; 
+            if (std::array<char, INET_ADDRSTRLEN> clientIp = {};
                 inet_ntop(AF_INET, &_socketAddress.sin_addr, clientIp.data(), INET_ADDRSTRLEN) == nullptr)
             {
                 std::cerr << "inet_ntop error: " << WSAGetLastError() << '\n';
@@ -107,7 +107,7 @@ namespace ServerNetworking
                 clientSocket,
                 reinterpret_cast<char*>(&actionType),
                 sizeof(actionType),
-                0); 
+                0);
                 recvReturnValue <= 0)
             {
                 if (const auto it = std::ranges::find(_connections.begin(), _connections.end(), clientSocket);
@@ -192,39 +192,43 @@ namespace ServerNetworking
             connection->setAutoCommit(false);
             bool result = false;
 
-            result = dbHelper.ExecuteUpdate(
+            auto query = std::format(
                 "INSERT INTO chats (name, photo, created_at) "
                 "SELECT NULL, NULL, NOW() "
                 "WHERE NOT EXISTS ("
-                "    SELECT 1 FROM chats WHERE name = '%s'"
+                "    SELECT 1 FROM chats WHERE name = '{}'"
                 ");",
-                receiverUserName.data()
-            );
+                receiverUserName.data());
+
+            result = dbHelper.ExecuteUpdate(query);
 
             size_t chatId = 0;
             if (auto* resultSet = dbHelper.ExecuteQuery("SELECT LAST_INSERT_ID() AS id;");
                 resultSet->next())
             {
                 chatId = resultSet->getInt("id");
-                result = dbHelper.ExecuteUpdate(
+
+                query = std::format(
                     "INSERT INTO users_chats (user_id, chat_id, joined_at) "
-                    "SELECT %zu, %zu, NOW() "
+                    "SELECT {}, {}, NOW() "
                     "WHERE NOT EXISTS ("
-                    "    SELECT 1 FROM users_chats WHERE user_id = %zu AND chat_id = %zu"
+                    "    SELECT 1 FROM users_chats WHERE user_id = {} AND chat_id = {}"
                     ");",
                     senderUserId, chatId,
-                    senderUserId, chatId
-                );
+                    senderUserId, chatId);
 
-                result = dbHelper.ExecuteUpdate(
+                result = dbHelper.ExecuteUpdate(query);
+
+                query = std::format(
                     "INSERT INTO users_chats (user_id, chat_id, joined_at) "
-                    "SELECT (SELECT id FROM users WHERE name = '%s' LIMIT 1), %zu, NOW() "
+                    "SELECT (SELECT id FROM users WHERE name = '{}' LIMIT 1), {}, NOW() "
                     "WHERE NOT EXISTS ("
-                    "    SELECT 1 FROM users_chats WHERE user_id = (SELECT id FROM users WHERE name = '%s' LIMIT 1) AND chat_id = %zu"
+                    "    SELECT 1 FROM users_chats WHERE user_id = (SELECT id FROM users WHERE name = '{}' LIMIT 1) AND chat_id = {});"
                     ");",
                     receiverUserName.data(), chatId,
-                    receiverUserName.data(), chatId
-                );
+                    receiverUserName.data(), chatId);
+
+                result = dbHelper.ExecuteUpdate(query);
             }
             connection->commit();
 
@@ -261,46 +265,50 @@ namespace ServerNetworking
             auto* connection = dbHelper.GetConnection();
             connection->setAutoCommit(false);
 
-            bool result = dbHelper.ExecuteUpdate(
+            auto query = std::format(
                 "INSERT INTO chats (name, photo, created_at) "
                 "SELECT NULL, NULL, NOW() "
                 "WHERE NOT EXISTS ("
-                "    SELECT 1 FROM chats WHERE id = %zu"
+                "    SELECT 1 FROM chats WHERE id = {}"
                 ");",
                 chatId
             );
+            bool result = dbHelper.ExecuteUpdate(query);
 
-            result = dbHelper.ExecuteUpdate(
+            query = std::format(
                 "INSERT INTO users_chats (user_id, chat_id, joined_at) "
-                "SELECT %zu, "
-                "       (SELECT id FROM chats WHERE id = %zu LIMIT 1), "
+                "SELECT {}, "
+                "       (SELECT id FROM chats WHERE id = {} LIMIT 1), "
                 "       NOW() "
                 "WHERE NOT EXISTS ("
-                "    SELECT 1 FROM users_chats WHERE user_id = %zu AND chat_id = %zu"
+                "    SELECT 1 FROM users_chats WHERE user_id = {} AND chat_id = {}"
                 ");",
                 senderUserId, chatId,
                 senderUserId, chatId
             );
+            result = dbHelper.ExecuteUpdate(query);
 
-            result = dbHelper.ExecuteUpdate(
+            query = std::format(
                 "INSERT INTO messages (chat_id, user_id, content, sent_at) "
                 "VALUES ("
-                "    (SELECT id FROM chats WHERE id = %zu LIMIT 1), "
-                "    %zu, '%s', NOW()"
+                "    (SELECT id FROM chats WHERE id = {} LIMIT 1), "
+                "    {}, '{}', NOW()"
                 ");",
                 chatId, senderUserId, message.data()
             );
+            result = dbHelper.ExecuteUpdate(query);
 
             connection->commit();
 
-            auto* resultSet = dbHelper.ExecuteQuery(
+            query = std::format(
                 "SELECT users_chats.user_id, messages.sent_at "
                 "FROM users_chats "
                 "JOIN messages ON users_chats.chat_id = messages.chat_id "
-                "WHERE users_chats.chat_id = %zu AND users_chats.user_id != %zu "
+                "WHERE users_chats.chat_id = {} AND users_chats.user_id != {} "
                 "ORDER BY messages.sent_at DESC LIMIT 1;",
                 chatId,
                 senderUserId);
+            auto* resultSet = dbHelper.ExecuteQuery(query);
 
             static constexpr auto actionType = NetworkCore::ActionType::kSendChatMessage;
             while (resultSet->next())
@@ -361,12 +369,13 @@ namespace ServerNetworking
 
         try
         {
-            result = Database::DatabaseHelper::GetInstance().ExecuteUpdate(
+            auto query = std::format(
                 "INSERT INTO users(name, login, password) "
-                "VALUES('%s', '%s', %zu);",
+                "VALUES('{}', '{}', {});",
                 userPacket.name.c_str(),
                 userPacket.login.c_str(),
                 userPacket.password);
+            result = Database::DatabaseHelper::GetInstance().ExecuteUpdate(query);
 
             send(clientSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
             send(clientSocket, reinterpret_cast<char*>(&result), sizeof(result), NULL);
@@ -402,11 +411,12 @@ namespace ServerNetworking
 
         try
         {
-            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
+            auto query = std::format(
                 "SELECT * FROM users "
-                "WHERE login = '%s' AND password = %zu;",
+                "WHERE login = '{}' AND password = {};",
                 userPacket.login.c_str(),
                 userPacket.password);
+            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
 
             bool result = false;
             if (resultSet->next()) result = true;
@@ -430,12 +440,13 @@ namespace ServerNetworking
 
         try
         {
-            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
+            auto query = std::format(
                 "SELECT * FROM users "
-                "WHERE name = '%s' AND login = '%s' "
-                "AND password = %zu AND id = %zu;",
+                "WHERE name = '{}' AND login = '{}' "
+                "AND password = {} AND id = {};",
                 userPacket.name.c_str(), userPacket.login.c_str(),
                 userPacket.password, userPacket.id);
+            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
 
             bool result = false;
             if (resultSet->next()) result = true;
@@ -464,10 +475,11 @@ namespace ServerNetworking
 
         try
         {
-            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
+            auto query = std::format(
                 "SELECT name FROM users "
-                "WHERE login = '%s';",
+                "WHERE login = '{}';",
                 userPacket.login.c_str());
+            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
 
             std::string result;
             size_t responseSize = result.size();
@@ -500,10 +512,11 @@ namespace ServerNetworking
 
         try
         {
-            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
+            auto query = std::format(
                 "SELECT id FROM users "
-                "WHERE login = '%s';",
+                "WHERE login = '{}';",
                 userPacket.login.c_str());
+            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
 
             size_t userId = 0;
             if (resultSet->next()) userId = resultSet->getInt("id");
@@ -528,7 +541,7 @@ namespace ServerNetworking
         {
             const NetworkCore::UserPacket userPacket = ReceiveUserCredentialsPacket(clientSocket);
 
-            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
+            auto query = std::format(
                 "(SELECT DISTINCT "
                 "c.id AS chat_id, "
                 "COALESCE(c.name, u2.name) AS chat_name, "
@@ -547,8 +560,8 @@ namespace ServerNetworking
                 "LEFT JOIN "
                 "messages m ON c.id = m.chat_id "
                 "WHERE "
-                "u.id = %zu "
-                "AND (c.name LIKE '%s%%' OR u2.name LIKE '%s%%') "
+                "u.id = {} "
+                "AND (c.name LIKE '{}%' OR u2.name LIKE '{}%') "
                 "AND m.sent_at = ( "
                 "SELECT MAX(sent_at) "
                 "FROM messages "
@@ -560,13 +573,13 @@ namespace ServerNetworking
                 "NULL AS last_message, "
                 "NULL AS last_message_time "
                 "FROM users u "
-                "WHERE u.name LIKE '%s%%' "
-                "AND u.id != %zu "
+                "WHERE u.name LIKE '{}%' "
+                "AND u.id != {} "
                 "AND NOT EXISTS ( "
                 "SELECT 1 "
                 "FROM users_chats uc "
                 "JOIN chats c ON uc.chat_id = c.id "
-                "WHERE uc.user_id = %zu "
+                "WHERE uc.user_id = {} "
                 "AND c.id IN ( "
                 "SELECT chat_id "
                 "FROM users_chats "
@@ -577,6 +590,7 @@ namespace ServerNetworking
                 userPacket.login.c_str(),
                 userPacket.id,
                 userPacket.id);
+            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
 
             size_t counter = 0;
             auto chatIdResult = std::make_unique<size_t[]>(resultSet->rowsCount());
@@ -641,7 +655,7 @@ namespace ServerNetworking
                 return;
             }
 
-            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
+            auto query = std::format(
                 "SELECT DISTINCT "
                 "c.id AS chat_id, "
                 "COALESCE(c.name, u2.login) AS chat_name, "
@@ -654,12 +668,13 @@ namespace ServerNetworking
                 "LEFT JOIN users_chats uc2 ON c.id = uc2.chat_id AND uc2.user_id != u.id "
                 "LEFT JOIN users u2 ON uc2.user_id = u2.id "
                 "LEFT JOIN messages m ON c.id = m.chat_id "
-                "WHERE u.id = %zu "
+                "WHERE u.id = {} "
                 "AND m.sent_at = "
                 "(SELECT MAX(sent_at) "
                 "FROM messages "
                 "WHERE chat_id = c.id);",
                 userPacket.id);
+            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
 
             size_t counter = 0;
             auto chatIdResult = std::make_unique<size_t[]>(resultSet->rowsCount());
@@ -728,11 +743,12 @@ namespace ServerNetworking
 
         try
         {
-            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(
+            auto query = std::format(
                 "SELECT * "
                 "FROM messages "
-                "WHERE chat_id = %zu;",
+                "WHERE chat_id = {};",
                 id);
+            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
 
             auto messagesResult = std::make_unique<std::string[]>(resultSet->rowsCount());
             auto messageTypeResult = std::make_unique<MessageBuffer::MessageStatus[]>(resultSet->rowsCount());

@@ -1,6 +1,6 @@
 ﻿#include "database.h"
 
-#include <cstdarg>
+#include <cppconn/exception.h>
 
 namespace Database
 {
@@ -11,21 +11,12 @@ namespace Database
         return instance;
     }
 
-    sql::ResultSet* DatabaseHelper::ExecuteQuery(const std::string query, ...)
+    sql::ResultSet* DatabaseHelper::ExecuteQuery(const std::string_view query)
     {
-        va_list args = nullptr;
-        va_start(args, query);
-        const int size = vsnprintf(nullptr, 0, query.c_str(), args);
-
-        std::vector<char> request(size + 1);;
-
-        vsnprintf(request.data(), request.size(), query.c_str(), args);
-        va_end(args);
-
         try
         {
             _statement = _connection->createStatement();
-            return _statement->executeQuery(request.data());
+            return _statement->executeQuery(query.data());
         }
         catch (const sql::SQLException& e)
         {
@@ -34,29 +25,18 @@ namespace Database
         }
     }
 
-    bool DatabaseHelper::ExecuteUpdate(const std::string query, ...)
+    bool DatabaseHelper::ExecuteUpdate(const std::string_view query)
     {
-        va_list args = nullptr;
-        va_start(args, query);
-        const int size = vsnprintf(nullptr, 0, query.c_str(), args);
-        va_end(args);
-
-        va_start(args, query);
-        std::vector<char> request(size + 1);
-        vsnprintf(request.data(), request.size(), query.c_str(), args);
-        va_end(args);
-
         try
         {
             _statement = _connection->createStatement();
-            _statement->executeUpdate(request.data());
+            _statement->executeUpdate(query.data());
 
             return true;
         }
         catch (const sql::SQLException& e)
         {
             std::cout << e.what() << '\n';
-            std::cout << request.data() << '\n';
             throw;
         }
     }

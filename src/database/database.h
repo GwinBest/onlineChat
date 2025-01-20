@@ -3,7 +3,6 @@
 #include "mysql_connection.h"
 
 #include <cppconn/driver.h>
-#include <cppconn/exception.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 
@@ -20,8 +19,8 @@ namespace Database
 
         static DatabaseHelper& GetInstance() noexcept;
 
-        [[nodiscard]] sql::ResultSet* ExecuteQuery(const std::string query, ...);
-        [[nodiscard]] bool ExecuteUpdate(const std::string query, ...);
+        [[nodiscard]] sql::ResultSet* ExecuteQuery(const std::string_view query);
+        [[nodiscard]] bool ExecuteUpdate(const std::string_view query);
 
         [[nodiscard]] sql::Connection* GetConnection() { return _connection; }
 

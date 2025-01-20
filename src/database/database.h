@@ -35,11 +35,6 @@ namespace Database
         sql::Connection* _connection = nullptr;
         sql::Statement* _statement = nullptr;
 
-        const sql::SQLString _hostName = "127.0.0.1:3306";
-        const sql::SQLString _userName = "root";
-        const sql::SQLString _password = "admin";
-        const sql::SQLString _schemaName = "test";
-
         enum class DatabaseState : uint8_t
         {
             kDatabaseDisconnected = 0,

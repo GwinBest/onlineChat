@@ -1,4 +1,4 @@
-#include "database.h"
+﻿#include "database.h"
 
 #include <cstdarg>
 
@@ -82,8 +82,11 @@ namespace Database
         try
         {
             _driver = get_driver_instance();
-            _connection = _driver->connect(_hostName, _userName, _password);
-            _connection->setSchema(_schemaName);
+            _connection = _driver->connect(
+                std::getenv("CHAT_DB_HOST"),
+                std::getenv("CHAT_DB_USER"),
+                std::getenv("CHAT_DB_PASSWORD"));
+            _connection->setSchema(std::getenv("CHAT_DB_SCHEMA"));
 
             _currentState = DatabaseState::kDatabaseConnected;
 

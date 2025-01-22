@@ -1,5 +1,7 @@
 ﻿#include "database.h"
 
+#include <cstdlib>
+
 #include <cppconn/exception.h>
 
 namespace Database
@@ -7,7 +9,6 @@ namespace Database
     DatabaseHelper& DatabaseHelper::GetInstance() noexcept
     {
         static DatabaseHelper instance;
-
         return instance;
     }
 
@@ -57,7 +58,7 @@ namespace Database
         }
     }
 
-    bool DatabaseHelper::Connect() noexcept
+    bool DatabaseHelper::Connect()
     {
         try
         {
@@ -87,5 +88,4 @@ namespace Database
 
         _currentState = DatabaseState::kDatabaseDisconnected;
     }
-
 } // !namespase Database

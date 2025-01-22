@@ -114,5 +114,4 @@ namespace Gui
     {
         emit DisplaySignInPage();
     }
-
 } // !namespace Gui

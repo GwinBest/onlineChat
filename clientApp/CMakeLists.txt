@@ -40,6 +40,7 @@ set(SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/userData/user.h
     ${CMAKE_SOURCE_DIR}/src/chatSystem/chatInfo.h
     ${CMAKE_SOURCE_DIR}/src/networkCore/networkCore.h
+    ${CMAKE_SOURCE_DIR}/src/networkCore/networkCore.cpp
     ${CMAKE_SOURCE_DIR}/src/common/common.h
     ${CMAKE_SOURCE_DIR}/src/userData/userRepository.h
     ${CMAKE_SOURCE_DIR}/src/userData/userRepository.cpp

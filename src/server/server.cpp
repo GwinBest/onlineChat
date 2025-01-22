@@ -4,11 +4,12 @@
 #include <WS2tcpip.h>
 #endif // WIN32
 
+#include <array>
+#include <bit>
 #include <chrono>
 #include <iostream>
 #include <string>
 #include <thread>
-#include <mutex>
 #include <memory>
 
 #include "common/common.h"
@@ -32,7 +33,7 @@ namespace ServerNetworking
         }
 #endif // WIN32
 
-        _socketAddress.sin_addr.s_addr = inet_addr(NetworkCore::ipAddress.c_str());
+        _socketAddress.sin_addr.s_addr = inet_addr(NetworkCore::ipAddress.data());
         _socketAddress.sin_port = htons(NetworkCore::port);
         _socketAddress.sin_family = AF_INET;
 

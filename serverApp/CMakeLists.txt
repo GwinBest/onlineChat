@@ -18,6 +18,7 @@ add_executable(Server
     ${CMAKE_SOURCE_DIR}/src/server/server.cpp
     ${CMAKE_SOURCE_DIR}/src/database/database.h
     ${CMAKE_SOURCE_DIR}/src/database/database.cpp
+    ${CMAKE_SOURCE_DIR}/src/networkCore/networkCore.cpp
 )
 
 add_compile_definitions(STATIC_CONCPP)

@@ -1,6 +1,6 @@
 #pragma once 
 
-#include "mysql_connection.h"
+#include <mysql_connection.h>
 
 #include <cppconn/driver.h>
 #include <cppconn/resultset.h>
@@ -29,7 +29,7 @@ namespace Database
     private:
         DatabaseHelper();
 
-        bool Connect() noexcept;
+        bool Connect();
         void Disconnect() noexcept;
 
     private:

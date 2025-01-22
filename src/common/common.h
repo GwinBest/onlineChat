@@ -9,5 +9,4 @@ namespace Common
 
     constexpr uint16_t maxInputBufferSize = 4097;
     constexpr uint8_t maxLastMessageSendTimeSize = 30;
-
 } // !namesapce Common

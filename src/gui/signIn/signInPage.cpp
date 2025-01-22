@@ -143,5 +143,4 @@ namespace Gui
     {
         emit DisplayLoginPage();
     }
-
 } // !namespace Gui

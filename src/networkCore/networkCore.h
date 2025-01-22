@@ -1,10 +1,12 @@
 #pragma once
 
+#ifdef WIN32
 #include <winsock2.h>
+#endif // WIN32
 
 #include <cstdint>
 #include <string>
-#include <vector>
+#include <string_view>
 
 namespace NetworkCore
 {
@@ -40,10 +42,12 @@ namespace NetworkCore
         size_t id = 0;
     };
 
+#ifdef WIN32
     constexpr WORD dllVersion = MAKEWORD(2, 2);
+#endif // WIN32
 
-    const std::string ipAddress = "127.0.0.1";
-    constexpr uint32_t port = 8080;
+    extern const std::string_view ipAddress;
+    extern const uint32_t port;
 
-    constexpr size_t serverResponseSize = 255;
+    constexpr uint8_t serverResponseSize = UINT8_MAX;
 } // !namespace NetworkCore

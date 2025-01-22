@@ -6,6 +6,7 @@
 #include "gui/login/loginPage.h"
 #include "gui/signIn/signInPage.h"
 
+// forward declaration
 namespace Ui { class MainWindowClass; };
 
 namespace Gui

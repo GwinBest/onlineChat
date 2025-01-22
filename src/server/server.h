@@ -1,12 +1,13 @@
 #pragma once
 
+#ifdef _WIN32
 #include <WinSock2.h>
+#endif // !_WIN32
 
 #include <array>
 #include <map>
 #include <string>
 
-#include "database/database.h"
 #include "networkCore/networkCore.h"
 
 namespace ServerNetworking
@@ -27,7 +28,7 @@ namespace ServerNetworking
         static void HandleCheckUserExistence(const SOCKET clientSocket);
         static void HandleCheckIsUserDataFromFileValid(const SOCKET clientSocket);
         static void HandleGetUserNameFromDatabase(const SOCKET clientSocket);
-        void HandleGetUserIdFromDatabase(const SOCKET clientSocket);
+        static void HandleGetUserIdFromDatabase(const SOCKET clientSocket);
         static void HandleFindMatchingChats(const SOCKET clientSocket);
         static void HandleGetAvailableChatsForUser(const SOCKET clientSocket);
         static void HandleReceiveAllMessagesForSelectedChat(const SOCKET clientSocket);
@@ -35,7 +36,10 @@ namespace ServerNetworking
         static NetworkCore::UserPacket ReceiveUserCredentialsPacket(const SOCKET clientSocket);
         static void SendServerErrorMessage(const SOCKET clientSocket, const std::string& errorMessage) noexcept;
 
+#ifdef _WIN32
         WSADATA _wsaData = {};
+#endif // !_WIN32
+
         SOCKET _serverSocket = 0;
         SOCKADDR_IN _socketAddress = {};
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <winsock2.h>
 #endif // WIN32
 
@@ -42,7 +42,7 @@ namespace NetworkCore
         size_t id = 0;
     };
 
-#ifdef WIN32
+#ifdef _WIN32
     constexpr WORD dllVersion = MAKEWORD(2, 2);
 #endif // WIN32
 

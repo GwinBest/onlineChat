@@ -1,6 +1,6 @@
 #include "server.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <WS2tcpip.h>
 #endif // WIN32
 
@@ -39,8 +39,8 @@ namespace ServerNetworking
 
         _serverSocket = socket(AF_INET, SOCK_STREAM, NULL);
         if (bind(_serverSocket,
-            std::bit_cast<SOCKADDR*>(&_socketAddress),
-            sizeof(_socketAddress)) != 0)
+                 std::bit_cast<SOCKADDR*>(&_socketAddress),
+                 sizeof(_socketAddress)) != 0)
         {
             std::cerr << "bind error: " << WSAGetLastError() << '\n';
             return false;
@@ -63,8 +63,8 @@ namespace ServerNetworking
         while (true)
         {
             const SOCKET newConnection = accept(_serverSocket,
-                std::bit_cast<SOCKADDR*>(&_socketAddress),
-                &sizeOfServerAddress);
+                                                std::bit_cast<SOCKADDR*>(&_socketAddress),
+                                                &sizeOfServerAddress);
 
             if (newConnection == INVALID_SOCKET)
             {
@@ -324,12 +324,12 @@ namespace ServerNetworking
 
                     send(receiverSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
 
-                    size_t sendMessageSize = strlen(message.data());
-                    send(receiverSocket, reinterpret_cast<char*>(&sendMessageSize), sizeof(sendMessageSize), NULL);
+                    const size_t sendMessageSize = message.size();
+                    send(receiverSocket, reinterpret_cast<const char*>(&sendMessageSize), sizeof(sendMessageSize), NULL);
                     send(receiverSocket, message.data(), static_cast<int>(sendMessageSize), NULL);
 
-                    size_t sendTimeSize = sentAt.size();
-                    send(receiverSocket, reinterpret_cast<char*>(&sendTimeSize), sizeof(sendTimeSize), NULL);
+                    const size_t sendTimeSize = sentAt.size();
+                    send(receiverSocket, reinterpret_cast<const char*>(&sendTimeSize), sizeof(sendTimeSize), NULL);
                     send(receiverSocket, sentAt.data(), static_cast<int>(sendTimeSize), NULL);
                 }
             }
@@ -828,14 +828,14 @@ namespace ServerNetworking
         return newUserPacket;
     }
 
-    void Server::SendServerErrorMessage(const SOCKET clientSocket, const std::string& errorMessage) noexcept
+    void Server::SendServerErrorMessage(const SOCKET clientSocket, const std::string_view errorMessage) noexcept
     {
         static constexpr auto actionType = NetworkCore::ActionType::kServerError;
 
         send(clientSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
 
-        size_t errorMessageSize = errorMessage.size();
-        send(clientSocket, reinterpret_cast<char*>(&errorMessageSize), sizeof(errorMessageSize), NULL);
-        send(clientSocket, errorMessage.c_str(), static_cast<int>(errorMessageSize), NULL);
+        const size_t errorMessageSize = errorMessage.size();
+        send(clientSocket, reinterpret_cast<const char*>(&errorMessageSize), sizeof(errorMessageSize), NULL);
+        send(clientSocket, errorMessage.data(), static_cast<int>(errorMessageSize), NULL);
     }
 } // !namespace ServerNetworking

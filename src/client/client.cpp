@@ -53,8 +53,9 @@ namespace ClientNetworking
 
         send(_clientSocket, reinterpret_cast<const char*>(&senderUserId), sizeof(senderUserId), NULL);
 
-        send(_clientSocket, reinterpret_cast<const char*>(data.size()), sizeof(data.size()), NULL);
-        send(_clientSocket, data.data(), data.size(), NULL);
+        const size_t dataSize = data.size();
+        send(_clientSocket, reinterpret_cast<const char*>(&dataSize), sizeof(dataSize), NULL);
+        send(_clientSocket, data.data(), dataSize, NULL);
     }
 
     void Client::CreateNewPersonalChat(const size_t senderUserId, const std::string_view receiverUserName) const
@@ -64,8 +65,9 @@ namespace ClientNetworking
 
         send(_clientSocket, reinterpret_cast<const char*>(&senderUserId), sizeof(senderUserId), NULL);
 
-        send(_clientSocket, reinterpret_cast<char*>(receiverUserName.size()), sizeof(receiverUserName.size()), NULL);
-        send(_clientSocket, receiverUserName.data(), static_cast<int>(receiverUserName.size()), NULL);
+        const size_t dataSize = receiverUserName.size();
+        send(_clientSocket, reinterpret_cast<const char*>(&dataSize), sizeof(dataSize), NULL);
+        send(_clientSocket, receiverUserName.data(), static_cast<int>(dataSize), NULL);
     }
 
     void Client::SendUserCredentialsPacket(const NetworkCore::UserPacket& userCredentials) const noexcept
@@ -213,7 +215,7 @@ namespace ClientNetworking
                     photo[photoSize] = '\0';
 
                     availableChatsVector.emplace_back(id, name.data(),
-                        lastMessage.data(), lastMessageSendTime.data());
+                                                      lastMessage.data(), lastMessageSendTime.data());
 
                     --availableChatsCount;
                 }
@@ -344,8 +346,8 @@ namespace ClientNetworking
         }
 
         if (connect(_clientSocket,
-            std::bit_cast<SOCKADDR*>(&_socketAddress),
-            sizeof(_socketAddress)) != 0)
+                    std::bit_cast<SOCKADDR*>(&_socketAddress),
+                    sizeof(_socketAddress)) != 0)
         {
 #ifndef NDEBUG
             std::cout << "connect error: " << WSAGetLastError() << '\n';

@@ -28,13 +28,13 @@ namespace ServerNetworking
         static void HandleCheckUserExistence(const SOCKET clientSocket);
         static void HandleCheckIsUserDataFromFileValid(const SOCKET clientSocket);
         static void HandleGetUserNameFromDatabase(const SOCKET clientSocket);
-        static void HandleGetUserIdFromDatabase(const SOCKET clientSocket);
+        void HandleGetUserIdFromDatabase(const SOCKET clientSocket);
         static void HandleFindMatchingChats(const SOCKET clientSocket);
         static void HandleGetAvailableChatsForUser(const SOCKET clientSocket);
         static void HandleReceiveAllMessagesForSelectedChat(const SOCKET clientSocket);
 
         static NetworkCore::UserPacket ReceiveUserCredentialsPacket(const SOCKET clientSocket);
-        static void SendServerErrorMessage(const SOCKET clientSocket, const std::string& errorMessage) noexcept;
+        static void SendServerErrorMessage(const SOCKET clientSocket, const std::string_view errorMessage) noexcept;
 
 #ifdef _WIN32
         WSADATA _wsaData = {};

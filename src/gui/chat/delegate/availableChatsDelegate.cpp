@@ -34,7 +34,7 @@ namespace Gui::Delegate
         const int centerY = rect.top() + (rect.height() - avatarSize) / 2;
         const QRect avatarRect(rect.left() + margin, centerY, avatarSize, avatarSize);
 
-        if (const QPixmap avatarPixmap(avatarPath); 
+        if (const QPixmap avatarPixmap(avatarPath);
             !avatarPixmap.isNull())
         {
             painter->drawPixmap(avatarRect, avatarPixmap.scaled(avatarSize,
@@ -84,7 +84,7 @@ namespace Gui::Delegate
                                            const QModelIndex& index) const
     {
         Q_UNUSED(option)
-        Q_UNUSED(index)
-        return { 0, 60 };
+            Q_UNUSED(index)
+            return { 0, 60 };
     }
 } // !namespace Gui::Delegate

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 #include <QString>
 
 namespace ChatSystem
@@ -25,16 +23,6 @@ namespace ChatSystem
             , name(std::move(name))
             , lastMessage(std::move(lastMessage))
             , lastMessageSendTime(std::move(lastMessageSendTime))
-        {}
-
-        ChatInfo(const size_t id,
-                 const std::string_view name,
-                 const std::string_view lastMessage = "",
-                 const std::string_view lastMessageSendTime = "") noexcept
-            : id(id)
-            , name(name.data())
-            , lastMessage(lastMessage.data())
-            , lastMessageSendTime(lastMessageSendTime.data())
         {}
     };
 } // !namespace ChatSystem

@@ -169,6 +169,9 @@ QPushButton:pressed {
                                                     background-color: rgb(61, 68, 75);
                                                 </string>
            </property>
+           <property name="maxLength">
+            <number>49</number>
+           </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
            </property>
@@ -362,8 +365,8 @@ border: none;</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>487</width>
-             <height>536</height>
+             <width>100</width>
+             <height>30</height>
             </rect>
            </property>
           </widget>

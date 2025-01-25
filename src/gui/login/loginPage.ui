@@ -132,6 +132,9 @@ QLineEdit:focus {
 	border-bottom: 1px solid rgb(0, 255, 132);
 }</string>
        </property>
+       <property name="maxLength">
+        <number>49</number>
+       </property>
        <property name="placeholderText">
         <string>Login</string>
        </property>
@@ -163,6 +166,9 @@ QLineEdit:focus {
 	border: none;
 	border-bottom: 1px solid rgb(0, 255, 132);
 }</string>
+       </property>
+       <property name="maxLength">
+        <number>254</number>
        </property>
        <property name="echoMode">
         <enum>QLineEdit::EchoMode::Password</enum>

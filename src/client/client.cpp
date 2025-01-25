@@ -342,7 +342,7 @@ namespace ClientNetworking
 #ifndef NDEBUG
             std::cout << "client already inited!" << '\n';
 #endif // !NDEBUG
-            return false;
+            return true;
         }
 
         if (connect(_clientSocket,

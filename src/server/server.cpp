@@ -8,9 +8,9 @@
 #include <bit>
 #include <chrono>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <thread>
-#include <memory>
 
 #include "common/common.h"
 #include "database/database.h"
@@ -39,7 +39,7 @@ namespace ServerNetworking
 
         _serverSocket = socket(AF_INET, SOCK_STREAM, NULL);
         if (bind(_serverSocket,
-                 std::bit_cast<SOCKADDR*>(&_socketAddress),
+                 std::bit_cast<SOCKADDR *>(&_socketAddress),
                  sizeof(_socketAddress)) != 0)
         {
             std::cerr << "bind error: " << WSAGetLastError() << '\n';
@@ -63,7 +63,7 @@ namespace ServerNetworking
         while (true)
         {
             const SOCKET newConnection = accept(_serverSocket,
-                                                std::bit_cast<SOCKADDR*>(&_socketAddress),
+                                                std::bit_cast<SOCKADDR *>(&_socketAddress),
                                                 &sizeOfServerAddress);
 
             if (newConnection == INVALID_SOCKET)
@@ -105,10 +105,10 @@ namespace ServerNetworking
         while (true)
         {
             if (const int32_t recvReturnValue = recv(
-                clientSocket,
-                reinterpret_cast<char*>(&actionType),
-                sizeof(actionType),
-                0);
+                    clientSocket,
+                    reinterpret_cast<char *>(&actionType),
+                    sizeof(actionType),
+                    0);
                 recvReturnValue <= 0)
             {
                 if (const auto it = std::ranges::find(_connections.begin(), _connections.end(), clientSocket);
@@ -178,18 +178,18 @@ namespace ServerNetworking
     void Server::HandleCreateNewPersonalChat(const SOCKET clientSocket)
     {
         size_t senderUserId = 0;
-        recv(clientSocket, reinterpret_cast<char*>(&senderUserId), sizeof(senderUserId), NULL);
+        recv(clientSocket, reinterpret_cast<char *>(&senderUserId), sizeof(senderUserId), NULL);
 
         size_t receiverUserNameSize = 0;
-        std::array<char, Common::maxInputBufferSize> receiverUserName = {};
-        recv(clientSocket, reinterpret_cast<char*>(&receiverUserNameSize), sizeof(receiverUserNameSize), NULL);
+        std::array<char, Common::maxInputBufferSize + 1> receiverUserName = {};
+        recv(clientSocket, reinterpret_cast<char *>(&receiverUserNameSize), sizeof(receiverUserNameSize), NULL);
         recv(clientSocket, receiverUserName.data(), static_cast<int>(receiverUserNameSize), NULL);
         receiverUserName[receiverUserNameSize] = '\0';
 
         try
         {
-            auto& dbHelper = Database::DatabaseHelper::GetInstance();
-            auto* connection = dbHelper.GetConnection();
+            auto &dbHelper = Database::DatabaseHelper::GetInstance();
+            auto *connection = dbHelper.GetConnection();
             connection->setAutoCommit(false);
             bool result = false;
 
@@ -204,7 +204,7 @@ namespace ServerNetworking
             result = dbHelper.ExecuteUpdate(query);
 
             size_t chatId = 0;
-            if (auto* resultSet = dbHelper.ExecuteQuery("SELECT LAST_INSERT_ID() AS id;");
+            if (auto *resultSet = dbHelper.ExecuteQuery("SELECT LAST_INSERT_ID() AS id;");
                 resultSet->next())
             {
                 chatId = resultSet->getInt("id");
@@ -235,10 +235,10 @@ namespace ServerNetworking
 
             static constexpr auto actionType = NetworkCore::ActionType::kCreateNewPersonalChat;
 
-            send(clientSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
-            send(clientSocket, reinterpret_cast<const char*>(&chatId), sizeof(chatId), NULL);
+            send(clientSocket, reinterpret_cast<const char *>(&actionType), sizeof(actionType), NULL);
+            send(clientSocket, reinterpret_cast<const char *>(&chatId), sizeof(chatId), NULL);
         }
-        catch (const sql::SQLException& e)
+        catch (const sql::SQLException &e)
         {
             std::cerr << "kCreateNewPersonalChat error: " << e.what() << '\n';
             SendServerErrorMessage(clientSocket, "Server error: server cant create new personal chat");
@@ -249,21 +249,21 @@ namespace ServerNetworking
     void Server::HandleSendChatMessage(const SOCKET clientSocket)
     {
         size_t chatId = 0;
-        recv(clientSocket, reinterpret_cast<char*>(&chatId), sizeof(chatId), NULL);
+        recv(clientSocket, reinterpret_cast<char *>(&chatId), sizeof(chatId), NULL);
 
         size_t senderUserId = 0;
-        recv(clientSocket, reinterpret_cast<char*>(&senderUserId), sizeof(senderUserId), NULL);
+        recv(clientSocket, reinterpret_cast<char *>(&senderUserId), sizeof(senderUserId), NULL);
 
         size_t messageSize = 0;
-        std::array<char, Common::maxInputBufferSize> message = {};
-        recv(clientSocket, reinterpret_cast<char*>(&messageSize), sizeof(messageSize), NULL);
+        std::array<char, Common::maxInputBufferSize + 1> message = {};
+        recv(clientSocket, reinterpret_cast<char *>(&messageSize), sizeof(messageSize), NULL);
         recv(clientSocket, message.data(), static_cast<int>(messageSize), NULL);
         message[messageSize] = '\0';
 
         try
         {
-            auto& dbHelper = Database::DatabaseHelper::GetInstance();
-            auto* connection = dbHelper.GetConnection();
+            auto &dbHelper = Database::DatabaseHelper::GetInstance();
+            auto *connection = dbHelper.GetConnection();
             connection->setAutoCommit(false);
 
             auto query = std::format(
@@ -272,8 +272,7 @@ namespace ServerNetworking
                 "WHERE NOT EXISTS ("
                 "    SELECT 1 FROM chats WHERE id = {}"
                 ");",
-                chatId
-            );
+                chatId);
             bool result = dbHelper.ExecuteUpdate(query);
 
             query = std::format(
@@ -285,8 +284,7 @@ namespace ServerNetworking
                 "    SELECT 1 FROM users_chats WHERE user_id = {} AND chat_id = {}"
                 ");",
                 senderUserId, chatId,
-                senderUserId, chatId
-            );
+                senderUserId, chatId);
             result = dbHelper.ExecuteUpdate(query);
 
             query = std::format(
@@ -295,8 +293,7 @@ namespace ServerNetworking
                 "    (SELECT id FROM chats WHERE id = {} LIMIT 1), "
                 "    {}, '{}', NOW()"
                 ");",
-                chatId, senderUserId, message.data()
-            );
+                chatId, senderUserId, message.data());
             result = dbHelper.ExecuteUpdate(query);
 
             connection->commit();
@@ -309,7 +306,7 @@ namespace ServerNetworking
                 "ORDER BY messages.sent_at DESC LIMIT 1;",
                 chatId,
                 senderUserId);
-            auto* resultSet = dbHelper.ExecuteQuery(query);
+            auto *resultSet = dbHelper.ExecuteQuery(query);
 
             static constexpr auto actionType = NetworkCore::ActionType::kSendChatMessage;
             while (resultSet->next())
@@ -322,19 +319,19 @@ namespace ServerNetworking
                 {
                     const SOCKET receiverSocket = it->second;
 
-                    send(receiverSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
+                    send(receiverSocket, reinterpret_cast<const char *>(&actionType), sizeof(actionType), NULL);
 
                     const size_t sendMessageSize = message.size();
-                    send(receiverSocket, reinterpret_cast<const char*>(&sendMessageSize), sizeof(sendMessageSize), NULL);
+                    send(receiverSocket, reinterpret_cast<const char *>(&sendMessageSize), sizeof(sendMessageSize), NULL);
                     send(receiverSocket, message.data(), static_cast<int>(sendMessageSize), NULL);
 
                     const size_t sendTimeSize = sentAt.size();
-                    send(receiverSocket, reinterpret_cast<const char*>(&sendTimeSize), sizeof(sendTimeSize), NULL);
+                    send(receiverSocket, reinterpret_cast<const char *>(&sendTimeSize), sizeof(sendTimeSize), NULL);
                     send(receiverSocket, sentAt.data(), static_cast<int>(sendTimeSize), NULL);
                 }
             }
         }
-        catch (const sql::SQLException& e)
+        catch (const sql::SQLException &e)
         {
             std::cerr << "kSendChatMessage error: " << e.what() << '\n';
             SendServerErrorMessage(clientSocket, "Server error: server cant push message to database");
@@ -378,15 +375,15 @@ namespace ServerNetworking
                 userPacket.password);
             result = Database::DatabaseHelper::GetInstance().ExecuteUpdate(query);
 
-            send(clientSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
-            send(clientSocket, reinterpret_cast<char*>(&result), sizeof(result), NULL);
+            send(clientSocket, reinterpret_cast<const char *>(&actionType), sizeof(actionType), NULL);
+            send(clientSocket, reinterpret_cast<char *>(&result), sizeof(result), NULL);
         }
-        catch (const sql::SQLException& e)
+        catch (const sql::SQLException &e)
         {
             std::cerr << "AddUserCredentialsToDatabase error: " << e.what() << '\n';
 
-            send(clientSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
-            send(clientSocket, reinterpret_cast<char*>(&result), sizeof(result), NULL);
+            send(clientSocket, reinterpret_cast<const char *>(&actionType), sizeof(actionType), NULL);
+            send(clientSocket, reinterpret_cast<char *>(&result), sizeof(result), NULL);
 
             SendServerErrorMessage(clientSocket, "Server error: server cant add user credentials to database");
 
@@ -417,17 +414,18 @@ namespace ServerNetworking
                 "WHERE login = '{}' AND password = {};",
                 userPacket.login.c_str(),
                 userPacket.password);
-            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
+            auto *resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
 
             bool result = false;
-            if (resultSet->next()) result = true;
+            if (resultSet->next())
+                result = true;
 
             static constexpr auto actionType = NetworkCore::ActionType::kCheckUserExistence;
 
-            send(clientSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
-            send(clientSocket, reinterpret_cast<char*>(&result), sizeof(result), NULL);
+            send(clientSocket, reinterpret_cast<const char *>(&actionType), sizeof(actionType), NULL);
+            send(clientSocket, reinterpret_cast<char *>(&result), sizeof(result), NULL);
         }
-        catch (const sql::SQLException& e)
+        catch (const sql::SQLException &e)
         {
             std::cerr << "CheckUserExistence error: " << e.what() << '\n';
 
@@ -447,17 +445,18 @@ namespace ServerNetworking
                 "AND password = {} AND id = {};",
                 userPacket.name.c_str(), userPacket.login.c_str(),
                 userPacket.password, userPacket.id);
-            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
+            auto *resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
 
             bool result = false;
-            if (resultSet->next()) result = true;
+            if (resultSet->next())
+                result = true;
 
             static constexpr auto actionType = NetworkCore::ActionType::kCheckIsUserDataFromFileValid;
 
-            send(clientSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
-            send(clientSocket, reinterpret_cast<char*>(&result), sizeof(result), NULL);
+            send(clientSocket, reinterpret_cast<const char *>(&actionType), sizeof(actionType), NULL);
+            send(clientSocket, reinterpret_cast<char *>(&result), sizeof(result), NULL);
         }
-        catch (const sql::SQLException& e)
+        catch (const sql::SQLException &e)
         {
             std::cerr << "kCheckIsUserDataFromFileValid error: " << e.what() << '\n';
             SendServerErrorMessage(clientSocket, "Server error: server cant check is data from file valid");
@@ -480,21 +479,22 @@ namespace ServerNetworking
                 "SELECT name FROM users "
                 "WHERE login = '{}';",
                 userPacket.login.c_str());
-            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
+            auto *resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
 
             std::string result;
             size_t responseSize = result.size();
 
-            if (resultSet->next()) result = resultSet->getString("name");
+            if (resultSet->next())
+                result = resultSet->getString("name");
             responseSize = result.size();
 
             static constexpr auto actionType = NetworkCore::ActionType::kGetUserNameFromDatabase;
 
-            send(clientSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
-            send(clientSocket, reinterpret_cast<char*>(&responseSize), sizeof(responseSize), NULL);
+            send(clientSocket, reinterpret_cast<const char *>(&actionType), sizeof(actionType), NULL);
+            send(clientSocket, reinterpret_cast<char *>(&responseSize), sizeof(responseSize), NULL);
             send(clientSocket, result.c_str(), static_cast<int>(responseSize), NULL);
         }
-        catch (const sql::SQLException& e)
+        catch (const sql::SQLException &e)
         {
             std::cerr << "GetUserNameFromDatabase error: " << e.what() << '\n';
             SendServerErrorMessage(clientSocket, "Server error: server cant get user name from database");
@@ -517,19 +517,20 @@ namespace ServerNetworking
                 "SELECT id FROM users "
                 "WHERE login = '{}';",
                 userPacket.login.c_str());
-            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
+            auto *resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
 
             size_t userId = 0;
-            if (resultSet->next()) userId = resultSet->getInt("id");
+            if (resultSet->next())
+                userId = resultSet->getInt("id");
 
             static constexpr auto actionType = NetworkCore::ActionType::kGetUserIdFromDatabase;
 
-            send(clientSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
-            send(clientSocket, reinterpret_cast<char*>(&userId), sizeof(userId), NULL);
+            send(clientSocket, reinterpret_cast<const char *>(&actionType), sizeof(actionType), NULL);
+            send(clientSocket, reinterpret_cast<char *>(&userId), sizeof(userId), NULL);
 
             _connectionsToUserId[userId] = clientSocket;
         }
-        catch (const sql::SQLException& e)
+        catch (const sql::SQLException &e)
         {
             std::cerr << "GetUserIdFromDatabase error: " << e.what() << '\n';
             SendServerErrorMessage(clientSocket, "Server error: server cant get user name from database");
@@ -591,7 +592,7 @@ namespace ServerNetworking
                 userPacket.login.c_str(),
                 userPacket.id,
                 userPacket.id);
-            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
+            auto *resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
 
             size_t counter = 0;
             auto chatIdResult = std::make_unique<size_t[]>(resultSet->rowsCount());
@@ -613,31 +614,31 @@ namespace ServerNetworking
 
             static constexpr auto actionType = NetworkCore::ActionType::kFindMatchingChats;
 
-            send(clientSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
-            send(clientSocket, reinterpret_cast<char*>(&counter), sizeof(counter), NULL);
+            send(clientSocket, reinterpret_cast<const char *>(&actionType), sizeof(actionType), NULL);
+            send(clientSocket, reinterpret_cast<char *>(&counter), sizeof(counter), NULL);
 
             for (size_t i = 0; i < counter; ++i)
             {
-                send(clientSocket, reinterpret_cast<char*>(&chatIdResult[i]), sizeof(chatIdResult[0]), NULL);
+                send(clientSocket, reinterpret_cast<char *>(&chatIdResult[i]), sizeof(chatIdResult[0]), NULL);
 
                 size_t resultLength = chatNameResult[i].size();
-                send(clientSocket, reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
+                send(clientSocket, reinterpret_cast<char *>(&resultLength), sizeof(resultLength), NULL);
                 send(clientSocket, chatNameResult[i].c_str(), static_cast<int>(resultLength), NULL);
 
                 resultLength = lastMessageResult[i].size();
-                send(clientSocket, reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
+                send(clientSocket, reinterpret_cast<char *>(&resultLength), sizeof(resultLength), NULL);
                 send(clientSocket, lastMessageResult[i].c_str(), static_cast<int>(resultLength), NULL);
 
                 resultLength = lastMessageTimeResult[i].size();
-                send(clientSocket, reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
+                send(clientSocket, reinterpret_cast<char *>(&resultLength), sizeof(resultLength), NULL);
                 send(clientSocket, lastMessageTimeResult[i].c_str(), static_cast<int>(resultLength), NULL);
 
                 resultLength = chatPhotoResult[i].size();
-                send(clientSocket, reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
+                send(clientSocket, reinterpret_cast<char *>(&resultLength), sizeof(resultLength), NULL);
                 send(clientSocket, chatPhotoResult[i].c_str(), static_cast<int>(resultLength), NULL);
             }
         }
-        catch (const sql::SQLException& e)
+        catch (const sql::SQLException &e)
         {
             std::cerr << "FindMatchingChats error: " << e.what() << '\n';
             SendServerErrorMessage(clientSocket, "Server error: server cant push message to database");
@@ -675,7 +676,7 @@ namespace ServerNetworking
                 "FROM messages "
                 "WHERE chat_id = c.id);",
                 userPacket.id);
-            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
+            auto *resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
 
             size_t counter = 0;
             auto chatIdResult = std::make_unique<size_t[]>(resultSet->rowsCount());
@@ -697,31 +698,31 @@ namespace ServerNetworking
 
             static constexpr auto actionType = NetworkCore::ActionType::kGetAvailableChatsForUser;
 
-            send(clientSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
-            send(clientSocket, reinterpret_cast<char*>(&counter), sizeof(counter), NULL);
+            send(clientSocket, reinterpret_cast<const char *>(&actionType), sizeof(actionType), NULL);
+            send(clientSocket, reinterpret_cast<char *>(&counter), sizeof(counter), NULL);
 
             for (size_t i = 0; i < counter; ++i)
             {
-                send(clientSocket, reinterpret_cast<char*>(&chatIdResult[i]), sizeof(chatIdResult[0]), NULL);
+                send(clientSocket, reinterpret_cast<char *>(&chatIdResult[i]), sizeof(chatIdResult[0]), NULL);
 
                 size_t resultLength = chatNameResult[i].size();
-                send(clientSocket, reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
+                send(clientSocket, reinterpret_cast<char *>(&resultLength), sizeof(resultLength), NULL);
                 send(clientSocket, chatNameResult[i].c_str(), static_cast<int>(resultLength), NULL);
 
                 resultLength = lastMessageResult[i].size();
-                send(clientSocket, reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
+                send(clientSocket, reinterpret_cast<char *>(&resultLength), sizeof(resultLength), NULL);
                 send(clientSocket, lastMessageResult[i].c_str(), static_cast<int>(resultLength), NULL);
 
                 resultLength = lastMessageTimeResult[i].size();
-                send(clientSocket, reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
+                send(clientSocket, reinterpret_cast<char *>(&resultLength), sizeof(resultLength), NULL);
                 send(clientSocket, lastMessageTimeResult[i].c_str(), static_cast<int>(resultLength), NULL);
 
                 resultLength = chatPhotoResult[i].size();
-                send(clientSocket, reinterpret_cast<char*>(&resultLength), sizeof(resultLength), NULL);
+                send(clientSocket, reinterpret_cast<char *>(&resultLength), sizeof(resultLength), NULL);
                 send(clientSocket, chatPhotoResult[i].c_str(), static_cast<int>(resultLength), NULL);
             }
         }
-        catch (const sql::SQLException& e)
+        catch (const sql::SQLException &e)
         {
             std::cerr << "GetAvailableChatsForUser error: " << e.what() << '\n';
             SendServerErrorMessage(clientSocket, "Server error: server cant get available chats for user");
@@ -731,10 +732,10 @@ namespace ServerNetworking
     void Server::HandleReceiveAllMessagesForSelectedChat(const SOCKET clientSocket)
     {
         size_t userId = 0;
-        recv(clientSocket, reinterpret_cast<char*>(&userId), sizeof(userId), NULL);
+        recv(clientSocket, reinterpret_cast<char *>(&userId), sizeof(userId), NULL);
 
         size_t id = 0;
-        recv(clientSocket, reinterpret_cast<char*>(&id), sizeof(id), NULL);
+        recv(clientSocket, reinterpret_cast<char *>(&id), sizeof(id), NULL);
 
         if (id == 0)
         {
@@ -749,7 +750,7 @@ namespace ServerNetworking
                 "FROM messages "
                 "WHERE chat_id = {};",
                 id);
-            auto* resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
+            auto *resultSet = Database::DatabaseHelper::GetInstance().ExecuteQuery(query);
 
             auto messagesResult = std::make_unique<std::string[]>(resultSet->rowsCount());
             auto messageTypeResult = std::make_unique<MessageBuffer::MessageStatus[]>(resultSet->rowsCount());
@@ -777,22 +778,22 @@ namespace ServerNetworking
 
             static constexpr auto actionType = NetworkCore::ActionType::kReceiveAllMessagesForSelectedChat;
 
-            send(clientSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
-            send(clientSocket, reinterpret_cast<char*>(&count), sizeof(count), NULL);
+            send(clientSocket, reinterpret_cast<const char *>(&actionType), sizeof(actionType), NULL);
+            send(clientSocket, reinterpret_cast<char *>(&count), sizeof(count), NULL);
 
             for (size_t i = 0; i < count; ++i)
             {
                 size_t msgSize = messagesResult[i].size();
-                send(clientSocket, reinterpret_cast<char*>(&msgSize), sizeof(msgSize), NULL);
+                send(clientSocket, reinterpret_cast<char *>(&msgSize), sizeof(msgSize), NULL);
                 send(clientSocket, messagesResult[i].c_str(), msgSize, NULL);
-                send(clientSocket, reinterpret_cast<char*>(&messageTypeResult[i]), sizeof(messageTypeResult[i]), NULL);
+                send(clientSocket, reinterpret_cast<char *>(&messageTypeResult[i]), sizeof(messageTypeResult[i]), NULL);
 
                 size_t sendTimeSize = messagesSendTime[i].size();
-                send(clientSocket, reinterpret_cast<char*>(&sendTimeSize), sizeof(sendTimeSize), NULL);
+                send(clientSocket, reinterpret_cast<char *>(&sendTimeSize), sizeof(sendTimeSize), NULL);
                 send(clientSocket, messagesSendTime[i].c_str(), sendTimeSize, NULL);
             }
         }
-        catch (const sql::SQLException& e)
+        catch (const sql::SQLException &e)
         {
             std::cerr << "ReceiveAllMessagesForSelectedChat error: " << e.what() << '\n';
             SendServerErrorMessage(clientSocket, "Server error: server cant receive all messages for selected chat");
@@ -805,24 +806,24 @@ namespace ServerNetworking
 
         size_t userNameLength = 0;
         std::array<char, Common::userNameSize> userName = {};
-        recv(clientSocket, reinterpret_cast<char*>(&userNameLength), sizeof(userNameLength), NULL);
+        recv(clientSocket, reinterpret_cast<char *>(&userNameLength), sizeof(userNameLength), NULL);
         recv(clientSocket, userName.data(), static_cast<int>(userNameLength), NULL);
         userName[userNameLength] = '\0';
         newUserPacket.name = userName.data();
 
         size_t userLoginLength = 0;
         std::array<char, Common::userLoginSize> userLogin = {};
-        recv(clientSocket, reinterpret_cast<char*>(&userLoginLength), sizeof(userLoginLength), NULL);
+        recv(clientSocket, reinterpret_cast<char *>(&userLoginLength), sizeof(userLoginLength), NULL);
         recv(clientSocket, userLogin.data(), static_cast<int>(userLoginLength), NULL);
         userLogin[userLoginLength] = '\0';
         newUserPacket.login = userLogin.data();
 
         size_t userPassword = 0;
-        recv(clientSocket, reinterpret_cast<char*>(&userPassword), sizeof(userPassword), NULL);
+        recv(clientSocket, reinterpret_cast<char *>(&userPassword), sizeof(userPassword), NULL);
         newUserPacket.password = userPassword;
 
         size_t userId = 0;
-        recv(clientSocket, reinterpret_cast<char*>(&userId), sizeof(userId), NULL);
+        recv(clientSocket, reinterpret_cast<char *>(&userId), sizeof(userId), NULL);
         newUserPacket.id = userId;
 
         return newUserPacket;
@@ -832,10 +833,10 @@ namespace ServerNetworking
     {
         static constexpr auto actionType = NetworkCore::ActionType::kServerError;
 
-        send(clientSocket, reinterpret_cast<const char*>(&actionType), sizeof(actionType), NULL);
+        send(clientSocket, reinterpret_cast<const char *>(&actionType), sizeof(actionType), NULL);
 
         const size_t errorMessageSize = errorMessage.size();
-        send(clientSocket, reinterpret_cast<const char*>(&errorMessageSize), sizeof(errorMessageSize), NULL);
+        send(clientSocket, reinterpret_cast<const char *>(&errorMessageSize), sizeof(errorMessageSize), NULL);
         send(clientSocket, errorMessage.data(), static_cast<int>(errorMessageSize), NULL);
     }
 } // !namespace ServerNetworking

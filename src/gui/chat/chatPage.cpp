@@ -28,12 +28,10 @@ extern UserData::User currentUser;
 
 namespace Gui
 {
-    ChatPage::ChatPage(QWidget* parent)
-        : QWidget(parent)
-        , _ui(new Ui::ChatPage())
-        , _model(new Model::AvailableChatsModel())
-        , _delegate(new Delegate::AvailableChatsDelegate(_ui->availableChatsList))
-        , _messagesContainer(new QWidget())
+    using namespace CoroutineUtils;
+
+    ChatPage::ChatPage(QWidget *parent)
+        : QWidget(parent), _ui(new Ui::ChatPage()), _model(new Model::AvailableChatsModel()), _delegate(new Delegate::AvailableChatsDelegate(_ui->availableChatsList)), _messagesContainer(new QWidget())
     {
         _ui->setupUi(this);
 
@@ -52,8 +50,7 @@ namespace Gui
         connect(_sideBarWidget, &Widget::SideBarWidget::LogOutButtonPressed, this, [this]
                 {
                     emit LogOutButtonPressed();
-                    ToggleSideMenu();
-                });
+                    ToggleSideMenu(); });
 
         connect(_ui->menuButton, &QPushButton::clicked, this, &ChatPage::ToggleSideMenu);
 
@@ -69,14 +66,9 @@ namespace Gui
             clientInstance
                 .value()
                 .get()
-                .RegisterReceiveMessageCallback([this](const MessageBuffer::MessageNode& message)
-                                                {
-                                                    QMetaObject::invokeMethod(this, [this, message]
-                                                                              {
-                                                                                  RenderLastMessage(message);
-                                                                              },
-                                                                              Qt::QueuedConnection);
-                                                });
+                .RegisterReceiveMessageCallback([this](const MessageBuffer::MessageNode &message)
+                                                { QMetaObject::invokeMethod(this, [this, message]
+                                                                            { RenderLastMessage(message); }, Qt::QueuedConnection); });
         }
     }
 
@@ -110,7 +102,7 @@ namespace Gui
 
     void ChatPage::ToggleSideMenu() const noexcept
     {
-        auto* const animation = new(std::nothrow) QPropertyAnimation(_sideBarWidget, "geometry");
+        auto *const animation = new (std::nothrow) QPropertyAnimation(_sideBarWidget, "geometry");
         animation->setDuration(1);
 
         if (_isSideBarVisible)
@@ -145,32 +137,36 @@ namespace Gui
         _model->SetMatchingChats(userSearch.toStdString());
     }
 
-    void ChatPage::OnChatSelected() const
+    void ChatPage::OnChatSelected()
     {
         const QModelIndex index = _ui->availableChatsList->currentIndex();
 
-        if (lastSelectedRow == index.row()) return;
+        if (lastSelectedRow == index.row())
+            return;
 
         _ui->userName->setText(index.data(
-            Model::AvailableChatsModel::AvailableChatsRole::kChatNameRole).toString());
+                                        Model::AvailableChatsModel::AvailableChatsRole::kChatNameRole)
+                                   .toString());
 
         _ui->messageInput->clear();
 
         _ui->rightStack->setCurrentWidget(_ui->chatPage);
 
         FillMessageContainerLayout(index.data(
-            Model::AvailableChatsModel::AvailableChatsRole::kChatIdRole).toInt());
+                                            Model::AvailableChatsModel::AvailableChatsRole::kChatIdRole)
+                                       .toInt());
 
         lastSelectedRow = index.row();
 
         _isChatPageVisible = true;
     }
 
-    void ChatPage::OnSendButtonPressed() const
+    coroutine_void ChatPage::OnSendButtonPressed()
     {
         const auto lastMessageText = _ui->messageInput->toPlainText();
 
-        if (lastMessageText.trimmed().isEmpty()) return;
+        if (lastMessageText.trimmed().isEmpty())
+            co_return;
 
         auto remainingText = lastMessageText;
 
@@ -190,32 +186,35 @@ namespace Gui
 
             if (chatId == ChatSystem::ChatInfo::chatUndefined)
             {
-                chatId = UserData::UserRepository::CreateNewPersonalChat(
+                std::optional<size_t> optionalChatId = co_await UserData::UserRepository::CreateNewPersonalChatAsync(
                     currentUser.GetUserId(),
-                    index.data(Model::AvailableChatsModel::AvailableChatsRole::kChatNameRole).toString().toStdString())
-                    .value_or(ChatSystem::ChatInfo::chatUndefined);
-
-                _model->setData(index, chatId, Model::AvailableChatsModel::AvailableChatsRole::kChatIdRole);
+                    index.data(Model::AvailableChatsModel::AvailableChatsRole::kChatNameRole).toString().toStdString());
+                
+                _model->setData(index,
+                                optionalChatId.value_or(ChatSystem::ChatInfo::chatUndefined),
+                                Model::AvailableChatsModel::AvailableChatsRole::kChatIdRole);
             }
 
-            if (chatId == ChatSystem::ChatInfo::chatUndefined) return;
+            if (chatId == ChatSystem::ChatInfo::chatUndefined)
+                co_return;
 
             SendMessage(chatId,
                         currentUser.GetUserId(), messageChunk.data.c_str());
             RenderLastMessage(messageChunk);
         }
 
-        _ui->messageInput->clear();
+        QMetaObject::invokeMethod(this, [this]
+                                  { _ui->messageInput->clear(); }, Qt::QueuedConnection);
     }
 
-    void ChatPage::resizeEvent(QResizeEvent* event)
+    void ChatPage::resizeEvent(QResizeEvent *event)
     {
         QWidget::resizeEvent(event);
 
         _sideBarWidget->setFixedHeight(this->height());
     }
 
-    void ChatPage::keyPressEvent(QKeyEvent* event)
+    void ChatPage::keyPressEvent(QKeyEvent *event)
     {
         if (event->key() == Qt::Key_Escape)
         {
@@ -226,7 +225,7 @@ namespace Gui
         QWidget::keyPressEvent(event);
     }
 
-    void ChatPage::mousePressEvent(QMouseEvent* event)
+    void ChatPage::mousePressEvent(QMouseEvent *event)
     {
         if (event->buttons() == Qt::BackButton)
         {
@@ -253,63 +252,70 @@ namespace Gui
         }
     }
 
-    void ChatPage::FillMessageContainerLayout(const size_t chatId) const
+    coroutine_void ChatPage::FillMessageContainerLayout(const size_t chatId)
     {
         ClearMessageLayout();
 
-        if (chatId == 0) return;
+        if (chatId == 0)
+            co_return;
 
-        const auto chatMessage = UserData::UserRepository::GetAvailableChatMessages(
-            currentUser.GetUserId(), chatId);
+        const std::optional<std::vector<MessageBuffer::MessageNode>> chatMessage =
+            co_await UserData::UserRepository::GetAvailableChatMessagesAsync(
+                currentUser.GetUserId(), chatId);
 
-        if (!chatMessage.has_value()) return;
+        if (!chatMessage.has_value())
+            co_return;
 
         QDateTime previousDateTime = {};
         const QLocale locale = QLocale::English;
 
-        for (const auto& message : chatMessage.value())
+        for (const auto &message : chatMessage.value())
         {
             const QDateTime currentDateTime = QDateTime::fromString(message.sendTime.c_str(),
                                                                     "yyyy-MM-dd HH:mm:ss");
             if (currentDateTime.date() != previousDateTime.date())
             {
                 const QString currentSendTime = locale.toString(currentDateTime, "MMMM dd, yyyy");
-                _messagesContainerLayout->addWidget(ScrollArea::CreateDateDivider(currentSendTime));
+                QMetaObject::invokeMethod(this, [this, currentSendTime]
+                                          { _messagesContainerLayout->addWidget(ScrollArea::CreateDateDivider(currentSendTime)); }, Qt::QueuedConnection);
             }
 
-            _messagesContainerLayout->addWidget(ScrollArea::CreateMessage(message));
+            QMetaObject::invokeMethod(this, [this, message]
+                                      { _messagesContainerLayout->addWidget(ScrollArea::CreateMessage(message)); }, Qt::QueuedConnection);
 
             previousDateTime = currentDateTime;
         }
 
-        _messagesContainerLayout->addSpacerItem(
-            new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+        QMetaObject::invokeMethod(this, [this]
+                                  { _messagesContainerLayout->addSpacerItem(
+                                        new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding)); }, Qt::QueuedConnection);
     }
 
     void ChatPage::ClearMessageLayout() const
     {
         while (_messagesContainerLayout->count() > 0)
         {
-            const QLayoutItem* item = _messagesContainerLayout->takeAt(0);
+            const QLayoutItem *item = _messagesContainerLayout->takeAt(0);
             delete item->widget();
             delete item;
         }
     }
 
-    void ChatPage::RemoveLastSpacerItem(QVBoxLayout* layout)
+    void ChatPage::RemoveLastSpacerItem(QVBoxLayout *layout)
     {
         if (const int count = layout->count();
             count > 0)
         {
-            const QLayoutItem* item = layout->takeAt(count - 1);
+            const QLayoutItem *item = layout->takeAt(count - 1);
             delete item;
         }
     }
 
-    QString ChatPage::ExtractDateTimeFromMessageWidget(const QWidget* messageWidget)
+    QString ChatPage::ExtractDateTimeFromMessageWidget(const QWidget *messageWidget)
     {
-        const auto* label = messageWidget->findChild<QLabel*>();
-        if (label == nullptr) return {};
+        const auto *label = messageWidget->findChild<QLabel *>();
+        if (label == nullptr)
+            return {};
 
         const QString htmlContent = label->text();
         const QRegularExpression regexTime("<div style='color: #[0-9A-Fa-f]{6};font-size: 10px; text-align: right;'>(\\d{2}:\\d{2})</div>");
@@ -321,30 +327,32 @@ namespace Gui
         QString extractedTime;
         QString extractedDate;
 
-        if (matchTime.hasMatch()) extractedTime = matchTime.captured(1);
-        if (matchDate.hasMatch()) extractedDate = matchDate.captured(1);
+        if (matchTime.hasMatch())
+            extractedTime = matchTime.captured(1);
+        if (matchDate.hasMatch())
+            extractedDate = matchDate.captured(1);
 
         return QString("%1 %2").arg(extractedDate).arg(extractedTime);
     }
 
-    void ChatPage::SendMessage(const size_t chatId, const size_t senderUserId, const char* const data)
+    void ChatPage::SendMessage(const size_t chatId, const size_t senderUserId, const char *const data)
     {
-        if (!ClientNetworking::Client::GetInstance().has_value()) return;
+        if (!ClientNetworking::Client::GetInstance().has_value())
+            return;
 
         const auto clientInstance = ClientNetworking::Client::GetInstance().value();
 
         clientInstance.get().SendUserMessage(chatId, senderUserId, data);
     }
 
-    void ChatPage::RenderLastMessage(const MessageBuffer::MessageNode& message) const
+    void ChatPage::RenderLastMessage(const MessageBuffer::MessageNode &message) const
     {
         RemoveLastSpacerItem(_messagesContainerLayout);
 
         if (const int messageContainerSize = _messagesContainerLayout->count() - 1;
             messageContainerSize > 0)
         {
-            const auto* lastRenderedMessage = _messagesContainerLayout->
-                itemAt(messageContainerSize)->widget();
+            const auto *lastRenderedMessage = _messagesContainerLayout->itemAt(messageContainerSize)->widget();
 
             const auto lastRenderedMessageSendDate = ExtractDateTimeFromMessageWidget(lastRenderedMessage);
             const auto lastDateTime = QDateTime::fromString(lastRenderedMessageSendDate,

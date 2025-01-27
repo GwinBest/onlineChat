@@ -2,19 +2,32 @@
 
 #include <QWidget>
 
+#include "coroutineUtils/coroutineUtils.h"
 #include "messageBuffer/messageBuffer.h"
 #include "userData/user.h"
 
 class QVBoxLayout;
 
 // forward declaration
-namespace Ui { class ChatPage; }
+namespace Ui
+{
+    class ChatPage;
+}
 
-namespace Gui::Model { class AvailableChatsModel; }
+namespace Gui::Model
+{
+    class AvailableChatsModel;
+}
 
-namespace Gui::Delegate { class AvailableChatsDelegate; }
+namespace Gui::Delegate
+{
+    class AvailableChatsDelegate;
+}
 
-namespace Gui::Widget { class SideBarWidget; }
+namespace Gui::Widget
+{
+    class SideBarWidget;
+}
 
 namespace Gui
 {
@@ -23,7 +36,7 @@ namespace Gui
         Q_OBJECT
 
     public:
-        explicit ChatPage(QWidget* parent = nullptr);
+        explicit ChatPage(QWidget *parent = nullptr);
         ~ChatPage() override;
 
         void PreparePage() const noexcept;
@@ -34,38 +47,38 @@ namespace Gui
     private slots:
         void ToggleSideMenu() const noexcept;
         void OnSearchInputTextChanged() const noexcept;
-        void OnChatSelected() const;
-        void OnSendButtonPressed() const;
+        void OnChatSelected();
+        CoroutineUtils::coroutine_void OnSendButtonPressed();
 
     private:
-        void resizeEvent(QResizeEvent* event) override;
+        void resizeEvent(QResizeEvent *event) override;
 
-        void keyPressEvent(QKeyEvent* event) override;
-        void mousePressEvent(QMouseEvent* event) override;
+        void keyPressEvent(QKeyEvent *event) override;
+        void mousePressEvent(QMouseEvent *event) override;
 
         void ToggleUiElements() const;
 
-        void FillMessageContainerLayout(const size_t chatId) const;
+        CoroutineUtils::coroutine_void FillMessageContainerLayout(const size_t chatId);
         void ClearMessageLayout() const;
 
-        static void RemoveLastSpacerItem(QVBoxLayout* layout);
-        static QString ExtractDateTimeFromMessageWidget(const QWidget* messageWidget);
+        static void RemoveLastSpacerItem(QVBoxLayout *layout);
+        static QString ExtractDateTimeFromMessageWidget(const QWidget *messageWidget);
 
-        static void SendMessage(const size_t chatId, const size_t senderUserId, const char* const data);
-        void RenderLastMessage(const MessageBuffer::MessageNode& message) const;
+        static void SendMessage(const size_t chatId, const size_t senderUserId, const char *const data);
+        void RenderLastMessage(const MessageBuffer::MessageNode &message) const;
 
     private:
-        Ui::ChatPage* _ui = nullptr;
+        Ui::ChatPage *_ui = nullptr;
 
-        Model::AvailableChatsModel* _model = nullptr;
-        Delegate::AvailableChatsDelegate* _delegate = nullptr;
+        Model::AvailableChatsModel *_model = nullptr;
+        Delegate::AvailableChatsDelegate *_delegate = nullptr;
         static inline bool _isChatPageVisible = false;
 
-        Widget::SideBarWidget* _sideBarWidget = nullptr;
+        Widget::SideBarWidget *_sideBarWidget = nullptr;
         static inline bool _isSideBarVisible = false;
 
-        QWidget* _messagesContainer = nullptr;
-        QVBoxLayout* _messagesContainerLayout = nullptr;
+        QWidget *_messagesContainer = nullptr;
+        QVBoxLayout *_messagesContainerLayout = nullptr;
 
         static inline int lastSelectedRow = -1;
     };

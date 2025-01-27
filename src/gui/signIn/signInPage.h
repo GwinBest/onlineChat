@@ -3,6 +3,7 @@
 #include <QWidget>
 
 #include "gui/colors/colors.h"
+#include "coroutineUtils/coroutineUtils.h"
 
 // forward declaration
 namespace Ui { class SignInPage; };
@@ -24,7 +25,7 @@ namespace Gui
         void DisplayLoginPage() const;
 
     private slots:
-        void OnSignInButtonPressed() const noexcept;
+        CoroutineUtils::coroutine_void OnSignInButtonPressed();
         void OnLoginButtonPressed() const noexcept;
 
     private:

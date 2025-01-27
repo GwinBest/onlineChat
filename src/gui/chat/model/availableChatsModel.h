@@ -8,7 +8,8 @@
 #include <QList>
 #include <QString>
 
-#include <chatSystem/chatInfo.h>
+#include "chatSystem/chatInfo.h"
+#include "coroutineUtils/coroutineUtils.h"
 
 namespace Gui::Model
 {
@@ -26,14 +27,14 @@ namespace Gui::Model
     public:
         using QAbstractListModel::QAbstractListModel;
 
-        int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-        QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-        bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
+        int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+        QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+        bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
         [[nodiscard]] inline bool IsEmpty() const noexcept { return _availableChats.empty(); }
 
-        void SetAllAvailableChats();
-        void SetMatchingChats(const std::string& pattern);
+        CoroutineUtils::coroutine_void SetAllAvailableChats();
+        CoroutineUtils::coroutine_void SetMatchingChats(const std::string &pattern);
 
     private:
         QList<ChatSystem::ChatInfo> _availableChats;

@@ -46,6 +46,8 @@ namespace Gui
         _ui->availableChatsList->setUniformItemSizes(true);
         _ui->availableChatsList->setResizeMode(QListView::Adjust);
 
+        _ui->messageInput->installEventFilter(this);
+
         connect(_sideBarWidget, &Widget::SideBarWidget::HideSideBar, this, &ChatPage::ToggleSideMenu);
         connect(_sideBarWidget, &Widget::SideBarWidget::LogOutButtonPressed, this, [this]
                 {
@@ -189,7 +191,7 @@ namespace Gui
                 std::optional<size_t> optionalChatId = co_await UserData::UserRepository::CreateNewPersonalChatAsync(
                     currentUser.GetUserId(),
                     index.data(Model::AvailableChatsModel::AvailableChatsRole::kChatNameRole).toString().toStdString());
-                
+
                 _model->setData(index,
                                 optionalChatId.value_or(ChatSystem::ChatInfo::chatUndefined),
                                 Model::AvailableChatsModel::AvailableChatsRole::kChatIdRole);
@@ -234,6 +236,20 @@ namespace Gui
         }
 
         QWidget::mousePressEvent(event);
+    }
+
+    bool ChatPage::eventFilter(QObject *watched, QEvent *event)
+    {
+        if (watched->inherits("QTextEdit") && event->type() == QEvent::KeyPress)
+        {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter)
+            {
+                OnSendButtonPressed();
+                return true;
+            }
+        }
+        return QWidget::eventFilter(watched, event);
     }
 
     void ChatPage::ToggleUiElements() const

@@ -56,6 +56,8 @@ namespace Gui
         void keyPressEvent(QKeyEvent *event) override;
         void mousePressEvent(QMouseEvent *event) override;
 
+        bool eventFilter(QObject *watched, QEvent *event) override;
+
         void ToggleUiElements() const;
 
         CoroutineUtils::coroutine_void FillMessageContainerLayout(const size_t chatId);

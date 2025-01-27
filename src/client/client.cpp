@@ -111,8 +111,6 @@ namespace ClientNetworking
             auto type = NetworkCore::ActionType::kActionUndefined;
             recv(_clientSocket, reinterpret_cast<char *>(&type), sizeof(type), NULL);
 
-            _serverResponse = {};
-
             switch (type)
             {
             case NetworkCore::ActionType::kCreateNewPersonalChat:

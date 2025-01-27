@@ -181,7 +181,7 @@ namespace ServerNetworking
         recv(clientSocket, reinterpret_cast<char *>(&senderUserId), sizeof(senderUserId), NULL);
 
         size_t receiverUserNameSize = 0;
-        std::array<char, Common::maxInputBufferSize + 1> receiverUserName = {};
+        std::array<char, Common::maxInputBufferSize> receiverUserName = {};
         recv(clientSocket, reinterpret_cast<char *>(&receiverUserNameSize), sizeof(receiverUserNameSize), NULL);
         recv(clientSocket, receiverUserName.data(), static_cast<int>(receiverUserNameSize), NULL);
         receiverUserName[receiverUserNameSize] = '\0';
@@ -255,7 +255,7 @@ namespace ServerNetworking
         recv(clientSocket, reinterpret_cast<char *>(&senderUserId), sizeof(senderUserId), NULL);
 
         size_t messageSize = 0;
-        std::array<char, Common::maxInputBufferSize + 1> message = {};
+        std::array<char, Common::maxInputBufferSize> message = {};
         recv(clientSocket, reinterpret_cast<char *>(&messageSize), sizeof(messageSize), NULL);
         recv(clientSocket, message.data(), static_cast<int>(messageSize), NULL);
         message[messageSize] = '\0';
@@ -527,6 +527,15 @@ namespace ServerNetworking
 
             send(clientSocket, reinterpret_cast<const char *>(&actionType), sizeof(actionType), NULL);
             send(clientSocket, reinterpret_cast<char *>(&userId), sizeof(userId), NULL);
+
+            for (const auto &element : _connectionsToUserId)
+            {
+                if (element.second == clientSocket)
+                {
+                    _connectionsToUserId.erase(element.first);
+                    break;
+                }
+            }
 
             _connectionsToUserId[userId] = clientSocket;
         }

@@ -245,6 +245,9 @@ namespace Gui
             QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
             if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter)
             {
+                if (keyEvent->modifiers() & Qt::ShiftModifier)
+                    return false;
+
                 OnSendButtonPressed();
                 return true;
             }

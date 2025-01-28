@@ -100,6 +100,8 @@ namespace Gui
         _ui->availableChatsList->setItemDelegate(_delegate);
 
         _sideBarWidget->UpdateUserName(currentUser.GetUserName());
+
+        ToggleUiElements();
     }
 
     void ChatPage::ToggleSideMenu() const noexcept

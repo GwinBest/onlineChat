@@ -7,7 +7,10 @@
 #include "gui/signIn/signInPage.h"
 
 // forward declaration
-namespace Ui { class MainWindowClass; };
+namespace Ui
+{
+    class MainWindowClass;
+};
 
 namespace Gui
 {
@@ -16,7 +19,7 @@ namespace Gui
         Q_OBJECT
 
     public:
-        explicit MainWindow(QWidget* parent = nullptr);
+        explicit MainWindow(QWidget *parent = nullptr);
         ~MainWindow() override;
 
     private slots:
@@ -25,10 +28,13 @@ namespace Gui
         void DisplayChatPage() const noexcept;
 
     private:
-        Ui::MainWindowClass* _ui = nullptr;
+        CoroutineUtils::coroutine_void PreparePage() noexcept;
 
-        LoginPage* _loginPage = nullptr;
-        SignInPage* _signInPage = nullptr;
-        ChatPage* _chatPage = nullptr;
+    private:
+        Ui::MainWindowClass *_ui = nullptr;
+
+        LoginPage *_loginPage = nullptr;
+        SignInPage *_signInPage = nullptr;
+        ChatPage *_chatPage = nullptr;
     };
 } // !namespace Gui

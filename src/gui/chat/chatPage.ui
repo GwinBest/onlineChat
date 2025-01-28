@@ -219,7 +219,68 @@ QPushButton:pressed {
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">border: none;</string>
+          <string notr="true">QScrollBar:vertical {
+    background-color: #2A2A2A;
+    width: 8px;
+    margin: 0;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #666666;
+    min-height: 30px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #7A7A7A;
+}
+
+QScrollBar::handle:vertical:pressed {
+    background-color: #888888;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+/* Горизонтальный скроллбар */
+QScrollBar:horizontal {
+    background-color: #2A2A2A;
+    height: 8px;
+    margin: 0;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: #666666;
+    min-width: 30px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background-color: #7A7A7A;
+}
+
+QScrollBar::handle:horizontal:pressed {
+    background-color: #888888;
+}
+
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    background: none;
+}</string>
          </property>
         </widget>
        </item>
@@ -244,7 +305,7 @@ QPushButton:pressed {
                             </string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="emptyPage">
        <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -355,7 +416,68 @@ border: none;</string>
         <item>
          <widget class="QScrollArea" name="scrollArea">
           <property name="styleSheet">
-           <string notr="true">border: none;</string>
+           <string notr="true">QScrollBar:vertical {
+    background-color: #2A2A2A;
+    width: 8px;
+    margin: 0;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #666666;
+    min-height: 30px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #7A7A7A;
+}
+
+QScrollBar::handle:vertical:pressed {
+    background-color: #888888;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+/* Горизонтальный скроллбар */
+QScrollBar:horizontal {
+    background-color: #2A2A2A;
+    height: 8px;
+    margin: 0;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: #666666;
+    min-width: 30px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background-color: #7A7A7A;
+}
+
+QScrollBar::handle:horizontal:pressed {
+    background-color: #888888;
+}
+
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    background: none;
+}</string>
           </property>
           <property name="widgetResizable">
            <bool>true</bool>
@@ -365,8 +487,8 @@ border: none;</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>100</width>
-             <height>30</height>
+             <width>486</width>
+             <height>534</height>
             </rect>
            </property>
           </widget>

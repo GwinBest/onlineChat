@@ -25,4 +25,4 @@ namespace ChatSystem
             , lastMessageSendTime(std::move(lastMessageSendTime))
         {}
     };
-} // !namespace ChatSystem
+}   // namespace ChatSystem

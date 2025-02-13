@@ -16,15 +16,18 @@ namespace Gui::Delegate
 
         const QRect rect = option.rect;
         QColor backgroundColor;
-        if (option.state & QStyle::State_Selected)          backgroundColor = QColor(colorSelectedChat);
-        else if (option.state & QStyle::State_MouseOver)    backgroundColor = QColor(colorOnHover);
-        else                                                backgroundColor = QColor(colorGray);
+        if (option.state & QStyle::State_Selected) backgroundColor = QColor(colorSelectedChat);
+        else if (option.state & QStyle::State_MouseOver) backgroundColor = QColor(colorOnHover);
+        else backgroundColor = QColor(colorGray);
+
         painter->fillRect(rect, backgroundColor);
 
-        const QString name = index.data(Model::AvailableChatsModel::kChatNameRole).toString();
-        const QString lastMessage = index.data(Model::AvailableChatsModel::kLastMessageRole).toString();
         const QString avatarPath = index.data(Qt::DecorationRole).toString();
-        QString sendTime = index.data(Model::AvailableChatsModel::kLastMessageSendTimeRole).toString();
+        const QString name = index.data(Model::AvailableChatsModel::kChatNameRole).toString();
+        const QString lastMessage = index.data(Model::AvailableChatsModel::kLastMessageRole)
+                                        .toString();
+        QString sendTime = index.data(Model::AvailableChatsModel::kLastMessageSendTimeRole)
+                               .toString();
 
         const QDateTime dateTime = QDateTime::fromString(sendTime, "yyyy-MM-dd HH:mm:ss");
         sendTime = dateTime.time().toString("HH:mm");
@@ -34,13 +37,13 @@ namespace Gui::Delegate
         const int centerY = rect.top() + (rect.height() - avatarSize) / 2;
         const QRect avatarRect(rect.left() + margin, centerY, avatarSize, avatarSize);
 
-        if (const QPixmap avatarPixmap(avatarPath);
-            !avatarPixmap.isNull())
+        if (const QPixmap avatarPixmap(avatarPath); !avatarPixmap.isNull())
         {
-            painter->drawPixmap(avatarRect, avatarPixmap.scaled(avatarSize,
-                                                                avatarSize,
-                                                                Qt::KeepAspectRatioByExpanding,
-                                                                Qt::SmoothTransformation));
+            painter->drawPixmap(avatarRect,
+                                avatarPixmap.scaled(avatarSize,
+                                                    avatarSize,
+                                                    Qt::KeepAspectRatioByExpanding,
+                                                    Qt::SmoothTransformation));
         }
         else
         {
@@ -70,10 +73,7 @@ namespace Gui::Delegate
                           lastMessage);
 
         painter->setPen(Qt::white);
-        painter->drawText(QRect(rect.right() - 50,
-                                rect.top() + 5,
-                                40,
-                                20),
+        painter->drawText(QRect(rect.right() - 50, rect.top() + 5, 40, 20),
                           Qt::AlignRight,
                           sendTime);
 
@@ -84,7 +84,7 @@ namespace Gui::Delegate
                                            const QModelIndex& index) const
     {
         Q_UNUSED(option)
-            Q_UNUSED(index)
-            return { 0, 60 };
+        Q_UNUSED(index)
+        return {0, 60};
     }
-} // !namespace Gui::Delegate
+}   // namespace Gui::Delegate

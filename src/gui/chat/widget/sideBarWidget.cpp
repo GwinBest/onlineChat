@@ -1,9 +1,8 @@
 #include "sideBarWidget.h"
 
-#include "ui_sideBarWidget.h"
-
 #include <QMouseEvent>
 
+#include "ui_sideBarWidget.h"
 #include "userData/userCredentialsFile.h"
 
 namespace Gui::Widget
@@ -17,7 +16,10 @@ namespace Gui::Widget
         _ui->transparentFrame->setMouseTracking(true);
         _ui->transparentFrame->installEventFilter(this);
 
-        connect(_ui->logOutButton, &QPushButton::pressed, this, &SideBarWidget::OnLogOutButtonPressed);
+        connect(_ui->logOutButton,
+                &QPushButton::pressed,
+                this,
+                &SideBarWidget::OnLogOutButtonPressed);
     }
 
     SideBarWidget::~SideBarWidget()
@@ -53,4 +55,4 @@ namespace Gui::Widget
 
         return QWidget::eventFilter(obj, event);
     }
-} //!namespace Gui::Widget
+}   // namespace Gui::Widget

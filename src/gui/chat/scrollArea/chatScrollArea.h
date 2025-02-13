@@ -9,4 +9,4 @@ namespace Gui::ScrollArea
     QWidget* CreateMessage(const MessageBuffer::MessageNode& message);
 
     QWidget* CreateDateDivider(const QString& dateText);
-} // !namespace Gui::ScrollArea
+}   // namespace Gui::ScrollArea

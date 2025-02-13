@@ -1,11 +1,10 @@
 #include "loginPage.h"
-#include "ui_loginPage.h"
 
+#include <QMessageBox>
 #include <coroutine>
 #include <string>
 
-#include <QMessageBox>
-
+#include "ui_loginPage.h"
 #include "userData/user.h"
 #include "userData/userCredentialsFile.h"
 #include "userData/userRepository.h"
@@ -14,8 +13,9 @@ extern UserData::User currentUser;
 
 namespace Gui
 {
-    LoginPage::LoginPage(QWidget *parent)
-        : QWidget(parent), _ui(new Ui::LoginPage())
+    LoginPage::LoginPage(QWidget* parent)
+        : QWidget(parent)
+        , _ui(new Ui::LoginPage())
     {
         _ui->setupUi(this);
 
@@ -68,38 +68,45 @@ namespace Gui
             _ui->passwordInput->setStyleSheet(SetInputStyleSheet(colorBlue));
         }
 
-        if (isFieldEmpty)
-            co_return;
+        if (isFieldEmpty) co_return;
 
         currentUser.SetUserLogin(login);
-        currentUser.SetUserPassword(std::hash<std::string>{}(password));
+        currentUser.SetUserPassword(std::hash<std::string> {}(password));
 
         auto isUserExist = co_await UserData::UserRepository::IsUserExistAsync(currentUser);
 
         if (!isUserExist.has_value())
         {
-            QMetaObject::invokeMethod(this, [this]
-                                      { QMessageBox::critical(nullptr, "Error", "Cant connect to the server"); }, Qt::QueuedConnection);
+            QMetaObject::invokeMethod(
+                this,
+                [this] { QMessageBox::critical(nullptr, "Error", "Cant connect to the server"); },
+                Qt::QueuedConnection);
             co_return;
         }
 
         if (!isUserExist.value())
         {
-            QMetaObject::invokeMethod(this, [this]
-                                      { _ui->userNotFound->setVisible(true); }, Qt::QueuedConnection);
+            QMetaObject::invokeMethod(
+                this,
+                [this] { _ui->userNotFound->setVisible(true); },
+                Qt::QueuedConnection);
             co_return;
         }
 
-        QMetaObject::invokeMethod(this, [this]
-                                  { _ui->userNotFound->setVisible(false); }, Qt::QueuedConnection);
+        QMetaObject::invokeMethod(
+            this,
+            [this] { _ui->userNotFound->setVisible(false); },
+            Qt::QueuedConnection);
 
         auto userId = co_await UserData::UserRepository::GetUserIdFromDatabaseAsync(login);
         auto userName = co_await UserData::UserRepository::GetUserNameFromDatabaseAsync(login);
 
         if (!userId.has_value() || !userName.has_value())
         {
-            QMetaObject::invokeMethod(this, [this]
-                                      { QMessageBox::critical(nullptr, "Error", "Cant connect to the server"); }, Qt::QueuedConnection);
+            QMetaObject::invokeMethod(
+                this,
+                [this] { QMessageBox::critical(nullptr, "Error", "Cant connect to the server"); },
+                Qt::QueuedConnection);
             co_return;
         }
 
@@ -119,4 +126,4 @@ namespace Gui
     {
         emit DisplaySignInPage();
     }
-} // !namespace Gui
+}   // namespace Gui

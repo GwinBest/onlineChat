@@ -16,4 +16,4 @@ namespace Gui
     static constexpr const char* const colorMessageReceived = "#33393f";
     static constexpr const char* const colorDateDivider = "#2f343b";
     static constexpr const char* const colorMessageTimeSend = "#808080";
-} // !namespace Gui
+}   // namespace Gui

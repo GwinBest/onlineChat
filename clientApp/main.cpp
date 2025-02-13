@@ -1,7 +1,6 @@
 ﻿#include <QApplication>
 
 #include "gui/mainWindow.h"
-
 #include "userData/user.h"
 
 UserData::User currentUser;

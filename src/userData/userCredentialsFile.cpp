@@ -1,13 +1,13 @@
 #include "userCredentialsFile.h"
 
 #ifdef WIN32
-#include <Windows.h> // for SetFileAttributesA
+#include <Windows.h>   // for SetFileAttributesA
 
 #ifdef GetUserName
 #undef GetUserName
-#endif // GetUserName
+#endif                 // GetUserName
 
-#endif // WIN32
+#endif                 // WIN32
 
 #include <string>
 
@@ -30,8 +30,9 @@ namespace UserData
             return true;
         }
 
-        _credentialsFile.open(_fileName, std::ios::in | std::ios::out |
-                              std::ios::trunc | std::ios::binary); // if file already exist - clear it
+        _credentialsFile.open(_fileName,
+                              std::ios::in | std::ios::out | std::ios::trunc
+                                  | std::ios::binary);   // if file already exist - clear it
         if (_credentialsFile.is_open())
         {
 #ifdef WIN32
@@ -68,11 +69,13 @@ namespace UserData
             _credentialsFile.write(" ", sizeof(char));
 
             const std::string& userLogin = user.GetUserLogin();
-            _credentialsFile.write(userLogin.c_str(), static_cast<std::streamsize>(userLogin.size()));
+            _credentialsFile.write(userLogin.c_str(),
+                                   static_cast<std::streamsize>(userLogin.size()));
             _credentialsFile.write(" ", sizeof(char));
 
             const size_t userPassword = user.GetUserPassword();
-            _credentialsFile.write(reinterpret_cast<const char*>(&userPassword), sizeof(userPassword));
+            _credentialsFile.write(reinterpret_cast<const char*>(&userPassword),
+                                   sizeof(userPassword));
 
             const size_t userId = user.GetUserId();
             _credentialsFile.write(reinterpret_cast<const char*>(&userId), sizeof(userId));
@@ -103,4 +106,4 @@ namespace UserData
 
         return user;
     }
-} // !namespace UserData
+}   // namespace UserData

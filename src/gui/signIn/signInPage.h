@@ -2,11 +2,11 @@
 
 #include <QWidget>
 
-#include "gui/colors/colors.h"
 #include "coroutineUtils/coroutineUtils.h"
+#include "gui/colors/colors.h"
 
 // forward declaration
-namespace Ui { class SignInPage; };
+class Ui::SignInPage;
 
 namespace Gui
 {
@@ -32,16 +32,20 @@ namespace Gui
         inline QString SetInputStyleSheet(const QString& primaryColor) const noexcept
         {
             return "QLineEdit { "
-                "background-color: " + QString(colorTransparent) + ";" +
-                "border: none; "
-                "border-bottom: 1px solid " + primaryColor + ";}" +
-                "QLineEdit:focus { "
-                "background-color: " + QString(colorTransparent) + "; " +
-                "border: none; "
-                "border-bottom: 1px solid " + QString(colorLightGreen) + ";}";
+                   "background-color: "
+                 + QString(colorTransparent) + ";"
+                 + "border: none; "
+                   "border-bottom: 1px solid "
+                 + primaryColor + ";}"
+                 + "QLineEdit:focus { "
+                   "background-color: "
+                 + QString(colorTransparent) + "; "
+                 + "border: none; "
+                   "border-bottom: 1px solid "
+                 + QString(colorLightGreen) + ";}";
         }
 
     private:
         Ui::SignInPage* _ui = nullptr;
     };
-} // !namespace Gui
+}   // namespace Gui

@@ -24,5 +24,4 @@ namespace MessageBuffer
         std::string sendTime;
         MessageStatus messageType = MessageStatus::kUndefined;
     };
-} // !namespace MessageBuffer
-
+}   // namespace MessageBuffer

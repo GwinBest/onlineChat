@@ -2,7 +2,7 @@
 
 #ifdef _WIN32
 #include <WinSock2.h>
-#endif // !_WIN32
+#endif   // !_WIN32
 
 #include <array>
 #include <map>
@@ -34,11 +34,12 @@ namespace ServerNetworking
         static void HandleReceiveAllMessagesForSelectedChat(const SOCKET clientSocket);
 
         static NetworkCore::UserPacket ReceiveUserCredentialsPacket(const SOCKET clientSocket);
-        static void SendServerErrorMessage(const SOCKET clientSocket, const std::string_view errorMessage) noexcept;
+        static void SendServerErrorMessage(const SOCKET clientSocket,
+                                           const std::string_view errorMessage) noexcept;
 
 #ifdef _WIN32
         WSADATA _wsaData = {};
-#endif // !_WIN32
+#endif   // !_WIN32
 
         SOCKET _serverSocket = 0;
         SOCKADDR_IN _socketAddress = {};
@@ -50,4 +51,4 @@ namespace ServerNetworking
         using UserId = size_t;
         std::map<UserId, SOCKET> _connectionsToUserId = {};
     };
-} // !namespace ServerNetworking
+}   // namespace ServerNetworking

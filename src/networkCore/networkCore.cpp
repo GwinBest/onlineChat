@@ -17,4 +17,4 @@ namespace NetworkCore
 
     const std::string_view ipAddress = GetServerIpAddress();
     const uint32_t port = GetServerPort();
-} // !namesapce NetworkCore
+}   // namespace NetworkCore

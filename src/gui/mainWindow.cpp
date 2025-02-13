@@ -1,8 +1,7 @@
 #include "mainWindow.h"
 
-#include "ui_mainWindow.h"
-
 #include "gui/chat/model/availableChatsModel.h"
+#include "ui_mainWindow.h"
 #include "userData/userCredentialsFile.h"
 #include "userData/userRepository.h"
 
@@ -10,8 +9,12 @@ extern UserData::User currentUser;
 
 namespace Gui
 {
-    MainWindow::MainWindow(QWidget *parent)
-        : QMainWindow(parent), _ui(new Ui::MainWindowClass()), _loginPage(new Gui::LoginPage()), _signInPage(new Gui::SignInPage()), _chatPage(new Gui::ChatPage())
+    MainWindow::MainWindow(QWidget* parent)
+        : QMainWindow(parent)
+        , _ui(new Ui::MainWindowClass())
+        , _loginPage(new Gui::LoginPage())
+        , _signInPage(new Gui::SignInPage())
+        , _chatPage(new Gui::ChatPage())
     {
         _ui->setupUi(this);
 
@@ -59,17 +62,14 @@ namespace Gui
 
     CoroutineUtils::coroutine_void MainWindow::PreparePage() noexcept
     {
-        if (!UserData::UserCredentialsFile::IsFileExists())
-            DisplayLoginPage();
+        if (!UserData::UserCredentialsFile::IsFileExists()) DisplayLoginPage();
 
         const UserData::User user = UserData::UserCredentialsFile::ReadCredentials();
         auto isUserExist = co_await UserData::UserRepository::IsUserExistAsync(user);
-        if (!isUserExist.value_or(false))
-            DisplayLoginPage();
+        if (!isUserExist.value_or(false)) DisplayLoginPage();
 
         currentUser = std::move(user);
 
-        QMetaObject::invokeMethod(this, [this]
-                                  { DisplayChatPage(); }, Qt::QueuedConnection);
+        QMetaObject::invokeMethod(this, [this] { DisplayChatPage(); }, Qt::QueuedConnection);
     }
-} // !namespace Gui
+}   // namespace Gui

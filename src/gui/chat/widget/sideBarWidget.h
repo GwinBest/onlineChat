@@ -1,11 +1,10 @@
 #pragma once
 
+#include <QWidget>
 #include <string>
 
-#include <QWidget>
-
 // forward declaration
-namespace Ui { class SideBarWidget; };
+class Ui::SideBarWidget;
 
 namespace Gui::Widget
 {
@@ -35,4 +34,4 @@ namespace Gui::Widget
     private:
         Ui::SideBarWidget* _ui = nullptr;
     };
-} // !namespace Gui::Widget
+}   // namespace Gui::Widget

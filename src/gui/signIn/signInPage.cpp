@@ -1,10 +1,9 @@
 #include "signInPage.h"
-#include "ui_signInPage.h"
-
-#include <string>
 
 #include <QMessageBox>
+#include <string>
 
+#include "ui_signInPage.h"
 #include "userData/user.h"
 #include "userData/userCredentialsFile.h"
 #include "userData/userRepository.h"
@@ -15,8 +14,9 @@ namespace Gui
 {
     using namespace CoroutineUtils;
 
-    SignInPage::SignInPage(QWidget *parent)
-        : QWidget(parent), _ui(new Ui::SignInPage())
+    SignInPage::SignInPage(QWidget* parent)
+        : QWidget(parent)
+        , _ui(new Ui::SignInPage())
     {
         _ui->setupUi(this);
 
@@ -83,55 +83,71 @@ namespace Gui
             _ui->passwordInput->setStyleSheet(SetInputStyleSheet(colorBlue));
         }
 
-        if (isFieldEmpty)
-            co_return;
+        if (isFieldEmpty) co_return;
 
         currentUser.SetUserName(name);
         currentUser.SetUserLogin(login);
-        currentUser.SetUserPassword(std::hash<std::string>{}(password));
+        currentUser.SetUserPassword(std::hash<std::string> {}(password));
 
-        const std::optional<bool> isUserExist = co_await UserData::UserRepository::IsUserExistAsync(currentUser);
+        const std::optional<bool> isUserExist = co_await UserData::UserRepository::IsUserExistAsync(
+            currentUser);
 
         if (!isUserExist.has_value())
         {
-            QMetaObject::invokeMethod(this, [this]
-                                      { QMessageBox::critical(nullptr, "Error", "Cant connect to the server"); }, Qt::QueuedConnection);
+            QMetaObject::invokeMethod(
+                this,
+                [this] { QMessageBox::critical(nullptr, "Error", "Cant connect to the server"); },
+                Qt::QueuedConnection);
             co_return;
         }
 
         if (isUserExist.value())
         {
-            QMetaObject::invokeMethod(this, [this]
-                                      { _ui->userExistLabel->setVisible(true); }, Qt::QueuedConnection);
+            QMetaObject::invokeMethod(
+                this,
+                [this] { _ui->userExistLabel->setVisible(true); },
+                Qt::QueuedConnection);
 
             co_return;
         }
 
-        QMetaObject::invokeMethod(this, [this]
-                                  { _ui->userExistLabel->setVisible(false); }, Qt::QueuedConnection);
+        QMetaObject::invokeMethod(
+            this,
+            [this] { _ui->userExistLabel->setVisible(false); },
+            Qt::QueuedConnection);
 
-        const std::optional<bool> isPushSuccessful = co_await UserData::UserRepository::PushUserCredentialsToDatabaseAsync(currentUser);
+        const std::optional<bool> isPushSuccessful = co_await UserData::UserRepository::
+            PushUserCredentialsToDatabaseAsync(currentUser);
 
         if (!isPushSuccessful.has_value())
         {
-            QMetaObject::invokeMethod(this, [this]
-                                      { QMessageBox::critical(nullptr, "Error", "Cant connect to the server"); }, Qt::QueuedConnection);
+            QMetaObject::invokeMethod(
+                this,
+                [this] { QMessageBox::critical(nullptr, "Error", "Cant connect to the server"); },
+                Qt::QueuedConnection);
             co_return;
         }
 
         if (!isPushSuccessful.value())
         {
-            QMetaObject::invokeMethod(this, [this]
-                                      { QMessageBox::critical(nullptr, "Error", "Cant register user on the server"); }, Qt::QueuedConnection);
+            QMetaObject::invokeMethod(
+                this,
+                [this] {
+                    QMessageBox::critical(nullptr, "Error", "Cant register user on the server");
+                },
+                Qt::QueuedConnection);
             co_return;
         };
 
-        const std::optional<size_t> userId = co_await UserData::UserRepository::GetUserIdFromDatabaseAsync(login);
+        const std::optional<size_t>
+            userId = co_await UserData::UserRepository::GetUserIdFromDatabaseAsync(login);
 
         if (!userId.has_value())
         {
-            QMetaObject::invokeMethod(this, [this]
-                                      { QMessageBox::critical(nullptr, "Error", "Cant connect to the server"); }, Qt::QueuedConnection);
+            QMetaObject::invokeMethod(
+                this,
+                [this] { QMessageBox::critical(nullptr, "Error", "Cant connect to the server"); },
+                Qt::QueuedConnection);
             co_return;
         }
 
@@ -150,4 +166,4 @@ namespace Gui
     {
         emit DisplayLoginPage();
     }
-} // !namespace Gui
+}   // namespace Gui

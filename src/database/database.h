@@ -1,10 +1,9 @@
-#pragma once 
-
-#include <mysql_connection.h>
+#pragma once
 
 #include <cppconn/driver.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
+#include <mysql_connection.h>
 
 namespace Database
 {
@@ -12,7 +11,7 @@ namespace Database
     {
     public:
         DatabaseHelper(const DatabaseHelper&) = delete;
-        DatabaseHelper& operator= (const DatabaseHelper&) = delete;
+        DatabaseHelper& operator=(const DatabaseHelper&) = delete;
 
         DatabaseHelper(DatabaseHelper&&) = default;
         DatabaseHelper& operator=(DatabaseHelper&&) = default;
@@ -46,4 +45,4 @@ namespace Database
         DatabaseState _currentState = DatabaseState::kDatabaseDisconnected;
     };
 
-} // !namespase Database
+}   // namespace Database

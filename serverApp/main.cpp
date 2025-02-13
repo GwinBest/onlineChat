@@ -1,6 +1,6 @@
 ﻿#include <iostream>
 
-#include "../src/server/server.h"
+#include "server/server.h"
 
 int main()
 {
@@ -8,7 +8,7 @@ int main()
     if (!server.Start())
     {
         std::cout << "Cant start the server\n";
-        return 0;
+        return 1;
     }
 
     server.Run();

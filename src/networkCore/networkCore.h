@@ -2,7 +2,7 @@
 
 #ifdef _WIN32
 #include <winsock2.h>
-#endif // WIN32
+#endif   // WIN32
 
 #include <cstdint>
 #include <string>
@@ -44,10 +44,10 @@ namespace NetworkCore
 
 #ifdef _WIN32
     constexpr WORD dllVersion = MAKEWORD(2, 2);
-#endif // WIN32
+#endif   // WIN32
 
     extern const std::string_view ipAddress;
     extern const uint32_t port;
 
     constexpr uint8_t serverResponseSize = UINT8_MAX;
-} // !namespace NetworkCore
+}   // namespace NetworkCore

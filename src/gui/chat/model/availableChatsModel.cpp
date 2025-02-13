@@ -1,8 +1,8 @@
 #include "availableChatsModel.h"
 
-#include "userData/userRepository.h"
-
 #include <iostream>
+
+#include "userData/userRepository.h"
 
 extern UserData::User currentUser;
 
@@ -10,58 +10,44 @@ namespace Gui::Model
 {
     using namespace CoroutineUtils;
 
-    int AvailableChatsModel::rowCount(const QModelIndex &parent) const
+    int AvailableChatsModel::rowCount(const QModelIndex& parent) const
     {
-        if (parent.isValid())
-            return 0;
+        if (parent.isValid()) return 0;
         return static_cast<int>(_availableChats.size());
     }
 
-    QVariant AvailableChatsModel::data(const QModelIndex &index, const int role) const
+    QVariant AvailableChatsModel::data(const QModelIndex& index, const int role) const
     {
-        if (!index.isValid() || index.row() < 0 || index.row() >= _availableChats.size())
-            return {};
+        if (!index.isValid() || index.row() < 0 || index.row() >= _availableChats.size()) return {};
 
-        const ChatSystem::ChatInfo &chatInfo = _availableChats.at(index.row());
+        const ChatSystem::ChatInfo& chatInfo = _availableChats.at(index.row());
 
         switch (role)
         {
-        case kChatIdRole:
-            return chatInfo.id;
-        case kChatNameRole:
-            return chatInfo.name;
-        case kLastMessageRole:
-            return chatInfo.lastMessage;
-        case kLastMessageSendTimeRole:
-            return chatInfo.lastMessageSendTime;
-        default:
-            return {};
+        case kChatIdRole:              return chatInfo.id;
+        case kChatNameRole:            return chatInfo.name;
+        case kLastMessageRole:         return chatInfo.lastMessage;
+        case kLastMessageSendTimeRole: return chatInfo.lastMessageSendTime;
+        default:                       return {};
         }
     }
 
-    bool AvailableChatsModel::setData(const QModelIndex &index, const QVariant &value, int role)
+    bool AvailableChatsModel::setData(const QModelIndex& index, const QVariant& value, int role)
     {
         if (!index.isValid() || index.row() < 0 || index.row() >= _availableChats.size())
+        {
             return false;
+        }
 
-        ChatSystem::ChatInfo &chatInfo = _availableChats[index.row()];
+        ChatSystem::ChatInfo& chatInfo = _availableChats[index.row()];
 
         switch (role)
         {
-        case kChatIdRole:
-            chatInfo.id = value.toInt();
-            return true;
-        case kChatNameRole:
-            chatInfo.name = value.toString();
-            return true;
-        case kLastMessageRole:
-            chatInfo.lastMessage = value.toString();
-            return true;
-        case kLastMessageSendTimeRole:
-            chatInfo.lastMessageSendTime = value.toString();
-            return true;
-        default:
-            return false;
+        case kChatIdRole:              chatInfo.id = value.toInt(); return true;
+        case kChatNameRole:            chatInfo.name = value.toString(); return true;
+        case kLastMessageRole:         chatInfo.lastMessage = value.toString(); return true;
+        case kLastMessageSendTimeRole: chatInfo.lastMessageSendTime = value.toString(); return true;
+        default:                       return false;
         }
     }
 
@@ -71,13 +57,13 @@ namespace Gui::Model
 
         _availableChats.clear();
 
-        const std::optional<std::vector<ChatSystem::ChatInfo>> chats =
-            co_await UserData::UserRepository::GetAvailableChatsForUserAsync(currentUser.GetUserId());
+        const std::optional<std::vector<ChatSystem::ChatInfo>>
+            chats = co_await UserData::UserRepository::GetAvailableChatsForUserAsync(
+                currentUser.GetUserId());
 
-        if (!chats.has_value())
-            co_return;
+        if (!chats.has_value()) co_return;
 
-        for (const auto &item : chats.value())
+        for (const auto& item : chats.value())
         {
             _availableChats.append(item);
         }
@@ -85,25 +71,24 @@ namespace Gui::Model
         endResetModel();
     }
 
-    coroutine_void AvailableChatsModel::SetMatchingChats(const std::string &pattern)
+    coroutine_void AvailableChatsModel::SetMatchingChats(const std::string& pattern)
     {
         beginResetModel();
 
         _availableChats.clear();
 
-        const std::optional<std::vector<ChatSystem::ChatInfo>> chats =
-            co_await UserData::UserRepository::FindMatchingChatsAsync(currentUser.GetUserId(), pattern);
+        const std::optional<std::vector<ChatSystem::ChatInfo>>
+            chats = co_await UserData::UserRepository::FindMatchingChatsAsync(
+                currentUser.GetUserId(),
+                pattern);
 
-        if (!chats.has_value())
-            co_return;
+        if (!chats.has_value()) co_return;
 
-        for (const auto &item : chats.value())
+        for (const auto& item : chats.value())
         {
             _availableChats.append(item);
         }
 
-        // co_return;
-
         endResetModel();
     }
-} // !namespace Gui::Model
+}   // namespace Gui::Model

@@ -9,8 +9,9 @@ namespace Gui::Delegate
     public:
         using QStyledItemDelegate::QStyledItemDelegate;
 
-        void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+        void paint(QPainter* painter,
+                   const QStyleOptionViewItem& option,
+                   const QModelIndex& index) const override;
         QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
-
     };
-} // !namespace Gui::Delegate
+}   // namespace Gui::Delegate

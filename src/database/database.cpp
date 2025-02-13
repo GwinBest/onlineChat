@@ -1,8 +1,7 @@
 ﻿#include "database.h"
 
-#include <cstdlib>
-
 #include <cppconn/exception.h>
+#include <cstdlib>
 
 namespace Database
 {
@@ -63,10 +62,9 @@ namespace Database
         try
         {
             _driver = get_driver_instance();
-            _connection = _driver->connect(
-                std::getenv("CHAT_DB_HOST"),
-                std::getenv("CHAT_DB_USER"),
-                std::getenv("CHAT_DB_PASSWORD"));
+            _connection = _driver->connect(std::getenv("CHAT_DB_HOST"),
+                                           std::getenv("CHAT_DB_USER"),
+                                           std::getenv("CHAT_DB_PASSWORD"));
             _connection->setSchema(std::getenv("CHAT_DB_SCHEMA"));
 
             _currentState = DatabaseState::kDatabaseConnected;
@@ -88,4 +86,4 @@ namespace Database
 
         _currentState = DatabaseState::kDatabaseDisconnected;
     }
-} // !namespase Database
+}   // namespace Database

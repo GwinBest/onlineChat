@@ -24,30 +24,33 @@ namespace Gui::ScrollArea
         const QString contentText = QString::fromStdString(message.data);
         const QString contentWithBreaks = contentText.split("").join(zeroWidthSpace);
 
-        const auto content = QString(
-            "<div style='font-size: 14px;' data-date='%3'>%1</div>"
-            "<div style='color: " + QString(colorMessageTimeSend) +
-            ";font-size: 10px; text-align: right;'>%2</div>")
-            .arg(contentWithBreaks)
-            .arg(sendTime)
-            .arg(sendDate);
-
+        const auto content = QString("<div style='font-size: 14px;' data-date='%3'>%1</div>"
+                                     "<div style='color: "
+                                     + QString(colorMessageTimeSend)
+                                     + ";font-size: 10px; text-align: right;'>%2</div>")
+                                 .arg(contentWithBreaks)
+                                 .arg(sendTime)
+                                 .arg(sendDate);
 
         auto* messageLabel = new QLabel(content);
         messageLabel->setWordWrap(true);
         messageLabel->setStyleSheet(message.messageType == MessageBuffer::MessageStatus::kSend
-                                    ? "background-color: " + QString(colorMessageSend) + ";border-radius: 10px; padding: 8px;"
-                                    : "background-color: " + QString(colorMessageReceived) + ";border-radius: 10px; padding: 8px;");
+                                        ? "background-color: " + QString(colorMessageSend)
+                                              + ";border-radius: 10px; padding: 8px;"
+                                        : "background-color: " + QString(colorMessageReceived)
+                                              + ";border-radius: 10px; padding: 8px;");
 
         if (message.messageType == MessageBuffer::MessageStatus::kSend)
         {
-            layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
+            layout->addSpacerItem(
+                new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
             layout->addWidget(messageLabel);
         }
         else
         {
             layout->addWidget(messageLabel);
-            layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
+            layout->addSpacerItem(
+                new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
         }
 
         layout->setContentsMargins(0, 0, 0, 0);
@@ -66,14 +69,12 @@ namespace Gui::ScrollArea
 
         auto* dateLabel = new QLabel(dateText);
         dateLabel->setAlignment(Qt::AlignCenter);
-        dateLabel->setStyleSheet(
-            "color: " + QString(colorWhite) +
-            ";background-color: " + QString(colorDateDivider) +
-            ";border-radius: 12px;"
-            "padding: 4px 12px;"
-            "font-size: 12px;"
-            "font-weight: bold;"
-        );
+        dateLabel->setStyleSheet("color: " + QString(colorWhite)
+                                 + ";background-color: " + QString(colorDateDivider)
+                                 + ";border-radius: 12px;"
+                                   "padding: 4px 12px;"
+                                   "font-size: 12px;"
+                                   "font-weight: bold;");
 
         auto* rightLine = new QFrame();
         rightLine->setFrameShape(QFrame::HLine);
@@ -87,4 +88,4 @@ namespace Gui::ScrollArea
 
         return dividerWidget;
     }
-} // !namespace ScrollArea
+}   // namespace Gui::ScrollArea

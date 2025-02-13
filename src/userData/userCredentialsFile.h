@@ -24,4 +24,4 @@ namespace UserData
 
         static inline bool _isFileExists = false;
     };
-} // !namespace UserData
+}   // namespace UserData

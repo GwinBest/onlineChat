@@ -62,14 +62,21 @@ namespace Gui
 
     CoroutineUtils::coroutine_void MainWindow::PreparePage() noexcept
     {
-        if (!UserData::UserCredentialsFile::IsFileExists()) DisplayLoginPage();
+        if (!UserData::UserCredentialsFile::IsFileExists())
+        {
+            QMetaObject::invokeMethod(this, [this] { DisplayLoginPage(); }, Qt::QueuedConnection);
+            co_return;
+        }
 
         const UserData::User user = UserData::UserCredentialsFile::ReadCredentials();
         auto isUserExist = co_await UserData::UserRepository::IsUserExistAsync(user);
-        if (!isUserExist.value_or(false)) DisplayLoginPage();
+        if (!isUserExist.value_or(false))
+        {
+            QMetaObject::invokeMethod(this, [this] { DisplayLoginPage(); }, Qt::QueuedConnection);
+            co_return;
+        }
 
         currentUser = std::move(user);
-
         QMetaObject::invokeMethod(this, [this] { DisplayChatPage(); }, Qt::QueuedConnection);
     }
 }   // namespace Gui

@@ -17,8 +17,15 @@
 #endif   // !WIN32
 
 // forward declarations
-class UserData::User;
-struct ChatSystem::ChatInfo;
+namespace UserData
+{
+    class User;
+}   // namespace UserData
+
+namespace ChatSystem
+{
+    struct ChatInfo;
+}   // namespace ChatSystem
 
 namespace ClientNetworking
 {

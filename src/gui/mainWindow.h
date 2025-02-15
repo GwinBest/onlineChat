@@ -7,7 +7,10 @@
 #include "gui/signIn/signInPage.h"
 
 // forward declaration
-class Ui::MainWindowClass;
+namespace Ui
+{
+    class MainWindowClass;
+}   // namespace Ui
 
 namespace Gui
 {

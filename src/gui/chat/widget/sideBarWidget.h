@@ -4,9 +4,13 @@
 #include <string>
 
 // forward declaration
-class Ui::SideBarWidget;
+namespace Ui
+{
+    class SideBarWidget;
+}   // namespace Ui
 
 namespace Gui::Widget
+
 {
     class SideBarWidget final : public QWidget
     {

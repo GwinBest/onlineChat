@@ -9,10 +9,28 @@
 class QVBoxLayout;
 
 // forward declaration
-class Ui::ChatPage;
-class Gui::Model::AvailableChatsModel;
-class Gui::Delegate::AvailableChatsDelegate;
-class Gui::Widget::SideBarWidget;
+namespace Ui
+{
+    class ChatPage;
+}   // namespace Ui
+
+namespace Gui
+{
+    namespace Model
+    {
+        class AvailableChatsModel;
+    }   // namespace Model
+
+    namespace Delegate
+    {
+        class AvailableChatsDelegate;
+    }   // namespace Delegate
+
+    namespace Widget
+    {
+        class SideBarWidget;
+    }   // namespace Widget
+}   // namespace Gui
 
 namespace Gui
 {

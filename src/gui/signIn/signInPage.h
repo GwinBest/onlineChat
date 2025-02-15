@@ -6,7 +6,10 @@
 #include "gui/colors/colors.h"
 
 // forward declaration
-class Ui::SignInPage;
+namespace Ui
+{
+    class SignInPage;
+}   // namespace Ui
 
 namespace Gui
 {

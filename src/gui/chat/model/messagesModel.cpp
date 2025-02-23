@@ -12,21 +12,24 @@ namespace Gui::Model
 {
     using namespace CoroutineUtils;
 
-    int MessageModel::rowCount(const QModelIndex& parent) const
+    int MessageModel::rowCount(const QModelIndex&) const
     {
-        return _messages.size();
+        return static_cast<int>(_messages.size());
     }
 
     QVariant MessageModel::data(const QModelIndex& index, int role) const
     {
-        if (!index.isValid() || index.row() >= _messages.size()) return {};
+        if (!index.isValid() || _messages.empty()) return {};
+
+        int row = index.row();
+        std::lock_guard<std::mutex> lock(_messagesMutex);
+        if (row < 0 || row >= static_cast<int>(_messages.size())) return {};
 
         if (role == Qt::DisplayRole)
         {
-            auto it = _messages.begin();
-            std::advance(it, index.row());
-
-            if (it != _messages.end()) return QVariant::fromValue(*it);
+            auto it = std::next(_messages.begin(), row);
+            if (it == _messages.end()) return {};
+            return QVariant::fromValue(*it);
         }
 
         return {};
@@ -44,6 +47,10 @@ namespace Gui::Model
         if (!chatMessage.has_value()) co_return;
 
         beginResetModel();
+
+        std::lock_guard<std::mutex> lock(_messagesMutex);
+
+        _messages.clear();
 
         for (const auto& message : chatMessage.value()) _messages.push_back(message);
 

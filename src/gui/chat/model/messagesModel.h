@@ -2,6 +2,7 @@
 
 #include <QAbstractListModel>
 #include <list>
+#include <mutex>
 
 #include "coroutineUtils/coroutineUtils.h"
 #include "messageBuffer/messageBuffer.h"
@@ -30,5 +31,7 @@ namespace Gui::Model
         std::list<MessageBuffer::MessageNode> _messages = {};
 
         static constexpr uint8_t maxMessages = UINT8_MAX;
+
+        mutable std::mutex _messagesMutex;
     };
 }   // namespace Gui::Model

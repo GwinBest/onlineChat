@@ -14,6 +14,8 @@ namespace MessageBuffer
 
     struct MessageNode final
     {
+        MessageNode() = default;
+
         MessageNode(const MessageStatus messageType, std::string data, std::string sendTime)
             : data(std::move(data))
             , sendTime(std::move(sendTime))

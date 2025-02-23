@@ -17,8 +17,12 @@ set(SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/gui/chat/chatPage.ui
     ${CMAKE_SOURCE_DIR}/src/gui/chat/model/availableChatsModel.h
     ${CMAKE_SOURCE_DIR}/src/gui/chat/model/availableChatsModel.cpp
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/model/messagesModel.cpp
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/model/messagesModel.h
     ${CMAKE_SOURCE_DIR}/src/gui/chat/delegate/availableChatsDelegate.h
     ${CMAKE_SOURCE_DIR}/src/gui/chat/delegate/availableChatsDelegate.cpp
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/delegate/messagesDelegate.cpp
+    ${CMAKE_SOURCE_DIR}/src/gui/chat/delegate/messagesDelegate.h
     ${CMAKE_SOURCE_DIR}/src/gui/chat/widget/sideBarWidget.h
     ${CMAKE_SOURCE_DIR}/src/gui/chat/widget/sideBarWidget.cpp
     ${CMAKE_SOURCE_DIR}/src/gui/chat/widget/sideBarWidget.ui

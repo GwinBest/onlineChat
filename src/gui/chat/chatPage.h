@@ -19,11 +19,13 @@ namespace Gui
     namespace Model
     {
         class AvailableChatsModel;
+        class MessageModel;
     }   // namespace Model
 
     namespace Delegate
     {
         class AvailableChatsDelegate;
+        class MessageDelegate;
     }   // namespace Delegate
 
     namespace Widget
@@ -63,15 +65,10 @@ namespace Gui
 
         void ToggleUiElements() const;
 
-        CoroutineUtils::coroutine_void FillMessageContainerLayout(const size_t chatId);
-        void ClearMessageLayout() const;
-
-        static void RemoveLastSpacerItem(QVBoxLayout* layout);
-        static QString ExtractDateTimeFromMessageWidget(const QWidget* messageWidget);
+        void AddLastMessage(const MessageBuffer::MessageNode& message);
 
         static void
             SendMessage(const size_t chatId, const size_t senderUserId, const char* const data);
-        void RenderLastMessage(const MessageBuffer::MessageNode& message) const;
 
     private:
         Ui::ChatPage* _ui = nullptr;
@@ -83,6 +80,8 @@ namespace Gui
         Widget::SideBarWidget* _sideBarWidget = nullptr;
         static inline bool _isSideBarVisible = false;
 
+        Model::MessageModel* _messageModel = nullptr;
+        Delegate::MessageDelegate* _messageDelegate = nullptr;
         QWidget* _messagesContainer = nullptr;
         QVBoxLayout* _messagesContainerLayout = nullptr;
 

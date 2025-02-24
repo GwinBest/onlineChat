@@ -4,6 +4,7 @@
 #include <QKeyEvent>
 #include <QPropertyAnimation>
 #include <QRegularExpression>
+#include <QScrollBar>
 
 #include "client/client.h"
 #include "common/common.h"
@@ -30,6 +31,8 @@ extern UserData::User currentUser;
 namespace Gui
 {
     using namespace CoroutineUtils;
+
+    bool viewAtBottom = false;
 
     ChatPage::ChatPage(QWidget* parent)
         : QWidget(parent)
@@ -128,6 +131,15 @@ namespace Gui
         connect(_sideBarWidget, &Widget::SideBarWidget::LogOutButtonPressed, this, [this] {
             emit LogOutButtonPressed();
             ToggleSideMenu();
+        });
+
+        connect(_ui->messageView->model(), &QAbstractItemModel::rowsAboutToBeInserted, this, [&] {
+            const auto* bar = _ui->messageView->verticalScrollBar();
+            viewAtBottom = bar ? (bar->value() == bar->maximum()) : false;
+        });
+
+        connect(_ui->messageView->model(), &QAbstractItemModel::rowsInserted, this, [&] {
+            if (viewAtBottom) _ui->messageView->scrollToBottom();
         });
 
         connect(_ui->menuButton, &QPushButton::clicked, this, &ChatPage::ToggleSideMenu);

@@ -22,7 +22,7 @@ namespace Gui::Model
         if (!index.isValid() || _messages.empty()) return {};
 
         int row = index.row();
-        std::lock_guard<std::mutex> lock(_messagesMutex);
+        std::lock_guard lock(_messagesMutex);
         if (row < 0 || row >= static_cast<int>(_messages.size())) return {};
 
         if (role == Qt::DisplayRole)
@@ -48,7 +48,7 @@ namespace Gui::Model
 
         beginResetModel();
 
-        std::lock_guard<std::mutex> lock(_messagesMutex);
+        std::lock_guard lock(_messagesMutex);
 
         _messages.clear();
 

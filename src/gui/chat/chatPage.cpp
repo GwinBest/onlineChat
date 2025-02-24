@@ -32,7 +32,7 @@ namespace Gui
 {
     using namespace CoroutineUtils;
 
-    bool viewAtBottom = false;
+    bool viewAtBottom = true;
 
     ChatPage::ChatPage(QWidget* parent)
         : QWidget(parent)
@@ -135,11 +135,12 @@ namespace Gui
 
         connect(_ui->messageView->model(), &QAbstractItemModel::rowsAboutToBeInserted, this, [&] {
             const auto* bar = _ui->messageView->verticalScrollBar();
-            viewAtBottom = bar ? (bar->value() == bar->maximum()) : false;
+            if (bar) viewAtBottom = (bar->value() == bar->maximum());
         });
 
         connect(_ui->messageView->model(), &QAbstractItemModel::rowsInserted, this, [&] {
-            if (viewAtBottom) _ui->messageView->scrollToBottom();
+            const auto* bar = _ui->messageView->verticalScrollBar();
+            if (bar && !viewAtBottom) _ui->messageView->scrollToBottom();
         });
 
         connect(_ui->menuButton, &QPushButton::clicked, this, &ChatPage::ToggleSideMenu);

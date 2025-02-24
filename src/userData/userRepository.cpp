@@ -11,7 +11,7 @@
 namespace UserData
 {
     Awaitable<std::optional<bool>>
-        UserRepository::PushUserCredentialsToDatabaseAsync(const User user)
+        UserRepository::PushUserCredentialsToDatabaseAsync(const User& user)
     {
         auto future = std::async(std::launch::async, [user]() -> std::optional<bool> {
             const NetworkCore::UserPacket request = {
@@ -32,7 +32,7 @@ namespace UserData
     }
 
     Awaitable<std::optional<std::string>>
-        UserRepository::GetUserNameFromDatabaseAsync(const std::string userLogin)
+        UserRepository::GetUserNameFromDatabaseAsync(const std::string& userLogin)
     {
         auto future = std::async(std::launch::async, [userLogin]() -> std::optional<std::string> {
             const NetworkCore::UserPacket request = {
@@ -52,7 +52,7 @@ namespace UserData
     }
 
     Awaitable<std::optional<size_t>>
-        UserRepository::GetUserIdFromDatabaseAsync(const std::string userLogin)
+        UserRepository::GetUserIdFromDatabaseAsync(const std::string& userLogin)
     {
         auto future = std::async(std::launch::async, [userLogin]() -> std::optional<size_t> {
             const NetworkCore::UserPacket request = {
@@ -71,7 +71,7 @@ namespace UserData
         return {std::move(future)};
     }
 
-    Awaitable<std::optional<bool>> UserRepository::IsUserDataFromFileValidAsync(const User user)
+    Awaitable<std::optional<bool>> UserRepository::IsUserDataFromFileValidAsync(const User& user)
     {
         auto future = std::async(std::launch::async, [user]() -> std::optional<bool> {
             const NetworkCore::UserPacket request = {
@@ -93,7 +93,7 @@ namespace UserData
         return {std::move(future)};
     }
 
-    Awaitable<std::optional<bool>> UserRepository::IsUserExistAsync(const User user)
+    Awaitable<std::optional<bool>> UserRepository::IsUserExistAsync(const User& user)
     {
         auto future = std::async(std::launch::async, [user]() -> std::optional<bool> {
             const NetworkCore::UserPacket request = {
@@ -114,7 +114,8 @@ namespace UserData
     }
 
     Awaitable<std::optional<std::vector<ChatSystem::ChatInfo>>>
-        UserRepository::FindMatchingChatsAsync(const size_t currentUserId, std::string pattern)
+        UserRepository::FindMatchingChatsAsync(const size_t currentUserId,
+                                               const std::string& pattern)
     {
         auto future = std::async(
             std::launch::async,
@@ -191,11 +192,11 @@ namespace UserData
 
     Awaitable<std::optional<size_t>>
         UserRepository::CreateNewPersonalChatAsync(const size_t senderUserId,
-                                                   const std::string receiverUserName)
+                                                   const std::string& receiverUserName)
     {
         auto future = std::async(
             std::launch::async,
-            [senderUserId, &receiverUserName]() -> std::optional<size_t> {
+            [senderUserId, receiverUserName]() -> std::optional<size_t> {
                 const std::optional<std::reference_wrapper<ClientNetworking::Client>>
                     instance = ClientNetworking::Client::GetInstance();
                 if (!instance.has_value()) return std::nullopt;

@@ -213,8 +213,7 @@ namespace ServerNetworking
                                     "WHERE NOT EXISTS ("
                                     "    SELECT 1 FROM users_chats WHERE user_id = (SELECT id "
                                     "FROM users "
-                                    "WHERE name = '{}' LIMIT 1) AND chat_id = {});"
-                                    ");",
+                                    "WHERE name = '{}' LIMIT 1) AND chat_id = {});",
                                     receiverUserName.data(),
                                     chatId,
                                     receiverUserName.data(),

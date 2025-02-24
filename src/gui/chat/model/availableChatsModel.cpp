@@ -77,7 +77,7 @@ namespace Gui::Model
 
         _availableChats.clear();
 
-        const std::optional<std::vector<ChatSystem::ChatInfo>>
+        const std::optional<std::vector<ChatSystem::ChatInfo>> 
             chats = co_await UserData::UserRepository::FindMatchingChatsAsync(
                 currentUser.GetUserId(),
                 pattern);

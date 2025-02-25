@@ -332,6 +332,11 @@ namespace ServerNetworking
                          sizeof(sendTimeSize),
                          NULL);
                     send(receiverSocket, sentAt.data(), static_cast<int>(sendTimeSize), NULL);
+
+                    send(receiverSocket,
+                         reinterpret_cast<const char*>(&chatId),
+                         sizeof(chatId),
+                         NULL);
                 }
             }
         }

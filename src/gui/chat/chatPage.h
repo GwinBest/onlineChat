@@ -67,6 +67,8 @@ namespace Gui
 
         void AddLastMessage(const MessageBuffer::MessageNode& message);
 
+        void HandleReceivedMessage(const size_t chatId, const MessageBuffer::MessageNode& message);
+
         static void
             SendMessage(const size_t chatId, const size_t senderUserId, const char* const data);
 

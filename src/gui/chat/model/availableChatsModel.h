@@ -12,6 +12,8 @@
 
 namespace Gui::Model
 {
+    bool IsChatInModel(const size_t chatId);
+
     class AvailableChatsModel final : public QAbstractListModel
     {
     public:
@@ -36,6 +38,10 @@ namespace Gui::Model
 
         CoroutineUtils::coroutine_void SetAllAvailableChats();
         CoroutineUtils::coroutine_void SetMatchingChats(const std::string& pattern);
+
+        bool IsChatInModel(const size_t chatId);
+
+        void AddChatById(const ChatSystem::ChatInfo&& chatInfo);
 
     private:
         QList<ChatSystem::ChatInfo> _availableChats;

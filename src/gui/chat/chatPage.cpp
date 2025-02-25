@@ -6,6 +6,7 @@
 #include <QRegularExpression>
 #include <QScrollBar>
 
+#include "chatSystem/chatInfo.h"
 #include "client/client.h"
 #include "common/common.h"
 #include "gui/chat/delegate/availableChatsDelegate.h"
@@ -161,10 +162,10 @@ namespace Gui
             clientInstance.has_value())
         {
             clientInstance.value().get().RegisterReceiveMessageCallback(
-                [this](const MessageBuffer::MessageNode& message) {
+                [this](const size_t chatId, const MessageBuffer::MessageNode& message) {
                     QMetaObject::invokeMethod(
                         this,
-                        [this, message] { AddLastMessage(message); },
+                        [this, chatId, message] { HandleReceivedMessage(chatId, message); },
                         Qt::QueuedConnection);
                 });
         }
@@ -289,12 +290,16 @@ namespace Gui
 
             if (chatId == ChatSystem::ChatInfo::chatUndefined)
             {
+                const auto chatName = index
+                                          .data(Model::AvailableChatsModel::AvailableChatsRole::
+                                                    kChatNameRole)
+                                          .toString()
+                                          .toStdString();
+
                 std::optional<size_t>
                     optionalChatId = co_await UserData::UserRepository::CreateNewPersonalChatAsync(
                         currentUser.GetUserId(),
-                        index.data(Model::AvailableChatsModel::AvailableChatsRole::kChatNameRole)
-                            .toString()
-                            .toStdString());
+                        chatName);
 
                 _model->setData(index,
                                 optionalChatId.value_or(ChatSystem::ChatInfo::chatUndefined),
@@ -389,6 +394,44 @@ namespace Gui
                 message.sendTime.c_str(),
                 Model::AvailableChatsModel::AvailableChatsRole::kLastMessageSendTimeRole);
             emit _model->dataChanged(index, index);
+        }
+    }
+
+    void ChatPage::HandleReceivedMessage(const size_t chatId,
+                                         const MessageBuffer::MessageNode& message)
+    {
+        if (!_model->IsChatInModel(chatId)) _model->SetAllAvailableChats();
+
+        const QModelIndex currentIndex = _ui->availableChatsList->currentIndex();
+        const size_t
+            currentChatId = currentIndex
+                                .data(Model::AvailableChatsModel::AvailableChatsRole::kChatIdRole)
+                                .toUInt();
+
+        if (currentChatId == chatId) _messageModel->AddMessage(message);
+
+        for (int row = 0; row < _model->rowCount(); ++row)
+        {
+            QModelIndex index = _model->index(row, 0);
+
+            const size_t receiverChatId = index
+                                              .data(Model::AvailableChatsModel::AvailableChatsRole::
+                                                        kChatIdRole)
+                                              .toUInt();
+
+            if (receiverChatId == chatId)
+            {
+                _model->setData(index,
+                                message.data.c_str(),
+                                Model::AvailableChatsModel::AvailableChatsRole::kLastMessageRole);
+
+                _model->setData(
+                    index,
+                    message.sendTime.c_str(),
+                    Model::AvailableChatsModel::AvailableChatsRole::kLastMessageSendTimeRole);
+
+                emit _model->dataChanged(index, index);
+            }
         }
     }
 

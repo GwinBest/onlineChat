@@ -61,7 +61,7 @@ namespace ClientNetworking
         void ReceiveThread() const;
 
         void RegisterReceiveMessageCallback(
-            std::function<void(const MessageBuffer::MessageNode&)> callback);
+            std::function<void(const size_t, const MessageBuffer::MessageNode&)> callback);
 
         template<typename T>
         T GetServerResponse() noexcept
@@ -109,6 +109,7 @@ namespace ClientNetworking
 
         mutable ServerResponse _serverResponse;
 
-        std::function<void(const MessageBuffer::MessageNode&)> _receiveMessageCallback = nullptr;
+        std::function<void(const size_t, const MessageBuffer::MessageNode&)>
+            _receiveMessageCallback = nullptr;
     };
 }   // namespace ClientNetworking

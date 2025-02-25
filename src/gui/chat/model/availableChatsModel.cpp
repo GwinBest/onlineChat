@@ -1,6 +1,6 @@
 #include "availableChatsModel.h"
 
-#include <iostream>
+#include <algorithm>
 
 #include "userData/userRepository.h"
 
@@ -77,7 +77,7 @@ namespace Gui::Model
 
         _availableChats.clear();
 
-        const std::optional<std::vector<ChatSystem::ChatInfo>> 
+        const std::optional<std::vector<ChatSystem::ChatInfo>>
             chats = co_await UserData::UserRepository::FindMatchingChatsAsync(
                 currentUser.GetUserId(),
                 pattern);
@@ -90,5 +90,25 @@ namespace Gui::Model
         }
 
         endResetModel();
+    }
+
+    bool AvailableChatsModel::IsChatInModel(const size_t chatId)
+    {
+        auto it = std::find_if(
+            _availableChats.begin(),
+            _availableChats.end(),
+            [chatId](const ChatSystem::ChatInfo& chat) { return chat.id == chatId; });
+        return it != _availableChats.end();
+    }
+
+    void AvailableChatsModel::AddChatById(const ChatSystem::ChatInfo&& chatInfo)
+    {
+        const int row = _availableChats.size();
+
+        beginInsertRows(QModelIndex(), row, row);
+
+        _availableChats.push_back(std::move(chatInfo));
+
+        endInsertRows();
     }
 }   // namespace Gui::Model

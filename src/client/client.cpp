@@ -162,12 +162,15 @@ namespace ClientNetworking
                 recv(_clientSocket, sentAt.data(), static_cast<int>(sendTimeSize), NULL);
                 sentAt[sendTimeSize] = '\0';
 
-                const MessageBuffer::MessageNode
-                    messageNode(MessageBuffer::MessageStatus::kReceived,
-                                std::string(receiveMessage.data()),
-                                sentAt.data());
+                size_t chatId = 0;
+                recv(_clientSocket, reinterpret_cast<char*>(&chatId), sizeof(chatId), NULL);
 
-                if (_receiveMessageCallback) _receiveMessageCallback(messageNode);
+                const MessageBuffer::MessageNode messageNode(
+                    MessageBuffer::MessageStatus::kReceived,
+                    std::string(receiveMessage.data()),
+                    sentAt.data());
+
+                if (_receiveMessageCallback) _receiveMessageCallback(chatId, messageNode);
 
                 break;
             }
@@ -357,7 +360,7 @@ namespace ClientNetworking
     }
 
     void Client::RegisterReceiveMessageCallback(
-        std::function<void(const MessageBuffer::MessageNode&)> callback)
+        std::function<void(const size_t, const MessageBuffer::MessageNode&)> callback)
     {
         _receiveMessageCallback = std::move(callback);
     }

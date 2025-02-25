@@ -1,51 +1,43 @@
 CREATE SCHEMA `online_chat` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 
 CREATE TABLE `online_chat`.`users` (
-  `user_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_name` VARCHAR(50) NOT NULL,
-  `user_login` VARCHAR(50) NOT NULL,
-  `user_password` BIGINT UNSIGNED NOT NULL,
-  PRIMARY KEY (`user_id`),
-  UNIQUE INDEX `user_id_UNIQUE` (`user_id` ASC) VISIBLE,
-  UNIQUE INDEX `user_login_UNIQUE` (`user_login` ASC) VISIBLE)
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    login VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    photo VARCHAR(255))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE `online_chat`.`chats` (
-  `chat_id` INT NOT NULL AUTO_INCREMENT,
-  `chat_participants` VARCHAR(105) NOT NULL,
-  `photo` LONGBLOB,
-  PRIMARY KEY (`chat_id`),
-  UNIQUE INDEX `chat_id_UNIQUE` (`chat_id` ASC) VISIBLE,
-  UNIQUE INDEX `chat_participants_UNIQUE` (`chat_participants` ASC) VISIBLE)
+   id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255),
+    photo VARCHAR(255),
+    created_at DATETIME NOT NULL)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE `online_chat`.`messages` (
-  `chat_id` INT NOT NULL,
-  `author_id` INT NOT NULL,
-  `message` VARCHAR(4096) NOT NULL)
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    chat_id INT,
+    user_id INT,
+    content TEXT NOT NULL,
+    sent_at DATETIME NOT NULL,
+    FOREIGN KEY (chat_id) REFERENCES chats(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
-CREATE TABLE `online_chat`.`user_to_chat_relations` (
-  `user_to_chat_relations` INT NOT NULL AUTO_INCREMENT,
-  `user_id` INT NOT NULL,
-  `chat_id` INT NOT NULL,
-  PRIMARY KEY (`user_to_chat_relations`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-CREATE TABLE `online_chat`.`users_chat_names` (
-  `users_chat_names` INT NOT NULL AUTO_INCREMENT,
-  `user_id` INT NOT NULL,
-  `chat_id` INT NOT NULL,
-  `chat_name` VARCHAR(50) NOT NULL,
-  PRIMARY KEY (`users_chat_names`))
+CREATE TABLE `online_chat`.`users_chats` (
+	user_id INT,
+    chat_id INT,
+    joined_at DATETIME NOT NULL,
+    PRIMARY KEY (user_id, chat_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (chat_id) REFERENCES chats(id) ON DELETE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;

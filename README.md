@@ -38,5 +38,7 @@ setx CHAT_DB_HOST "your_db_ip:your_db_port"
 setx CHAT_DB_USER "your_db_user"
 setx CHAT_DB_PASSWORD "your_db_password"
 setx CHAT_DB_SCHEMA "your_db_schema"
+setx CHAT_SERVER_IP "your_server_ip"
+setx CHAT_SERVER_PORT "your_server_port"
 ```
 After that, run the [following code](https://github.com/GwinBest/onlineChat/blob/5d7b133a00e55d44e87736bf6c8b9af14148c8a9/sqlScripts/create.sql) to create all necessary tables 
